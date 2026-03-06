@@ -130,10 +130,8 @@ export default function DirectMessages({ user }) {
 
   /* ── Open a conversation ── */
   const openConversation = async (u) => {
-    setSelectedUser(u);
     setMessages([]);
-    setMobileView('chat');
-    // ensure conversation document exists
+    // ensure conversation document exists BEFORE subscribing
     const dmId = getDMId(user.uid, u.uid);
     const snap = await getDoc(doc(db, 'dms', dmId));
     if (!snap.exists()) {
@@ -142,6 +140,8 @@ export default function DirectMessages({ user }) {
         createdAt: serverTimestamp(),
       });
     }
+    setSelectedUser(u);
+    setMobileView('chat');
     setTimeout(() => inputRef.current?.focus(), 150);
   };
 
