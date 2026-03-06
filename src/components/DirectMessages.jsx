@@ -272,7 +272,9 @@ export default function DirectMessages({ user }) {
                 <div className="welcome-msg"><div className="loader" /></div>
               ) : messages.length === 0 ? (
                 <div className="welcome-msg">
-                  <span className="welcome-icon" role="img" aria-label="message">🔒</span>
+                  <span className="welcome-icon" aria-hidden="true">
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </span>
                   <strong>No messages yet</strong>
                   <p>Say hello to {selectedUser.displayName}!</p>
                 </div>
@@ -318,7 +320,9 @@ export default function DirectMessages({ user }) {
           </>
         ) : (
           <div className="dm-welcome">
-            <span className="welcome-icon" role="img" aria-label="speech bubble">💬</span>
+            <span className="welcome-icon" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </span>
             <strong>Your Messages</strong>
             <p>Select someone from the list to start a private conversation.</p>
           </div>
