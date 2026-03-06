@@ -1,0 +1,17 @@
+# ── Environment variables ────────────────────────────────────
+# Never commit .env — it contains your Firebase credentials
+.env
+.env.local
+.env.production
+
+# ── Dependencies ─────────────────────────────────────────────
+node_modules/
+
+# ── Build output ─────────────────────────────────────────────
+dist/
+
+# ── OS / Editor junk ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
+.vscode/

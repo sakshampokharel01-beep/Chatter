@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return request.auth.token.email == 'sakshampokharel01@gmail.com';
+    }
+
+    function validMessage(data) {
+      return data.text is string
+        && data.text.size() >= 1
+        && data.text.size() <= 500
+        && data.uid == request.auth.uid
+        && data.createdAt == request.time;
+    }
+
+    function validDMMessage(data) {
+      return data.text is string
+        && data.text.size() >= 1
+        && data.text.size() <= 500
+        && data.uid == request.auth.uid
+        && !request.auth.token.firebase.sign_in_provider.matches('anonymous')
+        && data.createdAt == request.time;
+    }
+
+    // ── Global chat messages ────────────────────────────────────
+    // Anyone signed in can read; anyone signed in can write their own message;
+    // only admin can delete any message.
+    match /messages/{msgId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && validMessage(request.resource.data);
+      allow delete: if isAdmin();
+      allow update: if false; // no editing
+    }
+
+    // ── Registered users directory ──────────────────────────────
+    // Anyone signed in can read the list (needed for DM user picker);
+    // a user can only write their own document; no deletion.
+    match /users/{uid} {
+      allow read:   if isSignedIn();
+      allow create,
+            update: if isSignedIn()
+                    && isOwner(uid)
+                    && !request.auth.token.firebase.sign_in_provider.matches('anonymous');
+      allow delete: if false;
+    }
+
+    // ── Direct message conversations ────────────────────────────
+    // Only the two participants (whose UIDs are in the sorted ID) can
+    // read/write. Anonymous users cannot use DMs at all.
+    match /dms/{convId} {
+      function isParticipant() {
+        return request.auth.uid in resource.data.participants;
+      }
+      function isParticipantNew() {
+        return request.auth.uid in request.resource.data.participants;
+      }
+      function notAnon() {
+        return !request.auth.token.firebase.sign_in_provider.matches('anonymous');
+      }
+
+      allow read:   if isSignedIn() && notAnon() && isParticipant();
+      allow create: if isSignedIn() && notAnon() && isParticipantNew()
+                    && request.resource.data.participants.size() == 2;
+      allow update,
+            delete: if false;
+
+      // DM messages sub-collection
+      match /messages/{msgId} {
+        allow read:   if isSignedIn() && notAnon()
+                      && request.auth.uid in get(/databases/$(database)/documents/dms/$(convId)).data.participants;
+        allow create: if isSignedIn() && notAnon()
+                      && request.auth.uid in get(/databases/$(database)/documents/dms/$(convId)).data.participants
+                      && validDMMessage(request.resource.data);
+        allow update,
+              delete: if false;
+      }
+    }
+  }
+}
