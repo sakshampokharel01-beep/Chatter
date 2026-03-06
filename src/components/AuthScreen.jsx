@@ -146,8 +146,18 @@ export default function AuthScreen() {
   if (step === 'guestName') {
     return (
       <div className="auth-screen">
+        <div className="auth-orb auth-orb--1" />
+        <div className="auth-orb auth-orb--2" />
         <div className="auth-card">
-          <span className="auth-logo" role="img" aria-label="Guest">👤</span>
+          <span className="auth-logo" role="img" aria-label="Guest">
+            <div className="auth-logo-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <span className="auth-logo-ring" />
+          </span>
           <h1 className="auth-title" style={{ fontSize: '28px' }}>Choose a name</h1>
           <p className="auth-subtitle">This is how others will see you in the chat.</p>
           {error && <div className="error-msg" role="alert">{error}</div>}
@@ -169,7 +179,7 @@ export default function AuthScreen() {
           <div className="auth-buttons" style={{ marginTop: '20px' }}>
             <button
               className="btn-google"
-              style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff' }}
+              style={{ background: '#5b8dee', color: '#fff' }}
               onClick={handleGuestContinue}
               disabled={busy}
             >
@@ -189,21 +199,25 @@ export default function AuthScreen() {
   const isSignUp = mode === 'signup';
   return (
     <div className="auth-screen">
+      {/* Animated background orbs */}
+      <div className="auth-orb auth-orb--1" />
+      <div className="auth-orb auth-orb--2" />
+      <div className="auth-orb auth-orb--3" />
+
       <div className="auth-card">
         <div className="auth-logo" aria-hidden="true">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="48" height="48" rx="14" fill="url(#logo-grad)"/>
-            <path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="white" fillOpacity="0.92"/>
-            <circle cx="19" cy="24" r="1.5" fill="url(#logo-grad)"/>
-            <circle cx="24" cy="24" r="1.5" fill="url(#logo-grad)"/>
-            <circle cx="29" cy="24" r="1.5" fill="url(#logo-grad)"/>
-            <defs>
-              <linearGradient id="logo-grad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#6366f1"/>
-                <stop offset="1" stopColor="#8b5cf6"/>
-              </linearGradient>
-            </defs>
-          </svg>
+          <div className="auth-logo-icon">
+            <svg width="52" height="52" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="14" fill="#5b8dee"/>
+              <path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="white" fillOpacity="0.92"/>
+              <circle cx="19" cy="24" r="1.5" fill="#5b8dee"/>
+              <circle cx="24" cy="24" r="1.5" fill="#5b8dee"/>
+              <circle cx="29" cy="24" r="1.5" fill="#5b8dee"/>
+            </svg>
+          </div>
+          <span className="auth-logo-ring" />
+          <span className="auth-logo-dot auth-logo-dot--1" />
+          <span className="auth-logo-dot auth-logo-dot--2" />
         </div>
         <h1 className="auth-title">Chatter</h1>
         <p className="auth-subtitle">
@@ -305,7 +319,7 @@ export default function AuthScreen() {
           >
             {loading === 'email'
               ? <div className="btn-spinner btn-spinner-light" aria-hidden="true" />
-              : isSignUp ? '🚀 Create Account' : '→ Sign In'}
+              : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
         </form>
 

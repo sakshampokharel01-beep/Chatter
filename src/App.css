@@ -84,6 +84,30 @@ body {
 /* ================================================================
    AUTH SCREEN
    ================================================================ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.85); opacity: 0.5; }
+  50%  { transform: scale(1.1); opacity: 0; }
+  100% { transform: scale(0.85); opacity: 0; }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  25%      { transform: translate(30px, -20px); }
+  50%      { transform: translate(-10px, -35px); }
+  75%      { transform: translate(-25px, -10px); }
+}
+
 .auth-screen {
   min-height: 100%;
   display: flex;
@@ -91,26 +115,108 @@ body {
   justify-content: center;
   padding: 24px;
   background: #111318;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle animated dot grid */
+.auth-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(91, 141, 238, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 50% 60% at 50% 40%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 50% 60% at 50% 40%, black 20%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Floating orbs */
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(60px);
+  opacity: 0.35;
+}
+.auth-orb--1 {
+  width: 220px; height: 220px;
+  background: #2a4a88;
+  top: -60px; right: -40px;
+  animation: drift 12s ease-in-out infinite;
+}
+.auth-orb--2 {
+  width: 180px; height: 180px;
+  background: #3a5888;
+  bottom: -50px; left: -30px;
+  animation: drift 15s ease-in-out infinite reverse;
+}
+.auth-orb--3 {
+  width: 100px; height: 100px;
+  background: #5b8dee;
+  top: 40%; left: 10%;
+  animation: drift 10s ease-in-out infinite 2s;
+  opacity: 0.2;
 }
 
 .auth-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 410px;
-  background: #1a1e27;
+  background: rgba(26, 30, 39, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
   padding: 48px 40px 40px;
   text-align: center;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
-  animation: fadeUp 0.3s ease both;
+  animation: fadeUp 0.4s ease both;
 }
 
+/* ── Animated Logo ── */
 .auth-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   line-height: 1;
+  position: relative;
+}
+
+.auth-logo-icon {
+  position: relative;
+  z-index: 1;
+  animation: float 3s ease-in-out infinite;
+}
+
+.auth-logo-ring {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(91, 141, 238, 0.2);
+  animation: pulse-ring 2.5s ease-out infinite;
+}
+
+/* Small orbiting dots */
+.auth-logo-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #5b8dee;
+  opacity: 0.5;
+}
+.auth-logo-dot--1 {
+  animation: orbit 6s linear infinite;
+}
+.auth-logo-dot--2 {
+  animation: orbit 8s linear infinite reverse;
+  background: #80a0d0;
+  width: 4px; height: 4px;
+  opacity: 0.35;
 }
 
 .auth-title {
