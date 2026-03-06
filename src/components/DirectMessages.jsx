@@ -9,7 +9,6 @@ import {
   serverTimestamp,
   doc,
   setDoc,
-  getDoc,
 } from 'firebase/firestore';
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
 
@@ -131,14 +130,16 @@ export default function DirectMessages({ user }) {
   /* ── Open a conversation ── */
   const openConversation = async (u) => {
     setMessages([]);
-    // ensure conversation document exists BEFORE subscribing
     const dmId = getDMId(user.uid, u.uid);
-    const snap = await getDoc(doc(db, 'dms', dmId));
-    if (!snap.exists()) {
+    // Attempt to create the conversation doc; if it already exists the
+    // update rule will deny it — that's fine, we just ignore the error.
+    try {
       await setDoc(doc(db, 'dms', dmId), {
         participants: [user.uid, u.uid],
         createdAt: serverTimestamp(),
       });
+    } catch {
+      // doc already exists — safe to proceed
     }
     setSelectedUser(u);
     setMobileView('chat');
