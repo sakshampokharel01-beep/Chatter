@@ -344,7 +344,7 @@ export default function AuthScreen() {
             ? 'Already have an account? Switch to Sign In above.'
             : 'Guest sessions are temporary. Messages are visible to all users.'}
         </p>
-        <p className="crafted-footer">Crafted by <strong>Saksham Pokharel</strong></p>
+        <p className="crafted-footer">Crafted by <a href="https://sakshampokharel.me" target="_blank" rel="noopener noreferrer">Saksham Pokharel</a></p>
       </div>
     </div>
   );

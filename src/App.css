@@ -70,15 +70,35 @@ body {
 .crafted-footer {
   text-align: center;
   font-size: 11px;
-  color: #2e3240;
+  color: #555b70;
   margin-top: 10px;
   letter-spacing: 0.3px;
   user-select: none;
-  pointer-events: none;
 }
-.crafted-footer strong {
-  color: #404560;
-  font-weight: 600;
+.crafted-footer a {
+  color: #5b8dee;
+  font-weight: 700;
+  text-decoration: none;
+  position: relative;
+  transition: color .25s, text-shadow .25s;
+}
+.crafted-footer a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 0;
+  height: 1.5px;
+  background: #5b8dee;
+  border-radius: 1px;
+  transition: width .3s ease;
+}
+.crafted-footer a:hover {
+  color: #7fadff;
+  text-shadow: 0 0 8px rgba(91,141,238,.45);
+}
+.crafted-footer a:hover::after {
+  width: 100%;
 }
 
 /* ================================================================

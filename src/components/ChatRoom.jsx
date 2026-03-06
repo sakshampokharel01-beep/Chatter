@@ -311,7 +311,7 @@ export default function ChatRoom({ user }) {
                 <SendIcon />
               </button>
             </div>
-            <div className="crafted-footer">Crafted by <strong>Saksham Pokharel</strong></div>
+            <div className="crafted-footer">Crafted by <a href="https://sakshampokharel.me" target="_blank" rel="noopener noreferrer">Saksham Pokharel</a></div>
           </div>
         </>
       )}
