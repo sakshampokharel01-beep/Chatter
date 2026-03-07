@@ -101,6 +101,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
 
   const filtered = users.filter(u =>
     !removed.has(u.id) && (
+      !search ||
       u.displayName?.toLowerCase().includes(search.toLowerCase()) ||
       u.email?.toLowerCase().includes(search.toLowerCase())
     )
@@ -150,7 +151,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
                 </div>
                 <div className="admin-user-info">
                   <span className="admin-user-name">
-                    {u.displayName}
+                    {u.displayName || <em style={{color:'#666',fontStyle:'normal'}}>Unknown User</em>}
                     {isSelf   && <span className="admin-tag">You (Admin)</span>}
                     {!isSelf && isAnAdmin && <span className="admin-tag">Admin</span>}
                     {isBlocked && <span className="blocked-tag">Blocked</span>}
