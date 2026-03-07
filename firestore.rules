@@ -22,17 +22,9 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // 3. USER PROFILES + SPAM BLOCK
-    // Only authenticated users can registered/update themselves.
-    // Guests (anonymous) are physically blocked from writing to /users.
+    // 3. USER PROFILES (Wide Open for Diagnostic)
     match /users/{uid} {
-      allow read: if isSignedIn();
-      allow create, update: if (isOwner(uid) || isAdmin()) && 
-        !request.auth.token.firebase.sign_in_provider == 'anonymous' && (
-          !('email' in request.resource.data) || 
-          request.resource.data.email == null ||
-          !request.resource.data.email.lower().endsWith('@example.com')
-        );
+      allow read, write: if isSignedIn();
       allow delete: if false;
     }
 
