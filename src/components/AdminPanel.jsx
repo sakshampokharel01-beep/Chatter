@@ -141,6 +141,22 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     }
   };
 
+  const handleManualRegister = async (u) => {
+    if (!window.confirm(`Create registry for "${u.displayName}" manually?`)) return;
+    try {
+      await setDoc(doc(db, 'users', u.id), {
+        uid: u.id,
+        displayName: u.displayName,
+        photoURL: u.photoURL || null,
+        email: '(Manually Registered)',
+        lastSeen: serverTimestamp(),
+      });
+      alert('Success! User is now registered.');
+    } catch (e) {
+      alert('Failed to register: ' + e.message);
+    }
+  };
+
   const filtered = users.filter(u => {
     if (debugMode) return true;
     return !removed.has(u.id) && 
@@ -281,8 +297,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
                   <span className="admin-user-name">{u.displayName} <span className="admin-tag" style={{background:'#ff8a8a'}}>Missing Registry</span></span>
                   <span className="admin-user-uid">UID: {u.id}</span>
                 </div>
-                <div style={{color:'#ff8a8a', fontSize:'11px', flex:1, textAlign:'right', marginRight:'20px'}}>
-                  User is in Chat but Registry failed!
+                <div className="admin-user-actions">
+                   <button className="admin-action-btn promote" onClick={() => handleManualRegister(u)}>Fix Registry</button>
                 </div>
               </div>
           ))}
