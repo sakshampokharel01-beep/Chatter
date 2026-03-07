@@ -25,8 +25,10 @@ function App() {
   }, []);
 
   // Real-time listener: if admin deletes this user, force sign-out immediately
+  // Super-admin is always exempt — they can never be locked out
   useEffect(() => {
     if (!user) return;
+    if (user.email === import.meta.env.VITE_ADMIN_EMAIL) return; // super-admin is immune
     const unsub = onSnapshot(doc(db, 'deletedUsers', user.uid), (snap) => {
       if (snap.exists()) {
         setRemoved(true);
