@@ -82,12 +82,10 @@ export const signInWithEmail = (email, password) =>
 // Signs out first to always force the account picker.
 const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
 
-export const signInWithGoogle = async () => {
-  await signOut(auth);
-  return isMobile()
+export const signInWithGoogle = () =>
+  isMobile()
     ? signInWithRedirect(auth, googleProvider)
     : signInWithPopup(auth, googleProvider);
-};
 
 export { getRedirectResult };
 

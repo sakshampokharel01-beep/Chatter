@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, registerUser, signOutUser } from './firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { getRedirectResult } from 'firebase/auth';
+import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase';
 import AuthScreen from './components/AuthScreen';
@@ -14,20 +13,15 @@ function App() {
   const [removed, setRemoved] = useState(false);
 
   useEffect(() => {
-    // Process any pending Google redirect result first, then subscribe to auth state.
-    // This prevents the login screen flashing before the redirect resolves.
-    getRedirectResult(auth)
-      .catch(() => {}) // ignore errors here — AuthScreen handles them
-      .finally(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-          setUser(currentUser ?? null);
-          if (currentUser && !currentUser.isAnonymous) {
-            registerUser(currentUser);
-          }
-        });
-        // store unsubscribe so we can clean up
-        return unsubscribe;
-      });
+    // Subscribe to auth state. getRedirectResult is handled automatically
+    // by the Firebase SDK before onAuthStateChanged fires.
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser ?? null);
+      if (currentUser && !currentUser.isAnonymous) {
+        registerUser(currentUser);
+      }
+    });
+    return unsubscribe;
   }, []);
 
   // Real-time listener: if admin deletes this user, force sign-out immediately
