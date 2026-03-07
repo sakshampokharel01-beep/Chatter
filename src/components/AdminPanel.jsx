@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, orderBy, query, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query, where, getDocs, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function AdminPanel({ adminUid, isSuperAdmin }) {
@@ -77,9 +77,12 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   const handleRemove = async (uid, name) => {
     if (uid === adminUid) return;
     if (admins.has(uid)) { alert('You cannot remove another admin.'); return; }
-    if (!window.confirm(`Remove "${name}" from Chatter?\n\nThey will be instantly signed out and cannot come back.`)) return;
+    if (!window.confirm(`Remove "${name}" from Chatter?\n\nThey will be instantly signed out and their messages deleted.`)) return;
     try {
+      // Delete all their global messages
+      const msgsSnap = await getDocs(query(collection(db, 'messages'), where('uid', '==', uid)));
       await Promise.all([
+        ...msgsSnap.docs.map(d => deleteDoc(d.ref)),
         setDoc(doc(db, 'deletedUsers', uid), { deletedAt: serverTimestamp(), deletedBy: adminUid }),
         setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid }),
       ]);

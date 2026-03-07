@@ -5,6 +5,8 @@ import {
   query,
   orderBy,
   limit,
+  where,
+  getDocs,
   onSnapshot,
   serverTimestamp,
   deleteDoc,
@@ -181,9 +183,11 @@ export default function ChatRoom({ user }) {
 
   /* ── Remove a user (admin only) ── */
   const removeUser = useCallback(async (uid, name) => {
-    if (!window.confirm(`Remove "${name}" from Chatter? They will be instantly signed out and blocked.`)) return;
+    if (!window.confirm(`Remove "${name}" from Chatter? They will be instantly signed out and their messages deleted.`)) return;
     try {
+      const msgsSnap = await getDocs(query(collection(db, 'messages'), where('uid', '==', uid)));
       await Promise.all([
+        ...msgsSnap.docs.map(d => deleteDoc(d.ref)),
         setDoc(doc(db, 'deletedUsers', uid), { deletedAt: serverTimestamp(), deletedBy: user.uid }),
         setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: user.uid }),
       ]);
