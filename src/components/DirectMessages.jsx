@@ -106,7 +106,6 @@ export default function DirectMessages({ user }) {
       );
     }, (err) => {
       console.error('Users snapshot error:', err);
-      alert('Error loading users list: ' + err.message);
     });
   }, [user.uid]);
 

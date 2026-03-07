@@ -215,7 +215,6 @@ export default function ChatRoom({ user }) {
       setLoadingMsgs(false);
     }, (err) => {
       console.error('Global chat snapshot error:', err);
-      alert('Error loading global chat: ' + err.message);
       setLoadingMsgs(false);
     });
 
@@ -253,7 +252,6 @@ export default function ChatRoom({ user }) {
       });
     } catch (err) {
       console.error('Failed to send message:', err);
-      alert('Error sending message: ' + err.message);
       setInputText(text);
     } finally {
       setSending(false);
