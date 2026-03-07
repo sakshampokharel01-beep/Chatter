@@ -13,11 +13,10 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
 
   // Load all registered users
   useEffect(() => {
-    // Remove orderBy to avoid "Index Required" errors blocking the list
     const q = collection(db, 'users');
     return onSnapshot(q, snap => {
       const allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      // Sort on client side instead
+      console.log(`[AdminPanel] Received ${allUsers.length} total users from Firestore`);
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
       setUsers(allUsers);
       setLoading(false);
@@ -39,7 +38,9 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   // Track removed users
   useEffect(() => {
     return onSnapshot(collection(db, 'deletedUsers'), snap => {
-      setRemoved(new Set(snap.docs.map(d => d.id)));
+      const ids = snap.docs.map(d => d.id);
+      console.log(`[AdminPanel] Detected ${ids.length} removed UIDs:`, ids);
+      setRemoved(new Set(ids));
     }, (err) => {
       console.error('Deleted users snapshot error:', err);
     });

@@ -101,8 +101,9 @@ export default function DirectMessages({ user }) {
     return onSnapshot(q, (snap) => {
       const allUsers = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
-        .filter(u => u.uid !== user.uid);
+        .filter(u => u.id !== user.uid); // Use u.id as it's the Doc ID
       
+      console.log(`[DMs] Received ${allUsers.length} potential users (excluding self)`);
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
       setUsers(allUsers);
     }, (err) => {
@@ -248,15 +249,15 @@ export default function DirectMessages({ user }) {
           ) : (
             filtered.map(u => (
               <button
-                key={u.uid}
-                className={`dm-user-item${selectedUser?.uid === u.uid ? ' dm-user-active' : ''}`}
+                key={u.id}
+                className={`dm-user-item${selectedUser?.id === u.id ? ' dm-user-active' : ''}`}
                 onClick={() => openConversation(u)}
               >
                 <Avatar displayName={u.displayName} photoURL={u.photoURL} size={38} />
                 <div className="dm-user-info">
                   <span className="dm-user-name">{u.displayName}</span>
                 </div>
-                {selectedUser?.uid === u.uid && <span className="dm-selected-dot" />}
+                {selectedUser?.id === u.id && <span className="dm-selected-dot" />}
               </button>
             ))
           )}
