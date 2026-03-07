@@ -97,13 +97,14 @@ export default function DirectMessages({ user }) {
 
   /* ── Subscribe to registered users ── */
   useEffect(() => {
-    const q = query(collection(db, 'users'), orderBy('displayName', 'asc'));
+    const q = collection(db, 'users');
     return onSnapshot(q, (snap) => {
-      setUsers(
-        snap.docs
-          .map(d => ({ id: d.id, ...d.data() }))
-          .filter(u => u.uid !== user.uid),
-      );
+      const allUsers = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(u => u.uid !== user.uid);
+      
+      allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+      setUsers(allUsers);
     }, (err) => {
       console.error('Users snapshot error:', err);
     });

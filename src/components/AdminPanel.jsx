@@ -13,9 +13,13 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
 
   // Load all registered users
   useEffect(() => {
-    const q = query(collection(db, 'users'), orderBy('displayName'));
+    // Remove orderBy to avoid "Index Required" errors blocking the list
+    const q = collection(db, 'users');
     return onSnapshot(q, snap => {
-      setUsers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Sort on client side instead
+      allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+      setUsers(allUsers);
       setLoading(false);
     }, (err) => {
       console.error('Admin users snapshot error:', err);
