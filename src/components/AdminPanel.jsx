@@ -60,6 +60,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
 
   const handleBlock = async (uid, name) => {
     if (uid === adminUid) return;
+    if (admins.has(uid)) { alert('You cannot block another admin.'); return; }
     try {
       if (blocked.has(uid)) {
         if (!window.confirm(`Unblock "${name}"?`)) return;
@@ -75,6 +76,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
 
   const handleRemove = async (uid, name) => {
     if (uid === adminUid) return;
+    if (admins.has(uid)) { alert('You cannot remove another admin.'); return; }
     if (!window.confirm(`Remove "${name}" from Chatter?\n\nThey will be instantly signed out and cannot come back.`)) return;
     try {
       await Promise.all([
