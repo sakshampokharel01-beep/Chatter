@@ -121,26 +121,55 @@ export const signOutUser = () => {
   return signOut(auth);
 };
 
-// ── Register signed-in (non-anonymous) user in Firestore ─────
-// Called every sign-in so displayName/photoURL stay up to date.
-export const registerUser = async (user) => {
-  if (!user || user.isAnonymous) return;
+// ── Register signed-in (anonymous OR non-anonymous) user in Firestore ─────
+export const registerUser = async (user, retryCount = 0) => {
+  if (!user) return;
+  
+  const email = user.email?.toLowerCase() || '(anonymous)';
+  console.log("--- REGISTRATION ATTEMPT ---");
+  console.log("Active Project ID:", import.meta.env.VITE_FIREBASE_PROJECT_ID);
+  console.log("Auth Provider:", user.providerData[0]?.providerId || (user.isAnonymous ? 'anonymous' : 'email'));
+  console.log("UID/DocID:", user.uid);
+  console.log("Email Found:", email);
+
+  // 1. Anti-Spam: Block test domains (only for non-anonymous)
+  if (!user.isAnonymous && email.endsWith('@example.com')) {
+    console.warn("Registration rejected: @example.com domain is blocked.");
+    return;
+  }
+
+  const userRef = doc(db, 'users', user.uid);
   try {
-    await setDoc(doc(db, 'users', user.uid), {
+    await setDoc(userRef, {
       uid: user.uid,
       displayName: getDisplayName(user).slice(0, 64),
-      email: user.email || '',
+      email: user.isAnonymous ? null : email,
       photoURL: safePhotoURL(user.photoURL),
       lastSeen: serverTimestamp(),
+      isAnonymous: user.isAnonymous || false
     }, { merge: true });
+    console.log("✅ Registration SUCCESSFUL in Firestore");
   } catch (err) {
-    console.error('registerUser failed:', err);
+    console.error("❌ Registration FAILED:", err);
+    if (err.code === 'permission-denied') {
+      console.error("PERMISSION DENIED: Double-check if App Check is 'Enforced' in Firebase Console.");
+    }
+    // Simple retry for network glitches
+    if (retryCount < 2 && err.code !== 'permission-denied') {
+      console.log(`Retrying registration (Attempt ${retryCount + 2})...`);
+      setTimeout(() => registerUser(user, retryCount + 1), 2000);
+    }
   }
+  console.log("----------------------------");
 };
 
 // ── Admin ───────────────────────────────────────────────
 export const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
-export const isAdmin = (user) => !!(user?.email && user.email === ADMIN_EMAIL);
+export const isAdmin = (user) => {
+  const email = user?.email || '';
+  const adminEmail = (ADMIN_EMAIL || '').toLowerCase();
+  return !!(email && email.toLowerCase() === adminEmail);
+};
 
 // ── Deterministic DM conversation ID ─────────────────────────
 export const getDMId = (uid1, uid2) => [uid1, uid2].sort().join('_');

@@ -2,119 +2,64 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Helpers ────────────────────────────────────────────────
+    // 1. GLOBAL HELPERS
     function isSignedIn() {
       return request.auth != null;
     }
 
-    function isOwner(uid) {
-      return request.auth.uid == uid;
-    }
-
     function isAdmin() {
-      return request.auth.token.email == 'sakshampokharel01@gmail.com'
-        || exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return isSignedIn() && (
+        (request.auth.token.email != null && request.auth.token.email.lower() == 'sakshampokharel01@gmail.com') ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
     }
 
-    // Check blocked users collection — blocked users cannot post anything
-    function isNotBlocked() {
-      return !exists(/databases/$(database)/documents/blockedUsers/$(request.auth.uid));
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
     }
 
-    function validMessage(data) {
-      return data.text is string
-        && data.text.size() >= 1
-        && data.text.size() <= 500
-        && data.uid == request.auth.uid
-        && data.createdAt == request.time
-        && data.displayName is string
-        && data.displayName.size() >= 1
-        && data.displayName.size() <= 64
-        // Only exactly these fields allowed — no extra data can be injected
-        && data.keys().hasOnly(['text', 'uid', 'displayName', 'photoURL', 'createdAt', 'isAnonymous', 'isAdmin']);
-    }
-
-    function validDMMessage(data) {
-      return data.text is string
-        && data.text.size() >= 1
-        && data.text.size() <= 500
-        && data.uid == request.auth.uid
-        && !request.auth.token.firebase.sign_in_provider.matches('anonymous')
-        && data.createdAt == request.time
-        && data.displayName is string
-        && data.displayName.size() >= 1
-        && data.displayName.size() <= 64
-        // Only exactly these fields allowed
-        && data.keys().hasOnly(['text', 'uid', 'displayName', 'photoURL', 'createdAt']);
-    }
-
-    // ── Global chat messages ────────────────────────────────────
+    // 2. GLOBAL CHAT: Anyone signed in can read/post; only Admin can delete.
     match /messages/{msgId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && isNotBlocked() && validMessage(request.resource.data);
+      allow read, create: if isSignedIn();
       allow delete: if isAdmin();
       allow update: if false;
     }
 
-    // ── Registered users directory ──────────────────────────────
+    // 3. USER PROFILES: Diagnostic Mode — open write for testing
     match /users/{uid} {
       allow read:   if isSignedIn();
-      allow create,
-            update: if isSignedIn()
-                    && isOwner(uid)
-                    && isNotBlocked()
-                    && !request.auth.token.firebase.sign_in_provider.matches('anonymous');
+      allow write:  if isOwner(uid) || isAdmin();
       allow delete: if false;
     }
 
-    // ── Admins directory ────────────────────────────────────────
-    // Only the super-admin can grant/revoke admin; everyone signed in can read.
-    match /admins/{uid} {
-      allow read:  if isSignedIn();
-      allow write: if request.auth.token.email == 'sakshampokharel01@gmail.com';
-    }
+    // ── 4. ADMINISTRATIVE DATA ─────────────────────────────────
+    // Only admins can see the lists of blocked/deleted users.
+    // Regular users can only check if THEY THEMSELVES are blocked/deleted.
+    match /admins/{uid}       { allow read, write: if isAdmin(); }
+    match /blockedUsers/{uid} { allow read: if isOwner(uid) || isAdmin(); allow write: if isAdmin(); }
+    match /deletedUsers/{uid} { allow read: if isOwner(uid) || isAdmin(); allow write: if isAdmin(); }
 
-    // ── Blocked users ───────────────────────────────────────────
-    // Only admin can write (block/unblock); a user can only read their own status.
-    match /blockedUsers/{uid} {
-      allow read:  if isSignedIn() && (isOwner(uid) || isAdmin());
-      allow write: if isAdmin();
-    }
-
-    // ── Deleted users ────────────────────────────────────────────
-    // Admin can remove a user; any signed-in user can read (needed to filter DM list).
-    match /deletedUsers/{uid} {
-      allow read:  if isSignedIn();
-      allow write: if isAdmin();
-    }
-
-    // ── Direct message conversations ────────────────────────────
+    // ── 5. DIRECT MESSAGES ─────────────────────────────────────
+    // CRITICAL: Only the two participants can EVER read these messages.
     match /dms/{convId} {
       function isParticipant() {
         return request.auth.uid in resource.data.participants;
       }
-      function isParticipantNew() {
+      function isNewParticipant() {
         return request.auth.uid in request.resource.data.participants;
       }
-      function notAnon() {
-        return !request.auth.token.firebase.sign_in_provider.matches('anonymous');
-      }
 
-      allow read:   if isSignedIn() && notAnon() && isParticipant();
-      allow create: if isSignedIn() && notAnon() && isNotBlocked() && isParticipantNew()
-                    && request.resource.data.participants.size() == 2;
-      allow update,
+      allow read:   if isSignedIn() && isParticipant();
+      allow create: if isSignedIn() && isNewParticipant();
+      allow update, 
             delete: if false;
 
-      // DM messages sub-collection
-      match /messages/{msgId} {
-        allow read:   if isSignedIn() && notAnon()
-                      && request.auth.uid in get(/databases/$(database)/documents/dms/$(convId)).data.participants;
-        allow create: if isSignedIn() && notAnon() && isNotBlocked()
-                      && request.auth.uid in get(/databases/$(database)/documents/dms/$(convId)).data.participants
-                      && validDMMessage(request.resource.data);
-        allow update,
-              delete: if false;
+      // DM Sub-messages
+      match /messages/{mId} {
+        allow read: if isSignedIn() && 
+          get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]);
+        allow create: if isSignedIn() && 
+          get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]);
       }
     }
   }

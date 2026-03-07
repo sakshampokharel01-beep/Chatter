@@ -17,7 +17,7 @@ function App() {
     // by the Firebase SDK before onAuthStateChanged fires.
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser ?? null);
-      if (currentUser && !currentUser.isAnonymous) {
+      if (currentUser) {
         registerUser(currentUser);
       }
     });
@@ -28,7 +28,8 @@ function App() {
   // Super-admin is always exempt — they can never be locked out
   useEffect(() => {
     if (!user) return;
-    if (user.email === import.meta.env.VITE_ADMIN_EMAIL) return; // super-admin is immune
+    const adminEmail = (import.meta.env.VITE_ADMIN_EMAIL || '').toLowerCase();
+    if (user.email && user.email.toLowerCase() === adminEmail) return; // super-admin is immune
     const unsub = onSnapshot(doc(db, 'deletedUsers', user.uid), (snap) => {
       if (snap.exists()) {
         setRemoved(true);

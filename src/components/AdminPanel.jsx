@@ -111,10 +111,11 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   };
 
   const filtered = users.filter(u =>
-    !removed.has(u.id) && (
+    !removed.has(u.id) && 
+    !(u.email || '').toLowerCase().endsWith('@example.com') && (
       !search ||
-      u.displayName?.toLowerCase().includes(search.toLowerCase()) ||
-      u.email?.toLowerCase().includes(search.toLowerCase())
+      (u.displayName || '').toLowerCase().includes(search.toLowerCase()) ||
+      (u.email || '').toLowerCase().includes(search.toLowerCase())
     )
   );
 

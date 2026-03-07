@@ -200,6 +200,7 @@ export default function DirectMessages({ user }) {
 
   const filtered = users.filter(u =>
     !removed.has(u.id) &&
+    !(u.email || '').toLowerCase().endsWith('@example.com') &&
     (u.displayName || '').toLowerCase().includes(search.toLowerCase()),
   );
 
