@@ -64,7 +64,7 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
+googleProvider.setCustomParameters({ prompt: 'select_account', login_hint: '' });
 
 // ── Sign up with email + password ──────────────────────────
 export const signUpWithEmail = async (name, email, password) => {
@@ -79,12 +79,15 @@ export const signInWithEmail = (email, password) =>
 
 // ── Sign in with Google ──────────────────────────────────────
 // Uses redirect on mobile (popups are blocked), popup on desktop.
+// Signs out first to always force the account picker.
 const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
 
-export const signInWithGoogle = () =>
-  isMobile()
+export const signInWithGoogle = async () => {
+  await signOut(auth);
+  return isMobile()
     ? signInWithRedirect(auth, googleProvider)
     : signInWithPopup(auth, googleProvider);
+};
 
 export { getRedirectResult };
 
