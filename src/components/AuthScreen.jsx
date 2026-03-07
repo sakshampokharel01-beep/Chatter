@@ -16,6 +16,17 @@ function EyeIcon({ open }) {
   );
 }
 
+/* ── Abuse prevention ───────────────────────────────────── */
+const BLOCKED_DOMAINS = ['example.com','test.com','mailinator.com','guerrillamail.com','tempmail.com','throwam.com','sharklasers.com','trashmail.com','yopmail.com','fakeinbox.com'];
+const BLOCKED_NAME_PATTERNS = [/^load_test/i, /^test_/i, /^bot_/i, /^spam_/i, /^fake_/i];
+
+function validateSignUp(name, email) {
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (BLOCKED_DOMAINS.includes(domain)) return 'Sign-ups from this email domain are not allowed.';
+  if (BLOCKED_NAME_PATTERNS.some(p => p.test(name))) return 'That username is not allowed.';
+  return null;
+}
+
 /* ── Email error mapper ───────────────────────────────── */
 function mapEmailError(code) {
   return ({
@@ -75,6 +86,7 @@ export default function AuthScreen() {
   const [emailAddr, setEmailAddr] = useState('');
   const [emailPass, setEmailPass] = useState('');
   const [showPass,  setShowPass]  = useState(false);
+  const [honeypot,  setHoneypot]  = useState(''); // invisible field — bots fill it, humans don't
 
   const nameInputRef = useRef(null);
 
@@ -106,7 +118,11 @@ export default function AuthScreen() {
   // ── Email Sign Up ──────────────────────────────────────
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
+    // Honeypot: bots fill hidden fields, humans don't
+    if (honeypot) return;
     if (!emailAddr.trim() || !emailPass) return;
+    const validationError = validateSignUp(emailName, emailAddr.trim());
+    if (validationError) { setError(validationError); return; }
     setLoading('email'); setError('');
     try {
       await signUpWithEmail(emailName, emailAddr.trim(), emailPass);
@@ -321,6 +337,17 @@ export default function AuthScreen() {
               ? <div className="btn-spinner btn-spinner-light" aria-hidden="true" />
               : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
+          {/* Honeypot — hidden from real users, bots fill it automatically */}
+          <input
+            type="text"
+            name="website"
+            value={honeypot}
+            onChange={e => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            aria-hidden="true"
+            autoComplete="off"
+            style={{position:'absolute',left:'-9999px',opacity:0,height:0,width:0,pointerEvents:'none'}}
+          />
         </form>
 
         <div className="divider" aria-hidden="true"><span>or</span></div>

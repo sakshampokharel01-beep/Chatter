@@ -1,6 +1,8 @@
 # ── Environment variables ────────────────────────────────────
 # Never commit .env — it contains your Firebase credentials
 .env
+service-account.json
+delete-fake-accounts.mjs
 .env.local
 .env.production
 
