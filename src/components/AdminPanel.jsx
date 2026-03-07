@@ -10,7 +10,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   const [msgCount, setMsgCount] = useState(0);
   const [search, setSearch]     = useState('');
   const [loading, setLoading]   = useState(true);
-  const [debugMode, setDebugMode] = useState(false); // Force show ALL users bypassing filters
+  const [debugMode, setDebugMode] = useState(false); 
+  const [msgUsers, setMsgUsers]   = useState(new Map()); // Users found in messages but not in 'users' collection
 
   // Load all registered users
   useEffect(() => {
@@ -56,14 +57,28 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     });
   }, []);
 
-  // Track total message count
+  // Track messages to find "Missing" users
   useEffect(() => {
     return onSnapshot(collection(db, 'messages'), snap => {
       setMsgCount(snap.size);
+      const found = new Map();
+      snap.docs.forEach(d => {
+        const data = d.data();
+        if (data.uid && !users.some(u => u.id === data.uid)) {
+          found.set(data.uid, {
+            id: data.uid,
+            displayName: data.displayName,
+            photoURL: data.photoURL,
+            email: '(Check chat)',
+            fromMsg: true
+          });
+        }
+      });
+      setMsgUsers(found);
     }, (err) => {
       console.error('Messages count snapshot error:', err);
     });
-  }, []);
+  }, [users]);
 
   const handlePromote = async (uid, name) => {
     if (!window.confirm(`Make "${name}" an admin?\n\nThey will get full admin powers.`)) return;
@@ -204,6 +219,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
                   </span>
                   <span className="admin-user-uid">{u.email || ''}</span>
                 </div>
+                {u.fromMsg && <div style={{color:'#ff8a8a', fontSize:'11px', fontWeight:'bold', marginRight:'15px'}}>NOT REGISTERED</div>}
                 {!isSelf && (
                   <div className="admin-user-actions">
                     {isSuperAdmin && (
@@ -255,6 +271,21 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
               </div>
             );
           })}
+          
+          {[...msgUsers.values()].map(u => (
+              <div key={u.id} className="admin-user-row" style={{borderLeft: '4px solid #ff8a8a'}}>
+                <div className="admin-user-avatar">
+                  {u.photoURL ? <img src={u.photoURL} alt="" /> : <div className="admin-avatar-placeholder">?</div>}
+                </div>
+                <div className="admin-user-info">
+                  <span className="admin-user-name">{u.displayName} <span className="admin-tag" style={{background:'#ff8a8a'}}>Missing Registry</span></span>
+                  <span className="admin-user-uid">UID: {u.id}</span>
+                </div>
+                <div style={{color:'#ff8a8a', fontSize:'11px', flex:1, textAlign:'right', marginRight:'20px'}}>
+                  User is in Chat but Registry failed!
+                </div>
+              </div>
+          ))}
         </div>
       )}
 
