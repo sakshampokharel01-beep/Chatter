@@ -73,6 +73,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Deleted users ────────────────────────────────────────────
+    // Admin can remove a user; that user's client detects it and is force-signed out.
+    match /deletedUsers/{uid} {
+      allow read:  if isSignedIn() && isOwner(uid);
+      allow write: if isAdmin();
+    }
+
     // ── Direct message conversations ────────────────────────────
     match /dms/{convId} {
       function isParticipant() {

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { auth, registerUser } from './firebase';
+import { auth, registerUser, signOutUser } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from './firebase';
 import AuthScreen from './components/AuthScreen';
 import ChatRoom from './components/ChatRoom';
 import './App.css';
@@ -8,6 +10,7 @@ import './App.css';
 function App() {
   // undefined = still loading, null = signed out, object = signed in
   const [user, setUser] = useState(undefined);
+  const [removed, setRemoved] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -19,11 +22,31 @@ function App() {
     return unsubscribe;
   }, []);
 
+  // Real-time listener: if admin deletes this user, force sign-out immediately
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(doc(db, 'deletedUsers', user.uid), (snap) => {
+      if (snap.exists()) {
+        setRemoved(true);
+        signOutUser();
+      }
+    });
+    return unsub;
+  }, [user?.uid]);
+
   if (user === undefined) {
     return (
       <div className="loading-screen">
         <div className="loader" />
         <p className="loading-text">Loading Chatter…</p>
+      </div>
+    );
+  }
+
+  if (removed) {
+    return (
+      <div className="loading-screen">
+        <p className="loading-text" style={{color:'#e05c6a'}}>Your account has been removed by an admin.</p>
       </div>
     );
   }

@@ -53,7 +53,7 @@ function Avatar({ displayName, photoURL, size = 30 }) {
 }
 
 /* ── Single Chat Message ──────────────────────────────────── */
-function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock }) {
+function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove }) {
   const name = message.displayName || (message.isAnonymous ? 'Guest' : 'User');
 
   return (
@@ -94,6 +94,22 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock }) {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+              </svg>
+            </button>
+          )}
+          {onRemove && !isOwn && (
+            <button
+              className="msg-delete-btn"
+              onClick={() => onRemove(message.uid, name)}
+              title="Remove user from site"
+              aria-label="Remove user"
+              style={{color:'#e05c6a'}}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <line x1="17" y1="8" x2="23" y2="14"/>
+                <line x1="23" y1="8" x2="17" y2="14"/>
               </svg>
             </button>
           )}
@@ -150,6 +166,19 @@ export default function ChatRoom({ user }) {
       });
     } catch (err) {
       console.error('Block failed:', err);
+    }
+  }, [user.uid]);
+
+  /* ── Remove a user (admin only) ── */
+  const removeUser = useCallback(async (uid, name) => {
+    if (!window.confirm(`Remove "${name}" from Chatter? They will be instantly signed out and blocked.`)) return;
+    try {
+      await Promise.all([
+        setDoc(doc(db, 'deletedUsers', uid), { deletedAt: serverTimestamp(), deletedBy: user.uid }),
+        setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: user.uid }),
+      ]);
+    } catch (err) {
+      console.error('Remove failed:', err);
     }
   }, [user.uid]);
 
@@ -303,6 +332,7 @@ export default function ChatRoom({ user }) {
                     hideAvatar={hideAvatar}
                     onDelete={adminUser ? deleteMessage : null}
                     onBlock={adminUser ? blockUser : null}
+                    onRemove={adminUser ? removeUser : null}
                   />
                 );
               })
