@@ -34,22 +34,30 @@ export default function AdminPanel({ adminUid }) {
 
   const handleBlock = async (uid, name) => {
     if (uid === adminUid) return;
-    if (blocked.has(uid)) {
-      if (!window.confirm(`Unblock "${name}"?`)) return;
-      await deleteDoc(doc(db, 'blockedUsers', uid));
-    } else {
-      if (!window.confirm(`Block "${name}"? They cannot send messages.`)) return;
-      await setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid });
+    try {
+      if (blocked.has(uid)) {
+        if (!window.confirm(`Unblock "${name}"?`)) return;
+        await deleteDoc(doc(db, 'blockedUsers', uid));
+      } else {
+        if (!window.confirm(`Block "${name}"? They cannot send messages.`)) return;
+        await setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid });
+      }
+    } catch (e) {
+      alert('Action failed: ' + e.message);
     }
   };
 
   const handleRemove = async (uid, name) => {
     if (uid === adminUid) return;
     if (!window.confirm(`Remove "${name}" from Chatter?\n\nThey will be instantly signed out and cannot come back.`)) return;
-    await Promise.all([
-      setDoc(doc(db, 'deletedUsers', uid), { deletedAt: serverTimestamp(), deletedBy: adminUid }),
-      setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid }),
-    ]);
+    try {
+      await Promise.all([
+        setDoc(doc(db, 'deletedUsers', uid), { deletedAt: serverTimestamp(), deletedBy: adminUid }),
+        setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid }),
+      ]);
+    } catch (e) {
+      alert('Remove failed: ' + e.message);
+    }
   };
 
   const filtered = users.filter(u =>

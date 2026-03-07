@@ -69,14 +69,14 @@ service cloud.firestore {
     // ── Blocked users ───────────────────────────────────────────
     // Only admin can write (block/unblock); a user can only read their own status.
     match /blockedUsers/{uid} {
-      allow read:  if isSignedIn() && isOwner(uid);
+      allow read:  if isSignedIn() && (isOwner(uid) || isAdmin());
       allow write: if isAdmin();
     }
 
     // ── Deleted users ────────────────────────────────────────────
     // Admin can remove a user; that user's client detects it and is force-signed out.
     match /deletedUsers/{uid} {
-      allow read:  if isSignedIn() && isOwner(uid);
+      allow read:  if isSignedIn() && (isOwner(uid) || isAdmin());
       allow write: if isAdmin();
     }
 
