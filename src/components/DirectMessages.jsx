@@ -101,7 +101,7 @@ export default function DirectMessages({ user }) {
     return onSnapshot(q, (snap) => {
       const allUsers = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
-        .filter(u => u.id !== user.uid); // Use u.id as it's the Doc ID
+        .filter(u => u.id !== user.uid); // id is the UID from Firestore doc ID
       
       console.log(`[DMs] Received ${allUsers.length} potential users (excluding self)`);
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));

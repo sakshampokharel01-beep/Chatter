@@ -115,6 +115,16 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     }
   };
 
+  const handleUnremove = async (uid) => {
+    if (!window.confirm("Restore this user? They will be able to sign in and appear in lists again.")) return;
+    try {
+      await deleteDoc(doc(db, 'deletedUsers', uid));
+      await deleteDoc(doc(db, 'blockedUsers', uid));
+    } catch (e) {
+      alert('Failed to restore: ' + e.message);
+    }
+  };
+
   const filtered = users.filter(u =>
     !removed.has(u.id) && 
     !(u.email || '').toLowerCase().endsWith('@example.com') && (
@@ -130,7 +140,11 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
         <div className="admin-stats">
           <div className="admin-stat">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Registered Users <span className="admin-count">{users.filter(u => !removed.has(u.id)).length}</span>
+            Visible Users <span className="admin-count">{filtered.length}</span>
+          </div>
+          <div className="admin-stat" style={{color: removed.size > 0 ? '#ff8a8a' : 'inherit'}}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            Hidden/Removed <span className="admin-count">{removed.size}</span>
           </div>
           <div className="admin-stat">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -226,6 +240,25 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {removed.size > 0 && (
+        <div className="admin-removed-section" style={{marginTop:'30px', borderTop:'1px solid #333', paddingTop:'20px'}}>
+          <h3 style={{fontSize:'14px', color:'#ff8a8a', marginBottom:'15px'}}>Previously Removed Users (Hidden)</h3>
+          <div className="admin-user-list">
+            {users.filter(u => removed.has(u.id)).map(u => (
+              <div key={u.id} className="admin-user-row" style={{opacity: 0.7}}>
+                 <div className="admin-user-info">
+                   <span className="admin-user-name">{u.displayName || u.id} <span className="blocked-tag">HIDDEN</span></span>
+                   <span className="admin-user-uid">{u.email}</span>
+                 </div>
+                 <div className="admin-user-actions">
+                   <button className="admin-action-btn unblock" onClick={() => handleUnremove(u.id)}>Restore User</button>
+                 </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
