@@ -252,6 +252,7 @@ export default function ChatRoom({ user }) {
       });
     } catch (err) {
       console.error('Failed to send message:', err);
+      alert('Error sending message: ' + err.message);
       setInputText(text);
     } finally {
       setSending(false);
