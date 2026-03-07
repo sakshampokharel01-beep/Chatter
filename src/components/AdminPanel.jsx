@@ -1,0 +1,139 @@
+import React, { useState, useEffect } from 'react';
+import { collection, onSnapshot, orderBy, query, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
+
+export default function AdminPanel({ adminUid }) {
+  const [users, setUsers]       = useState([]);
+  const [blocked, setBlocked]   = useState(new Set());
+  const [removed, setRemoved]   = useState(new Set());
+  const [search, setSearch]     = useState('');
+  const [loading, setLoading]   = useState(true);
+
+  // Load all registered users
+  useEffect(() => {
+    const q = query(collection(db, 'users'), orderBy('displayName'));
+    return onSnapshot(q, snap => {
+      setUsers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setLoading(false);
+    });
+  }, []);
+
+  // Track blocked users
+  useEffect(() => {
+    return onSnapshot(collection(db, 'blockedUsers'), snap => {
+      setBlocked(new Set(snap.docs.map(d => d.id)));
+    });
+  }, []);
+
+  // Track removed users
+  useEffect(() => {
+    return onSnapshot(collection(db, 'deletedUsers'), snap => {
+      setRemoved(new Set(snap.docs.map(d => d.id)));
+    });
+  }, []);
+
+  const handleBlock = async (uid, name) => {
+    if (uid === adminUid) return;
+    if (blocked.has(uid)) {
+      if (!window.confirm(`Unblock "${name}"?`)) return;
+      await deleteDoc(doc(db, 'blockedUsers', uid));
+    } else {
+      if (!window.confirm(`Block "${name}"? They cannot send messages.`)) return;
+      await setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid });
+    }
+  };
+
+  const handleRemove = async (uid, name) => {
+    if (uid === adminUid) return;
+    if (!window.confirm(`Remove "${name}" from Chatter?\n\nThey will be instantly signed out and cannot come back.`)) return;
+    await Promise.all([
+      setDoc(doc(db, 'deletedUsers', uid), { deletedAt: serverTimestamp(), deletedBy: adminUid }),
+      setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid }),
+    ]);
+  };
+
+  const filtered = users.filter(u =>
+    u.displayName?.toLowerCase().includes(search.toLowerCase()) ||
+    u.email?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="admin-panel">
+      <div className="admin-panel-header">
+        <h2 className="admin-panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight:'8px',verticalAlign:'-2px'}}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Registered Users <span className="admin-count">{users.length}</span>
+        </h2>
+        <input
+          className="admin-search"
+          type="text"
+          placeholder="Search by name or email…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div className="admin-loading"><div className="loader" /></div>
+      ) : filtered.length === 0 ? (
+        <div className="admin-empty">No users found.</div>
+      ) : (
+        <div className="admin-user-list">
+          {filtered.map(u => {
+            const isAdmin  = u.id === adminUid;
+            const isBlocked = blocked.has(u.id);
+            const isRemoved = removed.has(u.id);
+            return (
+              <div key={u.id} className={`admin-user-row${isRemoved ? ' admin-user-removed' : ''}`}>
+                <div className="admin-user-avatar">
+                  {u.photoURL
+                    ? <img src={u.photoURL} alt={u.displayName} />
+                    : <div className="admin-avatar-placeholder">{(u.displayName || '?').charAt(0).toUpperCase()}</div>
+                  }
+                </div>
+                <div className="admin-user-info">
+                  <span className="admin-user-name">
+                    {u.displayName}
+                    {isAdmin  && <span className="admin-tag">You (Admin)</span>}
+                    {isRemoved && <span className="removed-tag">Removed</span>}
+                    {!isRemoved && isBlocked && <span className="blocked-tag">Blocked</span>}
+                  </span>
+                  <span className="admin-user-uid">{u.uid}</span>
+                </div>
+                {!isAdmin && !isRemoved && (
+                  <div className="admin-user-actions">
+                    <button
+                      className={`admin-action-btn ${isBlocked ? 'unblock' : 'block'}`}
+                      onClick={() => handleBlock(u.id, u.displayName)}
+                      title={isBlocked ? 'Unblock user' : 'Block user'}
+                    >
+                      {isBlocked ? (
+                        <>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          Unblock
+                        </>
+                      ) : (
+                        <>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                          Block
+                        </>
+                      )}
+                    </button>
+                    <button
+                      className="admin-action-btn remove"
+                      onClick={() => handleRemove(u.id, u.displayName)}
+                      title="Remove user from Chatter"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="23" y2="14"/><line x1="23" y1="8" x2="17" y2="14"/></svg>
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

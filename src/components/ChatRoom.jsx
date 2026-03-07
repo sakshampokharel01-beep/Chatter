@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '../firebase';
 import DirectMessages from './DirectMessages';
+import AdminPanel from './AdminPanel';
 
 const MAX_CHARS = 500;
 const MESSAGES_LIMIT = 150;
@@ -282,6 +283,16 @@ export default function ChatRoom({ user }) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             DMs{isGuest ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginLeft:'4px',verticalAlign:'-1px'}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> : ''}
           </button>
+          {adminUser && (
+            <button
+              className={`tab-btn${activeTab === 'admin' ? ' active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+              title="Admin Panel"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Users
+            </button>
+          )}
         </div>
 
         <div className="header-user">
@@ -377,6 +388,9 @@ export default function ChatRoom({ user }) {
 
       {/* ── Direct Messages ── */}
       {activeTab === 'dms' && <DirectMessages user={user} />}
+
+      {/* ── Admin Panel ── */}
+      {activeTab === 'admin' && adminUser && <AdminPanel adminUid={user.uid} />}
     </div>
   );
 }
