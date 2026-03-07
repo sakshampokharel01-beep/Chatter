@@ -257,7 +257,7 @@ export default function ChatRoom({ user }) {
       setSending(false);
       inputRef.current?.focus();
     }
-  }, [inputText, sending, user, displayName]);
+  }, [inputText, sending, user, displayName, adminUser]);
 
   /* ── Keyboard handler ── */
   const handleKeyDown = (e) => {
