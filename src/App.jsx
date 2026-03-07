@@ -17,7 +17,7 @@ function App() {
     // by the Firebase SDK before onAuthStateChanged fires.
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser ?? null);
-      if (currentUser) {
+      if (currentUser && !currentUser.isAnonymous) {
         registerUser(currentUser);
       }
     });

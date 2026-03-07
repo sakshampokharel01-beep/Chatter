@@ -53,14 +53,13 @@ const app = initializeApp(firebaseConfig);
 // To enable: Firebase Console → App Check → Register web app → reCAPTCHA v3
 // Then add VITE_RECAPTCHA_SITE_KEY to your .env and Vercel env vars,
 // and click "Enforce" for Firestore in Firebase Console → App Check.
-/* 
+// ── App Check (reCAPTCHA v3) ─────────────────────────────────
 if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
     isTokenAutoRefreshEnabled: true,
   });
 }
-*/
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -123,19 +122,19 @@ export const signOutUser = () => {
   return signOut(auth);
 };
 
-// ── Register signed-in (anonymous OR non-anonymous) user in Firestore ─────
+// ── Register signed-in (non-anonymous) user in Firestore ─────
 export const registerUser = async (user, retryCount = 0) => {
-  if (!user) return;
+  if (!user || user.isAnonymous) return;
   
-  const email = user.email?.toLowerCase() || '(anonymous)';
+  const email = user.email?.toLowerCase() || '';
   console.log("--- REGISTRATION ATTEMPT ---");
   console.log("Active Project ID:", import.meta.env.VITE_FIREBASE_PROJECT_ID);
-  console.log("Auth Provider:", user.providerData[0]?.providerId || (user.isAnonymous ? 'anonymous' : 'email'));
+  console.log("Auth Provider:", user.providerData[0]?.providerId || 'email');
   console.log("UID/DocID:", user.uid);
   console.log("Email Found:", email);
 
-  // 1. Anti-Spam: Block test domains (only for non-anonymous)
-  if (!user.isAnonymous && email.endsWith('@example.com')) {
+  // 1. Anti-Spam: Block test domains
+  if (email.endsWith('@example.com')) {
     console.warn("Registration rejected: @example.com domain is blocked.");
     return;
   }
@@ -145,10 +144,9 @@ export const registerUser = async (user, retryCount = 0) => {
     await setDoc(userRef, {
       uid: user.uid,
       displayName: getDisplayName(user).slice(0, 64),
-      email: user.isAnonymous ? null : email,
+      email: email,
       photoURL: safePhotoURL(user.photoURL),
       lastSeen: serverTimestamp(),
-      isAnonymous: user.isAnonymous || false
     }, { merge: true });
     console.log("✅ Registration SUCCESSFUL in Firestore");
   } catch (err) {

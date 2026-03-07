@@ -2,45 +2,41 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 1. GLOBAL HELPERS
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
+    // 1. HELPERS
+    function isSignedIn() { return request.auth != null; }
+    
     function isAdmin() {
       return isSignedIn() && (
+        request.auth.uid == 'lnYH4d6sv2NRE2DOm76B6WZGwdS2' ||
         (request.auth.token.email != null && request.auth.token.email.lower() == 'sakshampokharel01@gmail.com') ||
         exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
     }
+    
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
 
-    function isOwner(uid) {
-      return isSignedIn() && request.auth.uid == uid;
-    }
-
-    // 2. GLOBAL CHAT: Anyone signed in can read/post; only Admin can delete.
+    // 2. GLOBAL CHAT
     match /messages/{msgId} {
       allow read, create: if isSignedIn();
       allow delete: if isAdmin();
       allow update: if false;
     }
 
-    // 3. USER PROFILES: Diagnostic Mode — open write for testing
+    // 3. USER PROFILES + SPAM BLOCK
+    // Only authenticated users can registered/update themselves.
+    // Guests (anonymous) are physically blocked from writing to /users.
     match /users/{uid} {
-      allow read:   if isSignedIn();
-      allow write:  if isOwner(uid) || isAdmin();
+      allow read: if isSignedIn();
+      allow create, update: if (isOwner(uid) || isAdmin()) && 
+        !request.auth.token.firebase.sign_in_provider == 'anonymous' && (
+          !('email' in request.resource.data) || 
+          request.resource.data.email == null ||
+          !request.resource.data.email.lower().endsWith('@example.com')
+        );
       allow delete: if false;
     }
 
-    // ── 4. ADMINISTRATIVE DATA ─────────────────────────────────
-    // Only admins can see the lists of blocked/deleted users.
-    // Regular users can only check if THEY THEMSELVES are blocked/deleted.
-    match /admins/{uid}       { allow read, write: if isAdmin(); }
-    match /blockedUsers/{uid} { allow read: if isOwner(uid) || isAdmin(); allow write: if isAdmin(); }
-    match /deletedUsers/{uid} { allow read: if isOwner(uid) || isAdmin(); allow write: if isAdmin(); }
-
-    // ── 5. DIRECT MESSAGES ─────────────────────────────────────
-    // CRITICAL: Only the two participants can EVER read these messages.
+    // 4. PRIVATE DMs (Strictly Participant-Only)
     match /dms/{convId} {
       function isParticipant() {
         return request.auth.uid in resource.data.participants;
@@ -51,16 +47,17 @@ service cloud.firestore {
 
       allow read:   if isSignedIn() && isParticipant();
       allow create: if isSignedIn() && isNewParticipant();
-      allow update, 
-            delete: if false;
-
-      // DM Sub-messages
+      allow update, delete: if false;
+      
       match /messages/{mId} {
-        allow read: if isSignedIn() && 
-          get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]);
-        allow create: if isSignedIn() && 
+        allow read, create: if isSignedIn() && 
           get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]);
       }
     }
+
+    // 5. ADMIN DATA
+    match /admins/{u}        { allow read, write: if isAdmin(); }
+    match /blockedUsers/{u}  { allow read: if isOwner(u) || isAdmin(); allow write: if isAdmin(); }
+    match /deletedUsers/{u}  { allow read: if isOwner(u) || isAdmin(); allow write: if isAdmin(); }
   }
 }
