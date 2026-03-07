@@ -53,12 +53,14 @@ const app = initializeApp(firebaseConfig);
 // To enable: Firebase Console → App Check → Register web app → reCAPTCHA v3
 // Then add VITE_RECAPTCHA_SITE_KEY to your .env and Vercel env vars,
 // and click "Enforce" for Firestore in Firebase Console → App Check.
+/* 
 if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
     isTokenAutoRefreshEnabled: true,
   });
 }
+*/
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
