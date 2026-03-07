@@ -159,6 +159,8 @@ export default function ChatRoom({ user }) {
     if (isSuperAdmin) { setAdminUser(true); return; }
     return onSnapshot(collection(db, 'admins'), snap => {
       setAdminUser(snap.docs.some(d => d.id === user.uid));
+    }, (err) => {
+      console.error('Admin status snapshot error:', err);
     });
   }, [user.uid, isSuperAdmin]);
 
@@ -210,6 +212,9 @@ export default function ChatRoom({ user }) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setMessages(msgs);
+      setLoadingMsgs(false);
+    }, (err) => {
+      console.error('Global chat snapshot error:', err);
       setLoadingMsgs(false);
     });
 

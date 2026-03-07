@@ -125,12 +125,17 @@ export const signOutUser = () => {
 // Called every sign-in so displayName/photoURL stay up to date.
 export const registerUser = async (user) => {
   if (!user || user.isAnonymous) return;
-  await setDoc(doc(db, 'users', user.uid), {
-    uid: user.uid,
-    displayName: getDisplayName(user).slice(0, 64),
-    photoURL: safePhotoURL(user.photoURL),
-    lastSeen: serverTimestamp(),
-  }, { merge: true });
+  try {
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      displayName: getDisplayName(user).slice(0, 64),
+      email: user.email || '',
+      photoURL: safePhotoURL(user.photoURL),
+      lastSeen: serverTimestamp(),
+    }, { merge: true });
+  } catch (err) {
+    console.error('registerUser failed:', err);
+  }
 };
 
 // ── Admin ───────────────────────────────────────────────

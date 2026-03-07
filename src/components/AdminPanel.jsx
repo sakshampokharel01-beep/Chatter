@@ -17,6 +17,9 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     return onSnapshot(q, snap => {
       setUsers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       setLoading(false);
+    }, (err) => {
+      console.error('Admin users snapshot error:', err);
+      setLoading(false);
     });
   }, []);
 
@@ -24,6 +27,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   useEffect(() => {
     return onSnapshot(collection(db, 'blockedUsers'), snap => {
       setBlocked(new Set(snap.docs.map(d => d.id)));
+    }, (err) => {
+      console.error('Blocked users snapshot error:', err);
     });
   }, []);
 
@@ -31,6 +36,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   useEffect(() => {
     return onSnapshot(collection(db, 'deletedUsers'), snap => {
       setRemoved(new Set(snap.docs.map(d => d.id)));
+    }, (err) => {
+      console.error('Deleted users snapshot error:', err);
     });
   }, []);
 
@@ -38,6 +45,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   useEffect(() => {
     return onSnapshot(collection(db, 'admins'), snap => {
       setAdmins(new Set(snap.docs.map(d => d.id)));
+    }, (err) => {
+      console.error('Admins snapshot error:', err);
     });
   }, []);
 
@@ -45,6 +54,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   useEffect(() => {
     return onSnapshot(collection(db, 'messages'), snap => {
       setMsgCount(snap.size);
+    }, (err) => {
+      console.error('Messages count snapshot error:', err);
     });
   }, []);
 

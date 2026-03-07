@@ -104,6 +104,8 @@ export default function DirectMessages({ user }) {
           .map(d => ({ id: d.id, ...d.data() }))
           .filter(u => u.uid !== user.uid),
       );
+    }, (err) => {
+      console.error('Users snapshot error:', err);
     });
   }, [user.uid]);
 
@@ -111,6 +113,8 @@ export default function DirectMessages({ user }) {
   useEffect(() => {
     return onSnapshot(collection(db, 'deletedUsers'), snap => {
       setRemoved(new Set(snap.docs.map(d => d.id)));
+    }, (err) => {
+      console.error('Deleted users snapshot error:', err);
     });
   }, []);
 
@@ -126,6 +130,9 @@ export default function DirectMessages({ user }) {
     );
     return onSnapshot(q, (snap) => {
       setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setLoadingMsg(false);
+    }, (err) => {
+      console.error('DM messages snapshot error:', err);
       setLoadingMsg(false);
     });
   }, [selectedUser, user.uid]);
