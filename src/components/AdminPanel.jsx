@@ -61,8 +61,10 @@ export default function AdminPanel({ adminUid }) {
   };
 
   const filtered = users.filter(u =>
-    u.displayName?.toLowerCase().includes(search.toLowerCase()) ||
-    u.email?.toLowerCase().includes(search.toLowerCase())
+    !removed.has(u.id) && (
+      u.displayName?.toLowerCase().includes(search.toLowerCase()) ||
+      u.email?.toLowerCase().includes(search.toLowerCase())
+    )
   );
 
   return (
@@ -90,9 +92,8 @@ export default function AdminPanel({ adminUid }) {
           {filtered.map(u => {
             const isAdmin  = u.id === adminUid;
             const isBlocked = blocked.has(u.id);
-            const isRemoved = removed.has(u.id);
             return (
-              <div key={u.id} className={`admin-user-row${isRemoved ? ' admin-user-removed' : ''}`}>
+              <div key={u.id} className="admin-user-row">
                 <div className="admin-user-avatar">
                   {u.photoURL
                     ? <img src={u.photoURL} alt={u.displayName} />
@@ -103,12 +104,11 @@ export default function AdminPanel({ adminUid }) {
                   <span className="admin-user-name">
                     {u.displayName}
                     {isAdmin  && <span className="admin-tag">You (Admin)</span>}
-                    {isRemoved && <span className="removed-tag">Removed</span>}
-                    {!isRemoved && isBlocked && <span className="blocked-tag">Blocked</span>}
+                    {isBlocked && <span className="blocked-tag">Blocked</span>}
                   </span>
                   <span className="admin-user-uid">{u.uid}</span>
                 </div>
-                {!isAdmin && !isRemoved && (
+                {!isAdmin && (
                   <div className="admin-user-actions">
                     <button
                       className={`admin-action-btn ${isBlocked ? 'unblock' : 'block'}`}
