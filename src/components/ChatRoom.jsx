@@ -67,7 +67,10 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove }
 
       <div className="msg-content">
         {!isOwn && !hideAvatar && (
-          <span className="msg-sender">{name}</span>
+          <span className="msg-sender">
+            {name}
+            {message.isAdmin && <span className="admin-tag" style={{marginLeft:'6px',fontSize:'10px',padding:'1px 6px'}}>Admin</span>}
+          </span>
         )}
         <div className="msg-bubble-wrap">
           <div className="msg-bubble">{message.text}</div>
@@ -239,6 +242,7 @@ export default function ChatRoom({ user }) {
         displayName: (cu?.displayName || displayName).slice(0, 64),
         photoURL: safePhotoURL(cu?.photoURL),
         isAnonymous: user.isAnonymous ?? false,
+        isAdmin: adminUser,
         createdAt: serverTimestamp(),
       });
     } catch (err) {

@@ -141,7 +141,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
                     {!isSelf && isAnAdmin && <span className="admin-tag">Admin</span>}
                     {isBlocked && <span className="blocked-tag">Blocked</span>}
                   </span>
-                  <span className="admin-user-uid">{u.email || 'Guest / Anonymous'}</span>
+                  <span className="admin-user-uid">{u.email || ''}</span>
                 </div>
                 {!isSelf && (
                   <div className="admin-user-actions">
