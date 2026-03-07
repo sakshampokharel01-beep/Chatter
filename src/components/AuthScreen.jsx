@@ -180,6 +180,8 @@ export default function AuthScreen() {
           <div className="guest-name-form">
             <input
               ref={nameInputRef}
+              id="guest-name"
+              name="guest-name"
               className="guest-name-input"
               type="text"
               placeholder="e.g. CoolExplorer99"

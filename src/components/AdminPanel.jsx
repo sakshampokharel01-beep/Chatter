@@ -103,6 +103,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
           Registered Users <span className="admin-count">{users.length}</span>
         </h2>
         <input
+          id="admin-search"
+          name="admin-search"
           className="admin-search"
           type="text"
           placeholder="Search by name or email…"

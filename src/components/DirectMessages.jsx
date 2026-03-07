@@ -221,6 +221,8 @@ export default function DirectMessages({ user }) {
             <path d="m21 21-4.35-4.35" stroke="#55558a" strokeWidth="2" strokeLinecap="round" />
           </svg>
           <input
+            id="dm-search"
+            name="dm-search"
             className="dm-search"
             type="text"
             placeholder="Search…"
