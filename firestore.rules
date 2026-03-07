@@ -31,7 +31,7 @@ service cloud.firestore {
         && data.displayName.size() >= 1
         && data.displayName.size() <= 64
         // Only exactly these fields allowed — no extra data can be injected
-        && data.keys().hasOnly(['text', 'uid', 'displayName', 'photoURL', 'createdAt', 'isAnonymous']);
+        && data.keys().hasOnly(['text', 'uid', 'displayName', 'photoURL', 'createdAt', 'isAnonymous', 'isAdmin']);
     }
 
     function validDMMessage(data) {
@@ -82,9 +82,9 @@ service cloud.firestore {
     }
 
     // ── Deleted users ────────────────────────────────────────────
-    // Admin can remove a user; that user's client detects it and is force-signed out.
+    // Admin can remove a user; any signed-in user can read (needed to filter DM list).
     match /deletedUsers/{uid} {
-      allow read:  if isSignedIn() && (isOwner(uid) || isAdmin());
+      allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
