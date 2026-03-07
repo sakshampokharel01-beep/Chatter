@@ -103,7 +103,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
       <div className="admin-panel-header">
         <h2 className="admin-panel-title">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight:'8px',verticalAlign:'-2px'}}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Registered Users <span className="admin-count">{users.length}</span>
+          Registered Users <span className="admin-count">{users.filter(u => !removed.has(u.id)).length}</span>
         </h2>
         <input
           id="admin-search"
