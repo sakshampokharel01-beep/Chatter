@@ -146,7 +146,16 @@ export default function ChatRoom({ user }) {
 
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
-  const adminUser = isAdmin(user);
+  const isSuperAdmin = isAdmin(user);
+  const [adminUser, setAdminUser] = useState(isSuperAdmin);
+
+  // Real-time admin status — super-admin is always admin; others check the admins collection
+  useEffect(() => {
+    if (isSuperAdmin) { setAdminUser(true); return; }
+    return onSnapshot(collection(db, 'admins'), snap => {
+      setAdminUser(snap.docs.some(d => d.id === user.uid));
+    });
+  }, [user.uid, isSuperAdmin]);
 
   /* ── Delete a global message (admin only) ── */
   const deleteMessage = useCallback(async (id) => {
@@ -390,7 +399,7 @@ export default function ChatRoom({ user }) {
       {activeTab === 'dms' && <DirectMessages user={user} />}
 
       {/* ── Admin Panel ── */}
-      {activeTab === 'admin' && adminUser && <AdminPanel adminUid={user.uid} />}
+      {activeTab === 'admin' && adminUser && <AdminPanel adminUid={user.uid} isSuperAdmin={isSuperAdmin} />}
     </div>
   );
 }

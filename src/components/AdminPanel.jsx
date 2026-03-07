@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, orderBy, query, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
-export default function AdminPanel({ adminUid }) {
+export default function AdminPanel({ adminUid, isSuperAdmin }) {
   const [users, setUsers]       = useState([]);
   const [blocked, setBlocked]   = useState(new Set());
   const [removed, setRemoved]   = useState(new Set());
+  const [admins, setAdmins]     = useState(new Set());
   const [search, setSearch]     = useState('');
   const [loading, setLoading]   = useState(true);
 
@@ -31,6 +32,31 @@ export default function AdminPanel({ adminUid }) {
       setRemoved(new Set(snap.docs.map(d => d.id)));
     });
   }, []);
+
+  // Track admins
+  useEffect(() => {
+    return onSnapshot(collection(db, 'admins'), snap => {
+      setAdmins(new Set(snap.docs.map(d => d.id)));
+    });
+  }, []);
+
+  const handlePromote = async (uid, name) => {
+    if (!window.confirm(`Make "${name}" an admin?\n\nThey will get full admin powers.`)) return;
+    try {
+      await setDoc(doc(db, 'admins', uid), { grantedAt: serverTimestamp(), grantedBy: adminUid });
+    } catch (e) {
+      alert('Failed: ' + e.message);
+    }
+  };
+
+  const handleDemote = async (uid, name) => {
+    if (!window.confirm(`Remove admin from "${name}"?`)) return;
+    try {
+      await deleteDoc(doc(db, 'admins', uid));
+    } catch (e) {
+      alert('Failed: ' + e.message);
+    }
+  };
 
   const handleBlock = async (uid, name) => {
     if (uid === adminUid) return;
@@ -90,8 +116,9 @@ export default function AdminPanel({ adminUid }) {
       ) : (
         <div className="admin-user-list">
           {filtered.map(u => {
-            const isAdmin  = u.id === adminUid;
+            const isSelf    = u.id === adminUid;
             const isBlocked = blocked.has(u.id);
+            const isAnAdmin = isSelf || admins.has(u.id);
             return (
               <div key={u.id} className="admin-user-row">
                 <div className="admin-user-avatar">
@@ -103,13 +130,33 @@ export default function AdminPanel({ adminUid }) {
                 <div className="admin-user-info">
                   <span className="admin-user-name">
                     {u.displayName}
-                    {isAdmin  && <span className="admin-tag">You (Admin)</span>}
+                    {isSelf   && <span className="admin-tag">You (Admin)</span>}
+                    {!isSelf && isAnAdmin && <span className="admin-tag">Admin</span>}
                     {isBlocked && <span className="blocked-tag">Blocked</span>}
                   </span>
                   <span className="admin-user-uid">{u.uid}</span>
                 </div>
-                {!isAdmin && (
+                {!isSelf && (
                   <div className="admin-user-actions">
+                    {isSuperAdmin && (
+                      <button
+                        className={`admin-action-btn ${isAnAdmin ? 'unblock' : 'promote'}`}
+                        onClick={() => isAnAdmin ? handleDemote(u.id, u.displayName) : handlePromote(u.id, u.displayName)}
+                        title={isAnAdmin ? 'Remove admin' : 'Make admin'}
+                      >
+                        {isAnAdmin ? (
+                          <>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+                            Demote
+                          </>
+                        ) : (
+                          <>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Admin
+                          </>
+                        )}
+                      </button>
+                    )}
                     <button
                       className={`admin-action-btn ${isBlocked ? 'unblock' : 'block'}`}
                       onClick={() => handleBlock(u.id, u.displayName)}

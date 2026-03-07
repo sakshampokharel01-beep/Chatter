@@ -12,7 +12,8 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return request.auth.token.email == 'sakshampokharel01@gmail.com';
+      return request.auth.token.email == 'sakshampokharel01@gmail.com'
+        || exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
     // Check blocked users collection — blocked users cannot post anything
@@ -64,6 +65,13 @@ service cloud.firestore {
                     && isNotBlocked()
                     && !request.auth.token.firebase.sign_in_provider.matches('anonymous');
       allow delete: if false;
+    }
+
+    // ── Admins directory ────────────────────────────────────────
+    // Only the super-admin can grant/revoke admin; everyone signed in can read.
+    match /admins/{uid} {
+      allow read:  if isSignedIn();
+      allow write: if request.auth.token.email == 'sakshampokharel01@gmail.com';
     }
 
     // ── Blocked users ───────────────────────────────────────────

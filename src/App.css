@@ -222,6 +222,11 @@ body {
   cursor: pointer;
   transition: background .15s, color .15s;
 }
+.admin-action-btn.promote {
+  background: #1e2a3a;
+  color: #5b8dee;
+}
+.admin-action-btn.promote:hover { background: #1e3050; }
 .admin-action-btn.block {
   background: #2a1e1e;
   color: #e05c6a;
