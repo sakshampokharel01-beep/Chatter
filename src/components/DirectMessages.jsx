@@ -81,6 +81,7 @@ function SendIcon() {
 /* ── Direct Messages ──────────────────────────────────────── */
 export default function DirectMessages({ user }) {
   const [users, setUsers] = useState([]);
+  const [removed, setRemoved] = useState(new Set());
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -105,6 +106,13 @@ export default function DirectMessages({ user }) {
       );
     });
   }, [user.uid]);
+
+  /* ── Subscribe to removed users ── */
+  useEffect(() => {
+    return onSnapshot(collection(db, 'deletedUsers'), snap => {
+      setRemoved(new Set(snap.docs.map(d => d.id)));
+    });
+  }, []);
 
   /* ── Subscribe to DM messages when a conversation is open ── */
   useEffect(() => {
@@ -184,6 +192,7 @@ export default function DirectMessages({ user }) {
   };
 
   const filtered = users.filter(u =>
+    !removed.has(u.id) &&
     (u.displayName || '').toLowerCase().includes(search.toLowerCase()),
   );
 
