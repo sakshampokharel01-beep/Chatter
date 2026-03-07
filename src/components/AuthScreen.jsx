@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { signInWithGoogle, signInAsGuest, signUpWithEmail, signInWithEmail } from '../firebase';
+import { signInWithGoogle, signInAsGuest, signUpWithEmail, signInWithEmail, getRedirectResult, auth } from '../firebase';
 
 /* ── EyeIcon ─────────────────────────────────────────── */
 function EyeIcon({ open }) {
@@ -93,6 +93,21 @@ export default function AuthScreen() {
   useEffect(() => {
     if (step === 'guestName') setTimeout(() => nameInputRef.current?.focus(), 50);
   }, [step]);
+
+  // Handle Google redirect result on mobile (page reloads after redirect)
+  useEffect(() => {
+    setLoading('google');
+    getRedirectResult(auth)
+      .then(result => { if (!result) setLoading(null); })
+      .catch(err => {
+        setLoading(null);
+        const msgs = {
+          'auth/unauthorized-domain': 'This domain is not authorized. Check Firebase → Auth → Settings → Authorized domains.',
+          'auth/operation-not-allowed': 'Google sign-in not enabled in Firebase.',
+        };
+        setError(msgs[err.code] || `Error (${err.code}): ${err.message}`);
+      });
+  }, []);
 
   const goHome = () => { setStep('home'); setError(''); };
   const switchMode = (m) => { setMode(m); setError(''); setEmailPass(''); };

@@ -3,6 +3,8 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInAnonymously,
   signOut,
   updateProfile,
@@ -76,7 +78,15 @@ export const signInWithEmail = (email, password) =>
   signInWithEmailAndPassword(auth, email, password);
 
 // ── Sign in with Google ──────────────────────────────────────
-export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+// Uses redirect on mobile (popups are blocked), popup on desktop.
+const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+export const signInWithGoogle = () =>
+  isMobile()
+    ? signInWithRedirect(auth, googleProvider)
+    : signInWithPopup(auth, googleProvider);
+
+export { getRedirectResult };
 
 // ── Sign in as Anonymous guest ───────────────────────────────
 // Accepts a user-chosen name. Falls back to a random Guest# name.
