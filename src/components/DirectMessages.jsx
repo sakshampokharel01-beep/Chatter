@@ -210,9 +210,6 @@ export default function DirectMessages({ user }) {
       <div className={`dm-sidebar${mobileView === 'chat' ? ' dm-mobile-hidden' : ''}`}>
         <div className="dm-sidebar-header">
           <span className="dm-sidebar-title">Messages</span>
-          <span className="dm-sidebar-sub">
-            {users.length} registered user{users.length !== 1 ? 's' : ''}
-          </span>
         </div>
 
         <div className="dm-search-wrap">
