@@ -10,6 +10,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 // ── Safe URL allow-list ──────────────────────────────────────
 // Only allow https:// photo URLs to prevent javascript: injection
@@ -44,6 +45,18 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// ── App Check (reCAPTCHA v3) ─────────────────────────────────
+// Proves every request comes from your real app — blocks direct API scripts.
+// To enable: Firebase Console → App Check → Register web app → reCAPTCHA v3
+// Then add VITE_RECAPTCHA_SITE_KEY to your .env and Vercel env vars,
+// and click "Enforce" for Firestore in Firebase Console → App Check.
+if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);

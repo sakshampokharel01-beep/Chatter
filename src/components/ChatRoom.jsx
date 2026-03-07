@@ -8,6 +8,7 @@ import {
   onSnapshot,
   serverTimestamp,
   deleteDoc,
+  setDoc,
   doc,
 } from 'firebase/firestore';
 import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '../firebase';
@@ -52,7 +53,7 @@ function Avatar({ displayName, photoURL, size = 30 }) {
 }
 
 /* ── Single Chat Message ──────────────────────────────────── */
-function ChatMessage({ message, isOwn, hideAvatar, onDelete }) {
+function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock }) {
   const name = message.displayName || (message.isAnonymous ? 'Guest' : 'User');
 
   return (
@@ -79,6 +80,20 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete }) {
                 <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
+          {onBlock && !isOwn && (
+            <button
+              className="msg-delete-btn"
+              onClick={() => onBlock(message.uid, name)}
+              title="Block user"
+              aria-label="Block user"
+              style={{color:'#e05c6a'}}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
               </svg>
             </button>
           )}
@@ -124,6 +139,19 @@ export default function ChatRoom({ user }) {
       console.error('Delete failed:', err);
     }
   }, []);
+
+  /* ── Block a user (admin only) ── */
+  const blockUser = useCallback(async (uid, name) => {
+    if (!window.confirm(`Block "${name}"? They will be unable to send any messages.`)) return;
+    try {
+      await setDoc(doc(db, 'blockedUsers', uid), {
+        blockedAt: serverTimestamp(),
+        blockedBy: user.uid,
+      });
+    } catch (err) {
+      console.error('Block failed:', err);
+    }
+  }, [user.uid]);
 
   /* ── Subscribe to Firestore messages ── */
   useEffect(() => {
@@ -274,6 +302,7 @@ export default function ChatRoom({ user }) {
                     isOwn={isOwn}
                     hideAvatar={hideAvatar}
                     onDelete={adminUser ? deleteMessage : null}
+                    onBlock={adminUser ? blockUser : null}
                   />
                 );
               })

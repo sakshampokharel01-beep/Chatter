@@ -15,12 +15,22 @@ service cloud.firestore {
       return request.auth.token.email == 'sakshampokharel01@gmail.com';
     }
 
+    // Check blocked users collection — blocked users cannot post anything
+    function isNotBlocked() {
+      return !exists(/databases/$(database)/documents/blockedUsers/$(request.auth.uid));
+    }
+
     function validMessage(data) {
       return data.text is string
         && data.text.size() >= 1
         && data.text.size() <= 500
         && data.uid == request.auth.uid
-        && data.createdAt == request.time;
+        && data.createdAt == request.time
+        && data.displayName is string
+        && data.displayName.size() >= 1
+        && data.displayName.size() <= 64
+        // Only exactly these fields allowed — no extra data can be injected
+        && data.keys().hasOnly(['text', 'uid', 'displayName', 'photoURL', 'createdAt', 'isAnonymous']);
     }
 
     function validDMMessage(data) {
@@ -29,34 +39,41 @@ service cloud.firestore {
         && data.text.size() <= 500
         && data.uid == request.auth.uid
         && !request.auth.token.firebase.sign_in_provider.matches('anonymous')
-        && data.createdAt == request.time;
+        && data.createdAt == request.time
+        && data.displayName is string
+        && data.displayName.size() >= 1
+        && data.displayName.size() <= 64
+        // Only exactly these fields allowed
+        && data.keys().hasOnly(['text', 'uid', 'displayName', 'photoURL', 'createdAt']);
     }
 
     // ── Global chat messages ────────────────────────────────────
-    // Anyone signed in can read; anyone signed in can write their own message;
-    // only admin can delete any message.
     match /messages/{msgId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && validMessage(request.resource.data);
+      allow create: if isSignedIn() && isNotBlocked() && validMessage(request.resource.data);
       allow delete: if isAdmin();
-      allow update: if false; // no editing
+      allow update: if false;
     }
 
     // ── Registered users directory ──────────────────────────────
-    // Anyone signed in can read the list (needed for DM user picker);
-    // a user can only write their own document; no deletion.
     match /users/{uid} {
       allow read:   if isSignedIn();
       allow create,
             update: if isSignedIn()
                     && isOwner(uid)
+                    && isNotBlocked()
                     && !request.auth.token.firebase.sign_in_provider.matches('anonymous');
       allow delete: if false;
     }
 
+    // ── Blocked users ───────────────────────────────────────────
+    // Only admin can write (block/unblock); a user can only read their own status.
+    match /blockedUsers/{uid} {
+      allow read:  if isSignedIn() && isOwner(uid);
+      allow write: if isAdmin();
+    }
+
     // ── Direct message conversations ────────────────────────────
-    // Only the two participants (whose UIDs are in the sorted ID) can
-    // read/write. Anonymous users cannot use DMs at all.
     match /dms/{convId} {
       function isParticipant() {
         return request.auth.uid in resource.data.participants;
@@ -69,7 +86,7 @@ service cloud.firestore {
       }
 
       allow read:   if isSignedIn() && notAnon() && isParticipant();
-      allow create: if isSignedIn() && notAnon() && isParticipantNew()
+      allow create: if isSignedIn() && notAnon() && isNotBlocked() && isParticipantNew()
                     && request.resource.data.participants.size() == 2;
       allow update,
             delete: if false;
@@ -78,7 +95,7 @@ service cloud.firestore {
       match /messages/{msgId} {
         allow read:   if isSignedIn() && notAnon()
                       && request.auth.uid in get(/databases/$(database)/documents/dms/$(convId)).data.participants;
-        allow create: if isSignedIn() && notAnon()
+        allow create: if isSignedIn() && notAnon() && isNotBlocked()
                       && request.auth.uid in get(/databases/$(database)/documents/dms/$(convId)).data.participants
                       && validDMMessage(request.resource.data);
         allow update,
