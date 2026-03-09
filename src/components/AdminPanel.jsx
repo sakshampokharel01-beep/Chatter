@@ -11,7 +11,6 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   const [search, setSearch]     = useState('');
   const [loading, setLoading]   = useState(true);
   const [debugMode, setDebugMode] = useState(false); 
-  const [msgUsers, setMsgUsers]   = useState(new Map()); // Users found in messages but not in 'users' collection
 
   // Load all registered users
   useEffect(() => {
@@ -57,28 +56,14 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     });
   }, []);
 
-  // Track messages to find "Missing" users
+  // Track message count for stats
   useEffect(() => {
     return onSnapshot(collection(db, 'messages'), snap => {
       setMsgCount(snap.size);
-      const found = new Map();
-      snap.docs.forEach(d => {
-        const data = d.data();
-        if (data.uid && !users.some(u => u.id === data.uid)) {
-          found.set(data.uid, {
-            id: data.uid,
-            displayName: data.displayName,
-            photoURL: data.photoURL,
-            email: '(Check chat)',
-            fromMsg: true
-          });
-        }
-      });
-      setMsgUsers(found);
     }, (err) => {
       console.error('Messages count snapshot error:', err);
     });
-  }, [users]);
+  }, []);
 
   const handlePromote = async (uid, name) => {
     if (!window.confirm(`Make "${name}" an admin?\n\nThey will get full admin powers.`)) return;
@@ -131,31 +116,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     }
   };
 
-  const handleUnremove = async (uid) => {
-    if (!window.confirm("Restore this user? They will be able to sign in and appear in lists again.")) return;
-    try {
-      await deleteDoc(doc(db, 'deletedUsers', uid));
-      await deleteDoc(doc(db, 'blockedUsers', uid));
-    } catch (e) {
-      alert('Failed to restore: ' + e.message);
-    }
-  };
 
-  const handleManualRegister = async (u) => {
-    if (!window.confirm(`Create registry for "${u.displayName}" manually?`)) return;
-    try {
-      await setDoc(doc(db, 'users', u.id), {
-        uid: u.id,
-        displayName: u.displayName,
-        photoURL: u.photoURL || null,
-        email: '(Manually Registered)',
-        lastSeen: serverTimestamp(),
-      });
-      alert('Success! User is now registered.');
-    } catch (e) {
-      alert('Failed to register: ' + e.message);
-    }
-  };
 
   const filtered = users.filter(u => {
     if (debugMode) return true;
@@ -235,7 +196,6 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
                   </span>
                   <span className="admin-user-uid">{u.email || ''}</span>
                 </div>
-                {u.fromMsg && <div style={{color:'#ff8a8a', fontSize:'11px', fontWeight:'bold', marginRight:'15px'}}>NOT REGISTERED</div>}
                 {!isSelf && (
                   <div className="admin-user-actions">
                     {isSuperAdmin && (
@@ -288,41 +248,9 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
             );
           })}
           
-          {[...msgUsers.values()].map(u => (
-              <div key={u.id} className="admin-user-row" style={{borderLeft: '4px solid #ff8a8a'}}>
-                <div className="admin-user-avatar">
-                  {u.photoURL ? <img src={u.photoURL} alt="" /> : <div className="admin-avatar-placeholder">?</div>}
-                </div>
-                <div className="admin-user-info">
-                  <span className="admin-user-name">{u.displayName} <span className="admin-tag" style={{background:'#ff8a8a'}}>Missing Registry</span></span>
-                  <span className="admin-user-uid">UID: {u.id}</span>
-                </div>
-                <div className="admin-user-actions">
-                   <button className="admin-action-btn promote" onClick={() => handleManualRegister(u)}>Fix Registry</button>
-                </div>
-              </div>
-          ))}
         </div>
       )}
 
-      {removed.size > 0 && (
-        <div className="admin-removed-section" style={{marginTop:'30px', borderTop:'1px solid #333', paddingTop:'20px'}}>
-          <h3 style={{fontSize:'14px', color:'#ff8a8a', marginBottom:'15px'}}>Previously Removed Users (Hidden)</h3>
-          <div className="admin-user-list">
-            {users.filter(u => removed.has(u.id)).map(u => (
-              <div key={u.id} className="admin-user-row" style={{opacity: 0.7}}>
-                 <div className="admin-user-info">
-                   <span className="admin-user-name">{u.displayName || u.id} <span className="blocked-tag">HIDDEN</span></span>
-                   <span className="admin-user-uid">{u.email}</span>
-                 </div>
-                 <div className="admin-user-actions">
-                   <button className="admin-action-btn unblock" onClick={() => handleUnremove(u.id)}>Restore User</button>
-                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

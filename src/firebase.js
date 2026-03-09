@@ -124,17 +124,18 @@ export const signOutUser = () => {
 
 // ── Register signed-in (non-anonymous) user in Firestore ─────
 export const registerUser = async (user, retryCount = 0) => {
-  if (!user || user.isAnonymous) return;
+  if (!user) return;
   
+  const isGuest = user.isAnonymous;
   const email = user.email?.toLowerCase() || '';
   console.log("--- REGISTRATION ATTEMPT ---");
   console.log("Active Project ID:", import.meta.env.VITE_FIREBASE_PROJECT_ID);
-  console.log("Auth Provider:", user.providerData[0]?.providerId || 'email');
+  console.log("Auth Provider:", isGuest ? 'anonymous' : (user.providerData[0]?.providerId || 'email'));
   console.log("UID/DocID:", user.uid);
-  console.log("Email Found:", email);
+  console.log("User Type:", isGuest ? 'Guest' : 'Registered');
 
-  // 1. Anti-Spam: Block test domains
-  if (email.endsWith('@example.com')) {
+  // 1. Anti-Spam: Block test domains (only for non-anonymous)
+  if (!isGuest && email.endsWith('@example.com')) {
     console.warn("Registration rejected: @example.com domain is blocked.");
     return;
   }
@@ -147,8 +148,9 @@ export const registerUser = async (user, retryCount = 0) => {
       email: email,
       photoURL: safePhotoURL(user.photoURL),
       lastSeen: serverTimestamp(),
+      isAnonymous: isGuest,
     }, { merge: true });
-    console.log("✅ Registration SUCCESSFUL in Firestore");
+    console.log(`✅ ${isGuest ? 'Guest' : 'User'} Registration SUCCESSFUL in Firestore`);
   } catch (err) {
     console.error("❌ Registration FAILED:", err);
     if (err.code === 'permission-denied') {
