@@ -7,7 +7,6 @@ import AuthScreen from './components/AuthScreen';
 import ChatRoom from './components/ChatRoom';
 import './App.css';
 
-function App() {
   // undefined = still loading, null = signed out, object = signed in
   const [user, setUser] = useState(undefined);
   const [removed, setRemoved] = useState(false);
@@ -47,17 +46,53 @@ function App() {
       </div>
     );
   }
+  // Theme toggle state
+  const [theme, setTheme] = useState('dark');
+  useEffect(() => {
+    document.body.className = theme === 'light' ? 'light' : '';
+  }, [theme]);
 
-  if (removed) {
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
     return (
       <div className="loading-screen">
         <p className="loading-text" style={{color:'#e05c6a'}}>Your account has been removed by an admin.</p>
       </div>
     );
   }
+  if (removed) {
+    return (
+      <div className={`loading-screen${theme === 'light' ? ' light' : ''}`}>
+        <p className="loading-text" style={{color:'#e05c6a'}}>Your account has been removed by an admin.</p>
+        <button
+          className="theme-toggle-btn"
+          onClick={handleToggleTheme}
+          style={{marginTop: 16, padding: '8px 16px', borderRadius: 6, border: 'none', background: theme === 'light' ? '#22232a' : '#e2e6ed', color: theme === 'light' ? '#fff' : '#22232a', fontWeight: 600, cursor: 'pointer'}}
+        >
+          Switch to {theme === 'dark' ? 'Light' : 'Dark'} Theme
+        </button>
+      </div>
+    );
+  }
 
-  return (
     <div className="app">
+      {user ? <ChatRoom user={user} /> : <AuthScreen />}
+    </div>
+  );
+}
+
+export default App;
+  return (
+    <div className={`app${theme === 'light' ? ' light' : ''}`}>
+      <button
+        className="theme-toggle-btn"
+        onClick={handleToggleTheme}
+        style={{position: 'fixed', top: 12, right: 12, zIndex: 1000, padding: '8px 16px', borderRadius: 6, border: 'none', background: theme === 'light' ? '#22232a' : '#e2e6ed', color: theme === 'light' ? '#fff' : '#22232a', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.08)'}
+      >
+        Switch to {theme === 'dark' ? 'Light' : 'Dark'} Theme
+      </button>
       {user ? <ChatRoom user={user} /> : <AuthScreen />}
     </div>
   );

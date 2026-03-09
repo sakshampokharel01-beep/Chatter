@@ -1,4 +1,8 @@
-﻿/* ============================================================
+﻿/* Theme toggle button styles */
+.theme-toggle-btn {
+  transition: background 0.2s, color 0.2s;
+}
+/* ============================================================
    Chatter — Global Stylesheet
    Clean dark slate theme — natural, calm, minimal
    ============================================================ */
@@ -76,7 +80,6 @@ body {
   overflow: hidden;
   background: #111318;
 }
-.admin-panel-header {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -84,6 +87,7 @@ body {
   border-bottom: 1px solid #1e2330;
   flex-shrink: 0;
   flex-wrap: wrap;
+body {
 }
 .admin-stats {
   display: flex;
