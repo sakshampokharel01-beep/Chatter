@@ -10,7 +10,6 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   const [msgCount, setMsgCount] = useState(0);
   const [search, setSearch]     = useState('');
   const [loading, setLoading]   = useState(true);
-  const [debugMode, setDebugMode] = useState(false); 
 
   // Load all registered users
   useEffect(() => {
@@ -119,7 +118,6 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
 
 
   const filtered = users.filter(u => {
-    if (debugMode) return true;
     return !removed.has(u.id) && 
     !(u.email || '').toLowerCase().endsWith('@example.com') && (
       !search ||
@@ -128,31 +126,15 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     );
   });
 
-  const printDebug = () => {
-    console.log("--- DEBUG: ALL USERS IN STATE ---");
-    console.table(users.map(u => ({
-      id: u.id,
-      name: u.displayName,
-      email: u.email,
-      isRemoved: removed.has(u.id),
-      isBlocked: blocked.has(u.id)
-    })));
-  };
 
   return (
     <div className="admin-panel">
       <div className="admin-panel-header">
         <div className="admin-stats">
-          <div className="admin-stat" onClick={printDebug} style={{cursor:'pointer', textDecoration:'underline'}}>
+          <div className="admin-stat">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             Total in DB <span className="admin-count">{users.length}</span>
           </div>
-          <button 
-            onClick={() => setDebugMode(!debugMode)}
-            style={{background: debugMode ? '#ff8a8a' : '#333', border:'none', borderRadius:'4px', color:'white', fontSize:'10px', padding:'2px 8px'}}
-          >
-            {debugMode ? 'DEBUG: ON' : 'DEBUG: OFF'}
-          </button>
           <div className="admin-stat">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Msgs <span className="admin-count">{msgCount}</span>
