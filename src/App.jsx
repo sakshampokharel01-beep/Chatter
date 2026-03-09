@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { auth, registerUser, signOutUser } from './firebase';
-import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from './firebase';
-import AuthScreen from './components/AuthScreen';
-import ChatRoom from './components/ChatRoom';
-import './App.css';
-
+function App() {
   // undefined = still loading, null = signed out, object = signed in
   const [user, setUser] = useState(undefined);
   const [removed, setRemoved] = useState(false);
+  const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
     // Subscribe to auth state. getRedirectResult is handled automatically
@@ -38,16 +31,6 @@ import './App.css';
     return unsub;
   }, [user?.uid]);
 
-  if (user === undefined) {
-    return (
-      <div className="loading-screen">
-        <div className="loader" />
-        <p className="loading-text">Loading Chatter…</p>
-      </div>
-    );
-  }
-  // Theme toggle state
-  const [theme, setTheme] = useState('dark');
   useEffect(() => {
     document.body.className = theme === 'light' ? 'light' : '';
   }, [theme]);
@@ -56,12 +39,22 @@ import './App.css';
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  if (user === undefined) {
     return (
-      <div className="loading-screen">
-        <p className="loading-text" style={{color:'#e05c6a'}}>Your account has been removed by an admin.</p>
+      <div className={`loading-screen${theme === 'light' ? ' light' : ''}`}>
+        <div className="loader" />
+        <p className="loading-text">Loading Chatter…</p>
+        <button
+          className="theme-toggle-btn"
+          onClick={handleToggleTheme}
+          style={{marginTop: 16, padding: '8px 16px', borderRadius: 6, border: 'none', background: theme === 'light' ? '#22232a' : '#e2e6ed', color: theme === 'light' ? '#fff' : '#22232a', fontWeight: 600, cursor: 'pointer'}}
+        >
+          Switch to {theme === 'dark' ? 'Light' : 'Dark'} Theme
+        </button>
       </div>
     );
   }
+
   if (removed) {
     return (
       <div className={`loading-screen${theme === 'light' ? ' light' : ''}`}>
@@ -77,19 +70,12 @@ import './App.css';
     );
   }
 
-    <div className="app">
-      {user ? <ChatRoom user={user} /> : <AuthScreen />}
-    </div>
-  );
-}
-
-export default App;
   return (
     <div className={`app${theme === 'light' ? ' light' : ''}`}>
       <button
         className="theme-toggle-btn"
         onClick={handleToggleTheme}
-        style={{position: 'fixed', top: 12, right: 12, zIndex: 1000, padding: '8px 16px', borderRadius: 6, border: 'none', background: theme === 'light' ? '#22232a' : '#e2e6ed', color: theme === 'light' ? '#fff' : '#22232a', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.08)'}
+        style={{position: 'fixed', top: 12, right: 12, zIndex: 1000, padding: '8px 16px', borderRadius: 6, border: 'none', background: theme === 'light' ? '#22232a' : '#e2e6ed', color: theme === 'light' ? '#fff' : '#22232a', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.08)'}}
       >
         Switch to {theme === 'dark' ? 'Light' : 'Dark'} Theme
       </button>
@@ -97,5 +83,7 @@ export default App;
     </div>
   );
 }
+
+export default App;
 
 export default App;
