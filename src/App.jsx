@@ -1,3 +1,10 @@
+import React, { useState, useEffect } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { auth, db, registerUser, signOutUser } from './firebase';
+import AuthScreen from './components/AuthScreen';
+import ChatRoom from './components/ChatRoom';
+
 function App() {
   // undefined = still loading, null = signed out, object = signed in
   const [user, setUser] = useState(undefined);
