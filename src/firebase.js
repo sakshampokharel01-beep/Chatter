@@ -47,17 +47,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // ── App Check (reCAPTCHA v3) ─────────────────────────────────
-// Proves every request comes from your real app — blocks direct API scripts.
-// To enable: Firebase Console → App Check → Register web app → reCAPTCHA v3
-// Then add VITE_RECAPTCHA_SITE_KEY to your .env and Vercel env vars,
-// and click "Enforce" for Firestore in Firebase Console → App Check.
-// ── App Check (reCAPTCHA v3) ─────────────────────────────────
-if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
-  initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-    isTokenAutoRefreshEnabled: true,
-  });
-}
+// DISABLED: reCAPTCHA script fails to load on some networks (ERR_CERT_COMMON_NAME_INVALID).
+// When App Check token generation hangs, Firebase SDK queues ALL operations indefinitely,
+// causing infinite loading spinners on sign-in. Re-enable only when reCAPTCHA loads reliably.
+// if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+//   initializeAppCheck(app, {
+//     provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+//     isTokenAutoRefreshEnabled: true,
+//   });
+// }
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);

@@ -119,7 +119,6 @@ export default function AuthScreen() {
   // ── Email Sign Up ──────────────────────────────────────
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
-    // Honeypot: bots fill hidden fields, humans don't
     if (honeypot) return;
     if (!emailAddr.trim() || !emailPass) return;
     const validationError = validateSignUp(emailName, emailAddr.trim());
@@ -129,6 +128,7 @@ export default function AuthScreen() {
       await signUpWithEmail(emailName, emailAddr.trim(), emailPass);
     } catch (err) {
       setError(mapEmailError(err.code));
+    } finally {
       setLoading(null);
     }
   };
@@ -142,6 +142,7 @@ export default function AuthScreen() {
       await signInWithEmail(emailAddr.trim(), emailPass);
     } catch (err) {
       setError(mapEmailError(err.code));
+    } finally {
       setLoading(null);
     }
   };
@@ -153,6 +154,7 @@ export default function AuthScreen() {
       await signInAsGuest(guestName);
     } catch (err) {
       setError('Could not join as guest. Please try again.');
+    } finally {
       setLoading(null);
     }
   };
