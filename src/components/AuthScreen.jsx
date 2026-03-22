@@ -111,6 +111,7 @@ export default function AuthScreen() {
         };
         setError(msgs[err.code] || `Error (${err.code}): ${err.message}`);
       }
+    } finally {
       setLoading(null);
     }
   };
