@@ -10,7 +10,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+// App Check import removed — disabled due to reCAPTCHA network failures blocking all Firebase ops
 
 // ── Safe URL allow-list ──────────────────────────────────────
 // Only allow https:// photo URLs to prevent javascript: injection
