@@ -646,22 +646,23 @@
 }
 
 .cta-card {
-  padding: clamp(4rem, 8vw, 6rem) clamp(2rem, 5vw, 4rem);
+  padding: clamp(3rem, 6vw, 4.5rem) clamp(2rem, 4vw, 3.5rem);
   background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  border: 1.5px solid var(--border-default);
   border-radius: 16px;
   text-align: left;
   max-width: 800px;
   transition: all 0.45s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .cta-title {
   font-family: 'Instrument Serif', serif;
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 400;
+  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  font-weight: 450;
   line-height: 1.2;
   color: var(--text-primary);
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.25rem 0;
   transition: color 0.45s ease;
 }
 
@@ -671,7 +672,7 @@
   font-weight: 300;
   line-height: 1.65;
   color: var(--text-secondary);
-  margin: 0 0 2.5rem 0;
+  margin: 0 0 2rem 0;
   max-width: 600px;
   transition: color 0.45s ease;
 }
@@ -679,7 +680,7 @@
 .cta-buttons {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
 }
 
@@ -786,6 +787,20 @@
 
   .steps-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .cta-card {
+    padding: 2.5rem 1.75rem;
+  }
+  
+  .cta-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .cta-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
   }
 
   .theme-toggle {
