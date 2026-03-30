@@ -3,7 +3,6 @@ import '../styles/LandingPage.css';
 
 export default function LandingPage({ onGetStarted }) {
   const [theme, setTheme] = useState('dark');
-  const [isVisible, setIsVisible] = useState({});
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -14,7 +13,7 @@ export default function LandingPage({ onGetStarted }) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setIsVisible((prev) => ({ ...prev, [entry.target.id]: true }));
+            entry.target.classList.add('visible');
           }
         });
       },
