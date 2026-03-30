@@ -3,6 +3,7 @@ import './App.css';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db, registerUser, signOutUser } from './firebase';
+import { ThemeProvider } from './ThemeContext';
 import LandingPage from './components/LandingPage';
 import AuthScreen from './components/AuthScreen';
 import ChatRoom from './components/ChatRoom';
@@ -71,13 +72,19 @@ function App() {
 
   // Show landing page for first-time visitors
   if (showLanding && !user) {
-    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+    return (
+      <ThemeProvider>
+        <LandingPage onGetStarted={() => setShowLanding(false)} />
+      </ThemeProvider>
+    );
   }
 
   return (
-    <div className="app">
-      {user ? <ChatRoom user={user} /> : <AuthScreen onBack={() => setShowLanding(true)} />}
-    </div>
+    <ThemeProvider>
+      <div className="app">
+        {user ? <ChatRoom user={user} /> : <AuthScreen onBack={() => setShowLanding(true)} />}
+      </div>
+    </ThemeProvider>
   );
 }
 

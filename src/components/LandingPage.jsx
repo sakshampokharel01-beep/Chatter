@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useTheme } from '../ThemeContext';
 import '../styles/LandingPage.css';
 
 export default function LandingPage({ onGetStarted }) {
-  const [theme, setTheme] = useState('dark');
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -71,7 +68,7 @@ export default function LandingPage({ onGetStarted }) {
       {/* Theme Toggle */}
       <button 
         className="theme-toggle" 
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        onClick={toggleTheme}
         aria-label="Toggle theme"
       >
         <span className="toggle-track">

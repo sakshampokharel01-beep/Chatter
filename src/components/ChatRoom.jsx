@@ -14,6 +14,7 @@ import {
   doc,
 } from 'firebase/firestore';
 import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '../firebase';
+import { useTheme } from '../ThemeContext';
 import DirectMessages from './DirectMessages';
 import AdminPanel from './AdminPanel';
 
@@ -138,6 +139,7 @@ function SendIcon() {
 
 /* ── Chat Room (main) ─────────────────────────────────────── */
 export default function ChatRoom({ user }) {
+  const { toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('global');
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -317,6 +319,16 @@ export default function ChatRoom({ user }) {
         </div>
 
         <div className="header-user">
+          <button 
+            className="theme-toggle-chat" 
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            title="Toggle theme"
+          >
+            <span className="toggle-track">
+              <span className="toggle-thumb"></span>
+            </span>
+          </button>
           {user.photoURL ? (
             <img src={user.photoURL} alt={displayName} className="user-avatar" />
           ) : (

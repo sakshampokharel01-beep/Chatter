@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { signInWithGoogle, signInAsGuest, signUpWithEmail, signInWithEmail } from '../firebase';
+import { useTheme } from '../ThemeContext';
 
 /* ── EyeIcon ─────────────────────────────────────────── */
 function EyeIcon({ open }) {
@@ -75,6 +76,7 @@ function UserIcon() {
 }
 
 export default function AuthScreen({ onBack }) {
+  const { toggleTheme } = useTheme();
   const [loading, setLoading] = useState(null);
   const [error, setError]   = useState('');
   const [step, setStep]     = useState('home');   // 'home' | 'guestName'
@@ -167,6 +169,18 @@ export default function AuthScreen({ onBack }) {
       <div className="auth-screen">
         <div className="auth-orb auth-orb--1" />
         <div className="auth-orb auth-orb--2" />
+        
+        {/* Theme Toggle */}
+        <button 
+          className="theme-toggle" 
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        >
+          <span className="toggle-track">
+            <span className="toggle-thumb"></span>
+          </span>
+        </button>
+        
         <div className="auth-card">
           <span className="auth-logo" role="img" aria-label="Guest">
             <div className="auth-logo-icon">
@@ -224,6 +238,17 @@ export default function AuthScreen({ onBack }) {
       <div className="auth-orb auth-orb--1" />
       <div className="auth-orb auth-orb--2" />
       <div className="auth-orb auth-orb--3" />
+
+      {/* Theme Toggle */}
+      <button 
+        className="theme-toggle" 
+        onClick={toggleTheme}
+        aria-label="Toggle theme"
+      >
+        <span className="toggle-track">
+          <span className="toggle-thumb"></span>
+        </span>
+      </button>
 
       <div className="auth-card">
         {onBack && (
