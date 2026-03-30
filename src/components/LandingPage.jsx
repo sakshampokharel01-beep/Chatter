@@ -90,10 +90,6 @@ export default function LandingPage({ onGetStarted }) {
       <section className="hero">
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge">
-              <span className="badge-dot"></span>
-              Free Forever • No Credit Card Required
-            </div>
             <h1 className="hero-title">
               Connect with Anyone, Anywhere
             </h1>
@@ -108,7 +104,7 @@ export default function LandingPage({ onGetStarted }) {
                   <polyline points="12 5 19 12 12 19"/>
                 </svg>
               </button>
-              <button className="btn-secondary" onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>
+              <button className="btn-secondary" onClick={onGetStarted}>
                 Learn More
               </button>
             </div>
