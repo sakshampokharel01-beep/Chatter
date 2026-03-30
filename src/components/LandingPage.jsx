@@ -49,6 +49,24 @@ export default function LandingPage({ onGetStarted }) {
     }
   ];
 
+  const benefits = [
+    {
+      label: 'Speed',
+      title: 'Messages arrive in milliseconds',
+      description: 'Built on cutting-edge infrastructure. Your messages travel at the speed of light, not the speed of bureaucracy.'
+    },
+    {
+      label: 'Privacy',
+      title: 'Your data stays yours',
+      description: 'We don\'t read your messages. We don\'t sell your data. We don\'t track your behavior. Simple as that.'
+    },
+    {
+      label: 'Access',
+      title: 'No barriers to entry',
+      description: 'Start chatting in seconds. No phone number required. No email verification. No friction.'
+    }
+  ];
+
   return (
     <div className="landing">
       {/* Theme Toggle */}
@@ -119,17 +137,66 @@ export default function LandingPage({ onGetStarted }) {
         </div>
       </section>
 
+      {/* Benefits Section */}
+      <section className="benefits" id="benefits" data-reveal>
+        <div className="container">
+          <div className="section-marker">
+            <span>Why Chatter</span>
+          </div>
+          <div className="benefits-list">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="benefit-item">
+                <div className="benefit-label">{benefit.label}</div>
+                <div className="benefit-content">
+                  <h3 className="benefit-title">{benefit.title}</h3>
+                  <p className="benefit-description">{benefit.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="how-it-works" id="how" data-reveal>
+        <div className="container">
+          <div className="section-marker">
+            <span>How It Works</span>
+          </div>
+          <div className="steps-grid">
+            <div className="step-item">
+              <div className="step-number">01</div>
+              <h4 className="step-title">Choose your path</h4>
+              <p className="step-description">Sign in with Google, create an account with email, or jump in as a guest. Takes less than 10 seconds.</p>
+            </div>
+            <div className="step-item">
+              <div className="step-number">02</div>
+              <h4 className="step-title">Start chatting</h4>
+              <p className="step-description">Join the global chat room or send private messages. Your choice, your conversation.</p>
+            </div>
+            <div className="step-item">
+              <div className="step-number">03</div>
+              <h4 className="step-title">Connect freely</h4>
+              <p className="step-description">Build relationships, share ideas, have fun. No limits, no restrictions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="cta-section" id="cta" data-reveal>
         <div className="container">
           <div className="cta-card">
             <h2 className="cta-title">Ready to start?</h2>
             <p className="cta-subtitle">
-              Join thousands already connecting on Chatter. Free forever, no credit card required.
+              Join thousands already connecting on Chatter. Free forever, no credit card required. Start your first conversation in the next 30 seconds.
             </p>
-            <button className="btn-primary" onClick={onGetStarted}>
-              <span>Get Started Now</span>
-            </button>
+            <div className="cta-buttons">
+              <button className="btn-primary" onClick={onGetStarted}>
+                <span>Start Chatting Now</span>
+              </button>
+              <span className="cta-note">No signup required for guest access</span>
+            </div>
           </div>
         </div>
       </section>
