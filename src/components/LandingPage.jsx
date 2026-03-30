@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
-import { useTheme } from '../ThemeContext';
+import React, { useState, useEffect } from 'react';
 import '../styles/LandingPage.css';
 
 export default function LandingPage({ onGetStarted }) {
-  const { theme, toggleTheme } = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -63,21 +66,64 @@ export default function LandingPage({ onGetStarted }) {
     }
   ];
 
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setMenuOpen(false);
+    }
+  };
+
   return (
     <div className="landing">
-      {/* Theme Toggle */}
-      <button 
-        className="theme-toggle" 
-        onClick={toggleTheme}
-        aria-label="Toggle theme"
-      >
-        <span className="toggle-track">
-          <span className="toggle-thumb"></span>
-        </span>
-      </button>
+      {/* Header */}
+      <header className="landing-header">
+        <div className="container">
+          <div className="header-content">
+            <div className="header-logo-section">
+              <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="48" height="48" rx="14" fill="#5b8dee"/>
+                <path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="white" fillOpacity="0.92"/>
+                <circle cx="19" cy="24" r="1.5" fill="#5b8dee"/>
+                <circle cx="24" cy="24" r="1.5" fill="#5b8dee"/>
+                <circle cx="29" cy="24" r="1.5" fill="#5b8dee"/>
+              </svg>
+              <span className="header-brand-name">Chatter</span>
+            </div>
+
+            <button 
+              className="menu-toggle" 
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+            >
+              <span className={`hamburger ${menuOpen ? 'open' : ''}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+
+            <nav className={`nav-menu ${menuOpen ? 'open' : ''}`}>
+              <button className="nav-link" onClick={() => scrollToSection('hero')}>
+                Home
+              </button>
+              <button className="nav-link" onClick={() => scrollToSection('features')}>
+                Features
+              </button>
+              <button className="nav-link" onClick={() => scrollToSection('how')}>
+                How It Works
+              </button>
+              <button className="nav-link nav-link-cta" onClick={onGetStarted}>
+                Sign In
+              </button>
+            </nav>
+          </div>
+        </div>
+      </header>
 
       {/* Hero Section */}
-      <section className="hero">
+      <section className="hero" id="hero">
         <div className="container">
           <div className="hero-content">
             <span className="hero-tag animate-in">// MESSAGING PLATFORM</span>
