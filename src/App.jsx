@@ -62,6 +62,13 @@ function App() {
     return <LandingPage onGetStarted={() => setShowLanding(false)} />;
   }
 
+  // Add no-scroll class when in chat
+  if (user) {
+    document.body.classList.add('no-scroll');
+  } else {
+    document.body.classList.remove('no-scroll');
+  }
+
   return (
     <div className="app">
       {user ? <ChatRoom user={user} /> : <AuthScreen onBack={() => setShowLanding(true)} />}
