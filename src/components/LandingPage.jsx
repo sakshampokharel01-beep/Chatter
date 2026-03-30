@@ -245,7 +245,7 @@ export default function LandingPage({ onGetStarted }) {
       {/* Footer */}
       <footer className="footer">
         <div className="container">
-          <p>Made with ❤️ by <a href="https://sakshampokharel.me" target="_blank" rel="noopener noreferrer">Saksham Pokharel</a></p>
+          <p>© {new Date().getFullYear()} <a href="https://sakshampokharel.me" target="_blank" rel="noopener noreferrer">Saksham Pokharel</a>. All rights reserved.</p>
         </div>
       </footer>
     </div>
