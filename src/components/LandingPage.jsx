@@ -104,7 +104,7 @@ export default function LandingPage({ onGetStarted }) {
                   <polyline points="12 5 19 12 12 19"/>
                 </svg>
               </button>
-              <button className="btn-secondary" onClick={onGetStarted}>
+              <button className="btn-secondary" onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>
                 Learn More
               </button>
             </div>
