@@ -444,26 +444,40 @@
 .section-marker {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 4rem;
+  gap: 1.5rem;
+  margin-bottom: 4.5rem;
+  position: relative;
 }
 
 .section-marker::before {
   content: '';
-  flex: 0 0 40px;
-  height: 1px;
-  background: var(--accent);
+  flex: 0 0 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
   transition: background 0.45s ease;
 }
 
 .section-marker span {
   font-family: 'DM Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-tertiary);
+  color: var(--accent);
   transition: color 0.45s ease;
+  position: relative;
+  padding-bottom: 0.25rem;
+}
+
+.section-marker span::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.5;
 }
 
 .features-grid {
