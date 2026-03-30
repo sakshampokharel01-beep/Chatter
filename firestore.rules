@@ -6,11 +6,7 @@ service cloud.firestore {
     function isSignedIn() { return request.auth != null; }
     
     function isAdmin() {
-      return isSignedIn() && (
-        request.auth.uid == 'lnYH4d6sv2NRE2DOm76B6WZGwdS2' ||
-        (request.auth.token.email != null && request.auth.token.email.lower() == 'sakshampokharel01@gmail.com') ||
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-      );
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
     
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
@@ -22,9 +18,10 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // 3. USER PROFILES (Wide Open for Diagnostic)
+    // 3. USER PROFILES (Secured)
     match /users/{uid} {
-      allow read, write: if isSignedIn();
+      allow read: if isSignedIn();
+      allow write: if isOwner(uid);
       allow delete: if false;
     }
 

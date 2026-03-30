@@ -9,7 +9,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 // App Check import removed — disabled due to reCAPTCHA network failures blocking all Firebase ops
 
 // ── Safe URL allow-list ──────────────────────────────────────
@@ -123,9 +123,13 @@ export const registerUser = async (user, retryCount = 0) => {
   console.log("UID/DocID:", user.uid);
   console.log("User Type:", isGuest ? 'Guest' : 'Registered');
 
-  // 1. Anti-Spam: Block test domains (only for non-anonymous)
-  if (!isGuest && email.endsWith('@example.com')) {
-    console.warn("Registration rejected: @example.com domain is blocked.");
+  // 1. Anti-Spam: Block disposable/test domains (only for non-anonymous)
+  const blockedDomains = [
+    '@example.com', '@test.com', '@temp-mail.', '@guerrillamail.',
+    '@10minutemail.', '@throwaway.', '@mailinator.', '@trashmail.'
+  ];
+  if (!isGuest && blockedDomains.some(domain => email.includes(domain))) {
+    console.warn("Registration rejected: Disposable email domain blocked.");
     return;
   }
 
@@ -155,11 +159,16 @@ export const registerUser = async (user, retryCount = 0) => {
 };
 
 // ── Admin ───────────────────────────────────────────────
-export const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
-export const isAdmin = (user) => {
-  const email = user?.email || '';
-  const adminEmail = (ADMIN_EMAIL || '').toLowerCase();
-  return !!(email && email.toLowerCase() === adminEmail);
+// Check admin status from Firestore instead of exposing in client code
+export const isAdmin = async (user) => {
+  if (!user) return false;
+  try {
+    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+    return adminDoc.exists();
+  } catch (err) {
+    console.error('Error checking admin status:', err);
+    return false;
+  }
 };
 
 // ── Deterministic DM conversation ID ─────────────────────────
