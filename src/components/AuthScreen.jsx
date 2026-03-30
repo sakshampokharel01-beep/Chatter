@@ -74,7 +74,7 @@ function UserIcon() {
   );
 }
 
-export default function AuthScreen() {
+export default function AuthScreen({ onBack }) {
   const [loading, setLoading] = useState(null);
   const [error, setError]   = useState('');
   const [step, setStep]     = useState('home');   // 'home' | 'guestName'
@@ -226,6 +226,15 @@ export default function AuthScreen() {
       <div className="auth-orb auth-orb--3" />
 
       <div className="auth-card">
+        {onBack && (
+          <button className="back-to-landing" onClick={onBack} aria-label="Back to home">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back
+          </button>
+        )}
         <div className="auth-logo" aria-hidden="true">
           <div className="auth-logo-icon">
             <svg width="52" height="52" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
