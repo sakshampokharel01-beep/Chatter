@@ -38,7 +38,19 @@ function App() {
     return unsub;
   }, [user?.uid]);
 
-
+  // Manage body scroll class
+  useEffect(() => {
+    if (user) {
+      document.body.classList.add('no-scroll');
+    } else {
+      document.body.classList.remove('no-scroll');
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, [user]);
 
   if (user === undefined) {
     return (
@@ -60,13 +72,6 @@ function App() {
   // Show landing page for first-time visitors
   if (showLanding && !user) {
     return <LandingPage onGetStarted={() => setShowLanding(false)} />;
-  }
-
-  // Add no-scroll class when in chat
-  if (user) {
-    document.body.classList.add('no-scroll');
-  } else {
-    document.body.classList.remove('no-scroll');
   }
 
   return (
