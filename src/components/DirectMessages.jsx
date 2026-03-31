@@ -14,6 +14,8 @@ import {
   where,
 } from 'firebase/firestore';
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
+import VideoCall from './VideoCall';
+import { getSocket } from '../socket';
 
 const DM_LIMIT = 100;
 const MAX_CHARS = 500;
@@ -97,6 +99,8 @@ export default function DirectMessages({ user }) {
   const [search, setSearch] = useState('');
   const [mobileView, setMobileView] = useState('list'); // 'list' | 'chat'
   const [activeTab, setActiveTab] = useState('friends'); // 'friends' | 'all' | 'requests'
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [incomingCall, setIncomingCall] = useState(null); // { from: userId, fromName: string }
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -142,12 +146,20 @@ export default function DirectMessages({ user }) {
 
   /* ── Subscribe to removed users ── */
   useEffect(() => {
-    return onSnapshot(collection(db, 'deletedUsers'), snap => {
-      setRemoved(new Set(snap.docs.map(d => d.id)));
-    }, (err) => {
-      console.error('Deleted users snapshot error:', err);
-    });
-  }, []);
+    if (isGuest) return; // Guests don't need this
+    
+    const unsub = onSnapshot(
+      collection(db, 'deletedUsers'), 
+      (snap) => {
+        setRemoved(new Set(snap.docs.map(d => d.id)));
+      }, 
+      (err) => {
+        // Silently fail if no permission - not critical for DMs
+        console.warn('Could not load deleted users (may need Firestore rules deployed)');
+      }
+    );
+    return unsub;
+  }, [isGuest]);
 
   /* ── Subscribe to friend requests (sent by me) ── */
   useEffect(() => {
@@ -215,6 +227,58 @@ export default function DirectMessages({ user }) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  /* ── Listen for incoming calls ── */
+  useEffect(() => {
+    if (isGuest) return; // Don't set up socket for guest users
+    
+    const socket = getSocket(user.uid, displayName);
+
+    const handleCallSignal = ({ from, peerId }) => {
+      console.log('📞 Incoming call from:', from, 'peerId:', peerId);
+      
+      // Find the user who's calling - use a callback to get latest users
+      setUsers(currentUsers => {
+        const caller = currentUsers.find(u => u.id === from);
+        console.log('👤 Caller found:', caller);
+        
+        if (caller) {
+          console.log('✅ Setting incoming call notification');
+          setIncomingCall({ from, fromName: caller.displayName, peerId });
+        } else {
+          console.log('❌ Caller not found in users list');
+        }
+        
+        return currentUsers; // Don't modify users array
+      });
+    };
+
+    socket.on('call-signal', handleCallSignal);
+    console.log('🎧 Listening for call-signal events');
+
+    return () => {
+      socket.off('call-signal', handleCallSignal);
+      console.log('🔇 Stopped listening for call-signal events');
+    };
+  }, [user.uid, displayName, isGuest]); // Removed 'users' from dependencies
+
+  /* ── Accept incoming call ── */
+  const acceptIncomingCall = useCallback(() => {
+    if (!incomingCall) return;
+    
+    const caller = users.find(u => u.id === incomingCall.from);
+    if (caller) {
+      setSelectedUser(caller);
+      setShowVideoCall(true);
+      setIncomingCall(null);
+      setMobileView('chat');
+    }
+  }, [incomingCall, users]);
+
+  /* ── Reject incoming call ── */
+  const rejectIncomingCall = useCallback(() => {
+    setIncomingCall(null);
+  }, []);
 
   /* ── Send friend request ── */
   const sendFriendRequest = async (toUser) => {
@@ -502,6 +566,13 @@ export default function DirectMessages({ user }) {
                 <span className="dm-chat-name">{selectedUser.displayName}</span>
                 <span className="dm-chat-sub">Private conversation</span>
               </div>
+              <button 
+                className="video-call-btn" 
+                onClick={() => setShowVideoCall(true)}
+                title="Start video call"
+              >
+                📹
+              </button>
             </div>
 
             <div className="messages-container">
@@ -568,6 +639,37 @@ export default function DirectMessages({ user }) {
           </div>
         )}
       </div>
+
+      {/* Incoming Call Notification - Only show if video call is not already open */}
+      {incomingCall && !showVideoCall && (
+        <div className="incoming-call-notification">
+          <div className="incoming-call-content">
+            <div className="incoming-call-icon">📞</div>
+            <div className="incoming-call-info">
+              <strong>{incomingCall.fromName}</strong>
+              <span>Incoming video call...</span>
+            </div>
+            <div className="incoming-call-actions">
+              <button className="accept-call-btn" onClick={acceptIncomingCall}>
+                ✓ Accept
+              </button>
+              <button className="reject-call-btn" onClick={rejectIncomingCall}>
+                ✕ Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Call Modal */}
+      {showVideoCall && selectedUser && (
+        <VideoCall
+          user={user}
+          friendId={selectedUser.id}
+          friendName={selectedUser.displayName}
+          onClose={() => setShowVideoCall(false)}
+        />
+      )}
     </div>
   );
 }
