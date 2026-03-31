@@ -102,14 +102,36 @@ export default function DirectMessages({ user }) {
   const inputRef = useRef(null);
   const lastSentRef = useRef(0);
   const displayName = getDisplayName(user);
+  const isGuest = user.isAnonymous;
 
-  /* ── Subscribe to registered users ── */
+  // If user is a guest, show message that DMs are not available
+  if (isGuest) {
+    return (
+      <div className="dm-container">
+        <div className="dm-welcome" style={{ width: '100%', height: '100%' }}>
+          <span className="welcome-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          <strong>Direct Messages Unavailable</strong>
+          <p>Sign in with Google or Email to use Direct Messages and add friends.</p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Subscribe to registered users (exclude guests) ── */
   useEffect(() => {
     const q = collection(db, 'users');
     return onSnapshot(q, (snap) => {
       const allUsers = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
-        .filter(u => u.id !== user.uid);
+        .filter(u => 
+          u.id !== user.uid &&           // Not current user
+          !u.isAnonymous                 // Not a guest user
+        );
       
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
       setUsers(allUsers);
