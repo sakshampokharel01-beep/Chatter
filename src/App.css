@@ -1491,3 +1491,148 @@ body.no-scroll {
 .back-to-landing:hover svg {
   transform: translateX(-2px);
 }
+
+/* ================================================================
+   FRIEND REQUESTS & DM TABS
+   ================================================================ */
+
+.dm-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dm-tab {
+  flex: 1;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #606878;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.dm-tab:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #8898b0;
+}
+
+.dm-tab.active {
+  background: rgba(91, 141, 238, 0.12);
+  color: #5b8dee;
+}
+
+.request-badge {
+  background: #e05c6a;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+}
+
+.dm-user-item-wrapper {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.friend-badge,
+.pending-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.friend-badge {
+  background: rgba(76, 175, 125, 0.12);
+  color: #4caf7d;
+}
+
+.pending-badge {
+  background: rgba(200, 144, 64, 0.12);
+  color: #c89040;
+}
+
+.add-friend-btn {
+  background: rgba(91, 141, 238, 0.12);
+  border: 1px solid rgba(91, 141, 238, 0.25);
+  color: #5b8dee;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-friend-btn:hover {
+  background: rgba(91, 141, 238, 0.2);
+  border-color: rgba(91, 141, 238, 0.4);
+}
+
+.friend-request-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(91, 141, 238, 0.03);
+}
+
+.request-text {
+  font-size: 11px;
+  color: #606878;
+  margin-top: 2px;
+}
+
+.request-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.accept-btn,
+.reject-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.accept-btn {
+  background: rgba(76, 175, 125, 0.12);
+  color: #4caf7d;
+  border: 1px solid rgba(76, 175, 125, 0.25);
+}
+
+.accept-btn:hover {
+  background: rgba(76, 175, 125, 0.2);
+  border-color: rgba(76, 175, 125, 0.4);
+}
+
+.reject-btn {
+  background: rgba(224, 92, 106, 0.12);
+  color: #e05c6a;
+  border: 1px solid rgba(224, 92, 106, 0.25);
+}
+
+.reject-btn:hover {
+  background: rgba(224, 92, 106, 0.2);
+  border-color: rgba(224, 92, 106, 0.4);
+}

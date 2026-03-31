@@ -9,9 +9,6 @@ import {
   serverTimestamp,
   doc,
   setDoc,
-  updateDoc,
-  deleteDoc,
-  where,
 } from 'firebase/firestore';
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
 
@@ -81,14 +78,10 @@ function SendIcon() {
   );
 }
 
-/* ── Direct Messages with Friend Requests ──────────────────────────────────────── */
+/* ── Direct Messages ──────────────────────────────────────── */
 export default function DirectMessages({ user }) {
   const [users, setUsers] = useState([]);
   const [removed, setRemoved] = useState(new Set());
-  const [friends, setFriends] = useState(new Set());
-  const [pendingRequests, setPendingRequests] = useState(new Map()); // uid -> request doc
-  const [incomingRequests, setIncomingRequests] = useState([]);
-  
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -96,7 +89,6 @@ export default function DirectMessages({ user }) {
   const [loadingMsg, setLoadingMsg] = useState(false);
   const [search, setSearch] = useState('');
   const [mobileView, setMobileView] = useState('list'); // 'list' | 'chat'
-  const [activeTab, setActiveTab] = useState('friends'); // 'friends' | 'all' | 'requests'
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -109,8 +101,9 @@ export default function DirectMessages({ user }) {
     return onSnapshot(q, (snap) => {
       const allUsers = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
-        .filter(u => u.id !== user.uid);
+        .filter(u => u.id !== user.uid); // id is the UID from Firestore doc ID
       
+      console.log(`[DMs] Received ${allUsers.length} potential users (excluding self)`);
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
       setUsers(allUsers);
     }, (err) => {
@@ -126,49 +119,6 @@ export default function DirectMessages({ user }) {
       console.error('Deleted users snapshot error:', err);
     });
   }, []);
-
-  /* ── Subscribe to friend requests (sent by me) ── */
-  useEffect(() => {
-    const q = query(
-      collection(db, 'friendRequests'),
-      where('from', '==', user.uid)
-    );
-    return onSnapshot(q, (snap) => {
-      const pending = new Map();
-      snap.docs.forEach(d => {
-        pending.set(d.data().to, { id: d.id, ...d.data() });
-      });
-      setPendingRequests(pending);
-    });
-  }, [user.uid]);
-
-  /* ── Subscribe to incoming friend requests ── */
-  useEffect(() => {
-    const q = query(
-      collection(db, 'friendRequests'),
-      where('to', '==', user.uid)
-    );
-    return onSnapshot(q, (snap) => {
-      setIncomingRequests(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
-  }, [user.uid]);
-
-  /* ── Subscribe to friends list ── */
-  useEffect(() => {
-    const q = query(
-      collection(db, 'friends'),
-      where('users', 'array-contains', user.uid)
-    );
-    return onSnapshot(q, (snap) => {
-      const friendSet = new Set();
-      snap.docs.forEach(d => {
-        const data = d.data();
-        const otherUser = data.users.find(uid => uid !== user.uid);
-        if (otherUser) friendSet.add(otherUser);
-      });
-      setFriends(friendSet);
-    });
-  }, [user.uid]);
 
   /* ── Subscribe to DM messages when a conversation is open ── */
   useEffect(() => {
@@ -194,64 +144,19 @@ export default function DirectMessages({ user }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  /* ── Send friend request ── */
-  const sendFriendRequest = async (toUser) => {
-    try {
-      await addDoc(collection(db, 'friendRequests'), {
-        from: user.uid,
-        fromName: displayName,
-        fromPhoto: safePhotoURL(auth.currentUser?.photoURL),
-        to: toUser.id,
-        toName: toUser.displayName,
-        createdAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.error('Failed to send friend request:', err);
-      alert('Failed to send friend request');
-    }
-  };
-
-  /* ── Accept friend request ── */
-  const acceptFriendRequest = async (request) => {
-    try {
-      // Create friendship
-      await addDoc(collection(db, 'friends'), {
-        users: [user.uid, request.from],
-        createdAt: serverTimestamp(),
-      });
-      // Delete request
-      await deleteDoc(doc(db, 'friendRequests', request.id));
-    } catch (err) {
-      console.error('Failed to accept friend request:', err);
-      alert('Failed to accept friend request');
-    }
-  };
-
-  /* ── Reject friend request ── */
-  const rejectFriendRequest = async (requestId) => {
-    try {
-      await deleteDoc(doc(db, 'friendRequests', requestId));
-    } catch (err) {
-      console.error('Failed to reject friend request:', err);
-    }
-  };
-
-  /* ── Open a conversation (only if friends) ── */
+  /* ── Open a conversation ── */
   const openConversation = async (u) => {
-    if (!friends.has(u.id)) {
-      alert('You must be friends to send messages');
-      return;
-    }
-    
     setMessages([]);
-    const dmId = getDMId(user.uid, u.id);
+    const dmId = getDMId(user.uid, u.uid);
+    // Attempt to create the conversation doc; if it already exists the
+    // update rule will deny it — that's fine, we just ignore the error.
     try {
       await setDoc(doc(db, 'dms', dmId), {
-        participants: [user.uid, u.id],
+        participants: [user.uid, u.uid],
         createdAt: serverTimestamp(),
       });
     } catch {
-      // doc already exists
+      // doc already exists — safe to proceed
     }
     setSelectedUser(u);
     setMobileView('chat');
@@ -301,9 +206,6 @@ export default function DirectMessages({ user }) {
     (u.displayName || '').toLowerCase().includes(search.toLowerCase()),
   );
 
-  const friendsList = filtered.filter(u => friends.has(u.id));
-  const allUsersList = filtered;
-
   const charCount = inputText.length;
   const charClass =
     charCount > MAX_CHARS * 0.9 ? 'char-count danger'
@@ -318,146 +220,46 @@ export default function DirectMessages({ user }) {
       <div className={`dm-sidebar${mobileView === 'chat' ? ' dm-mobile-hidden' : ''}`}>
         <div className="dm-sidebar-header">
           <span className="dm-sidebar-title">Messages</span>
-          {incomingRequests.length > 0 && (
-            <span className="request-badge">{incomingRequests.length}</span>
-          )}
         </div>
 
-        {/* Tabs */}
-        <div className="dm-tabs">
-          <button
-            className={`dm-tab${activeTab === 'friends' ? ' active' : ''}`}
-            onClick={() => setActiveTab('friends')}
-          >
-            Friends ({friendsList.length})
-          </button>
-          <button
-            className={`dm-tab${activeTab === 'all' ? ' active' : ''}`}
-            onClick={() => setActiveTab('all')}
-          >
-            All Users
-          </button>
-          <button
-            className={`dm-tab${activeTab === 'requests' ? ' active' : ''}`}
-            onClick={() => setActiveTab('requests')}
-          >
-            Requests {incomingRequests.length > 0 && `(${incomingRequests.length})`}
-          </button>
+        <div className="dm-search-wrap">
+          <svg className="dm-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="#55558a" strokeWidth="2" />
+            <path d="m21 21-4.35-4.35" stroke="#55558a" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <input
+            id="dm-search"
+            name="dm-search"
+            className="dm-search"
+            type="text"
+            placeholder="Search…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            aria-label="Search users"
+          />
         </div>
-
-        {activeTab !== 'requests' && (
-          <div className="dm-search-wrap">
-            <svg className="dm-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="8" stroke="#55558a" strokeWidth="2" />
-              <path d="m21 21-4.35-4.35" stroke="#55558a" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            <input
-              className="dm-search"
-              type="text"
-              placeholder="Search…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-        )}
 
         <div className="dm-users-list">
-          {/* Friends Tab */}
-          {activeTab === 'friends' && (
-            friendsList.length === 0 ? (
-              <div className="dm-empty">No friends yet.\nAdd friends from All Users tab!</div>
-            ) : (
-              friendsList.map(u => (
-                <button
-                  key={u.id}
-                  className={`dm-user-item${selectedUser?.id === u.id ? ' dm-user-active' : ''}`}
-                  onClick={() => openConversation(u)}
-                >
-                  <Avatar displayName={u.displayName} photoURL={u.photoURL} size={38} />
-                  <div className="dm-user-info">
-                    <span className="dm-user-name">{u.displayName}</span>
-                  </div>
-                  {selectedUser?.id === u.id && <span className="dm-selected-dot" />}
-                </button>
-              ))
-            )
-          )}
-
-          {/* All Users Tab */}
-          {activeTab === 'all' && (
-            allUsersList.length === 0 ? (
-              <div className="dm-empty">No users found</div>
-            ) : (
-              allUsersList.map(u => {
-                const isFriend = friends.has(u.id);
-                const hasPending = pendingRequests.has(u.id);
-                
-                return (
-                  <div key={u.id} className="dm-user-item-wrapper">
-                    <div className="dm-user-item">
-                      <Avatar displayName={u.displayName} photoURL={u.photoURL} size={38} />
-                      <div className="dm-user-info">
-                        <span className="dm-user-name">{u.displayName}</span>
-                        {isFriend && <span className="friend-badge">Friend</span>}
-                        {hasPending && <span className="pending-badge">Pending</span>}
-                      </div>
-                      {!isFriend && !hasPending && (
-                        <button
-                          className="add-friend-btn"
-                          onClick={() => sendFriendRequest(u)}
-                          title="Send friend request"
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="8.5" cy="7" r="4"/>
-                            <line x1="20" y1="8" x2="20" y2="14"/>
-                            <line x1="23" y1="11" x2="17" y2="11"/>
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )
-          )}
-
-          {/* Requests Tab */}
-          {activeTab === 'requests' && (
-            incomingRequests.length === 0 ? (
-              <div className="dm-empty">No pending requests</div>
-            ) : (
-              incomingRequests.map(req => {
-                const reqUser = users.find(u => u.id === req.from);
-                if (!reqUser) return null;
-                
-                return (
-                  <div key={req.id} className="friend-request-item">
-                    <Avatar displayName={reqUser.displayName} photoURL={reqUser.photoURL} size={38} />
-                    <div className="dm-user-info">
-                      <span className="dm-user-name">{reqUser.displayName}</span>
-                      <span className="request-text">wants to be friends</span>
-                    </div>
-                    <div className="request-actions">
-                      <button
-                        className="accept-btn"
-                        onClick={() => acceptFriendRequest(req)}
-                        title="Accept"
-                      >
-                        ✓
-                      </button>
-                      <button
-                        className="reject-btn"
-                        onClick={() => rejectFriendRequest(req.id)}
-                        title="Reject"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
-            )
+          {filtered.length === 0 ? (
+            <div className="dm-empty">
+              {users.length === 0
+                ? 'No other users yet.\nAsk a friend to join with Google!'
+                : 'No users match your search.'}
+            </div>
+          ) : (
+            filtered.map(u => (
+              <button
+                key={u.id}
+                className={`dm-user-item${selectedUser?.id === u.id ? ' dm-user-active' : ''}`}
+                onClick={() => openConversation(u)}
+              >
+                <Avatar displayName={u.displayName} photoURL={u.photoURL} size={38} />
+                <div className="dm-user-info">
+                  <span className="dm-user-name">{u.displayName}</span>
+                </div>
+                {selectedUser?.id === u.id && <span className="dm-selected-dot" />}
+              </button>
+            ))
           )}
         </div>
       </div>
@@ -470,6 +272,7 @@ export default function DirectMessages({ user }) {
               <button
                 className="dm-back-btn"
                 onClick={() => setMobileView('list')}
+                aria-label="Back to users"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -487,11 +290,8 @@ export default function DirectMessages({ user }) {
                 <div className="welcome-msg"><div className="loader" /></div>
               ) : messages.length === 0 ? (
                 <div className="welcome-msg">
-                  <span className="welcome-icon">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.5">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
+                  <span className="welcome-icon" aria-hidden="true">
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   </span>
                   <strong>No messages yet</strong>
                   <p>Say hello to {selectedUser.displayName}!</p>
@@ -520,6 +320,7 @@ export default function DirectMessages({ user }) {
                   onChange={e => setInputText(e.target.value.slice(0, MAX_CHARS))}
                   onKeyDown={handleKeyDown}
                   disabled={sending}
+                  aria-label="DM input"
                 />
                 {charCount > 0 && (
                   <span className={charClass}>{charCount}/{MAX_CHARS}</span>
@@ -528,6 +329,7 @@ export default function DirectMessages({ user }) {
                   className="btn-send"
                   onClick={sendDM}
                   disabled={!inputText.trim() || sending}
+                  aria-label="Send message"
                 >
                   <SendIcon />
                 </button>
@@ -536,13 +338,11 @@ export default function DirectMessages({ user }) {
           </>
         ) : (
           <div className="dm-welcome">
-            <span className="welcome-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.5">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
+            <span className="welcome-icon" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#5b8dee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </span>
             <strong>Your Messages</strong>
-            <p>Add friends and start chatting!</p>
+            <p>Select someone from the list to start a private conversation.</p>
           </div>
         )}
       </div>
