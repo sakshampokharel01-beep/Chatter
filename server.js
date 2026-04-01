@@ -13,16 +13,47 @@ import cors from 'cors';
 const app = express();
 const httpServer = createServer(app);
 
-// Configure CORS
+// Configure CORS - Only allow your Vercel domain
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://chatter-talk.vercel.app',
+  process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
-// Initialize Socket.IO
+// Initialize Socket.IO with stricter CORS
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://chatter-talk.vercel.app',
+        process.env.CLIENT_URL
+      ].filter(Boolean);
+      
+      if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -38,16 +69,43 @@ io.on('connection', (socket) => {
   const userId = socket.handshake.auth.userId;
   const userName = socket.handshake.auth.userName;
   
+  // Validate user data
+  if (!userId || typeof userId !== 'string' || userId.length > 128) {
+    console.log('❌ Invalid userId');
+    socket.disconnect();
+    return;
+  }
+  
+  if (!userName || typeof userName !== 'string' || userName.length > 64) {
+    console.log('❌ Invalid userName');
+    socket.disconnect();
+    return;
+  }
+  
   if (userId) {
     users.set(userId, {
       socketId: socket.id,
-      userName: userName
+      userName: userName.slice(0, 64) // Ensure max length
     });
     console.log(`📝 Registered user: ${userName} (${userId})`);
   }
 
   // Handle call signal (initiating a call)
   socket.on('call-signal', ({ to, from, peerId }) => {
+    // Validate input
+    if (!to || !from || !peerId || 
+        typeof to !== 'string' || typeof from !== 'string' || typeof peerId !== 'string' ||
+        to.length > 128 || from.length > 128 || peerId.length > 128) {
+      console.log('❌ Invalid call signal data');
+      return;
+    }
+    
+    // Verify sender is authenticated
+    if (from !== userId) {
+      console.log('❌ Unauthorized call signal');
+      return;
+    }
+    
     console.log(`📞 Call signal from ${from} to ${to}, peer ID: ${peerId}`);
     
     const recipient = users.get(to);
