@@ -1850,9 +1850,11 @@ body.no-scroll {
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 18px;
   transition: all 0.2s;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .video-call-btn:hover {
@@ -1997,17 +1999,32 @@ body.no-scroll {
   border-color: #5b8dee;
 }
 
-.control-btn.mute,
-.control-btn.video {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: #e2e6ed;
+/* Mic and Video buttons - Active (unmuted/video-on) */
+.control-btn.unmuted,
+.control-btn.video-on {
+  background: rgba(52, 199, 89, 0.15);
+  border-color: rgba(52, 199, 89, 0.3);
+  color: #34c759;
 }
 
-.control-btn.mute:hover,
-.control-btn.video:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
+.control-btn.unmuted:hover,
+.control-btn.video-on:hover {
+  background: rgba(52, 199, 89, 0.25);
+  border-color: #34c759;
+}
+
+/* Mic and Video buttons - Disabled (muted/video-off) */
+.control-btn.muted,
+.control-btn.video-off {
+  background: rgba(255, 59, 48, 0.15);
+  border-color: rgba(255, 59, 48, 0.3);
+  color: #ff3b30;
+}
+
+.control-btn.muted:hover,
+.control-btn.video-off:hover {
+  background: rgba(255, 59, 48, 0.25);
+  border-color: #ff3b30;
 }
 
 .control-btn.end {
