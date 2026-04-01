@@ -45,21 +45,44 @@ export default function VideoCall({
     const handleCallSignal = ({ from, peerId: remotePeerId }) => {
       console.log(`📞 Incoming call from ${from}, peer ID: ${remotePeerId}`);
       // Auto-answer if it's from the friend we're chatting with
-      if (from === friendId && peer) {
+      if (from === friendId && peer && !connected && !calling) {
         answerCall(remotePeerId);
       }
     };
 
     // Listen for call ended signal
     const handleCallEnded = ({ from }) => {
-      console.log(`📴 Call ended by ${from}`);
-      // Clean up local resources
+      console.log(`📴 Call ended by ${from}, cleaning up...`);
+      
+      // Stop all local media tracks
       if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
+        localStream.getTracks().forEach(track => {
+          track.stop();
+          console.log('🛑 Stopped track:', track.kind);
+        });
       }
+      
+      // Stop all remote media tracks
+      if (remoteStream) {
+        remoteStream.getTracks().forEach(track => {
+          track.stop();
+        });
+      }
+      
+      // Close peer connection
       if (currentCallRef.current) {
         currentCallRef.current.close();
+        currentCallRef.current = null;
       }
+      
+      // Reset state
+      setLocalStream(null);
+      setRemoteStream(null);
+      setConnected(false);
+      setCalling(false);
+      setError(null);
+      hasAnsweredRef.current = false;
+      
       // Close the video call modal
       if (onClose) {
         onClose();
@@ -73,7 +96,7 @@ export default function VideoCall({
       socketConnection.off('call-signal', handleCallSignal);
       socketConnection.off('call-ended', handleCallEnded);
     };
-  }, [user.uid, friendId, peer, localStream, onClose]);
+  }, [user.uid, friendId, peer, localStream, remoteStream, connected, calling, onClose]);
 
   // Initialize PeerJS with ExpressTURN
   useEffect(() => {
@@ -137,11 +160,27 @@ export default function VideoCall({
     setPeer(peerInstance);
 
     return () => {
+      console.log('🧹 Cleaning up PeerJS and media streams...');
+      
+      // Stop all media tracks
+      if (localStream) {
+        localStream.getTracks().forEach(track => {
+          track.stop();
+          console.log('🛑 Cleanup: Stopped track:', track.kind);
+        });
+      }
+      
+      // Close peer connection
+      if (currentCallRef.current) {
+        currentCallRef.current.close();
+      }
+      
+      // Destroy peer instance
       if (peerInstance) {
         peerInstance.destroy();
       }
     };
-  }, []);
+  }, []); // Empty dependency array - only run once
 
   // Display local video stream
   useEffect(() => {
@@ -306,26 +345,44 @@ export default function VideoCall({
 
   // End the call
   const endCall = () => {
-    // Stop all tracks
+    console.log('📴 Ending call and cleaning up...');
+    
+    // Stop all local media tracks
     if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
+      localStream.getTracks().forEach(track => {
+        track.stop();
+        console.log('🛑 Stopped track:', track.kind);
+      });
+      setLocalStream(null);
+    }
+    
+    // Stop all remote media tracks
+    if (remoteStream) {
+      remoteStream.getTracks().forEach(track => {
+        track.stop();
+      });
+      setRemoteStream(null);
     }
     
     // Close peer connection
     if (currentCallRef.current) {
       currentCallRef.current.close();
+      currentCallRef.current = null;
     }
 
     // Notify via Socket.IO
-    if (socket) {
+    if (socket && friendId && user.uid) {
       socket.emit('call-ended', { to: friendId, from: user.uid });
+      console.log('📤 Sent call-ended signal to', friendId);
     }
 
-    // Reset state
-    setLocalStream(null);
-    setRemoteStream(null);
+    // Reset all state
     setConnected(false);
     setCalling(false);
+    setError(null);
+    setIsMuted(false);
+    setIsVideoOff(false);
+    hasAnsweredRef.current = false;
     
     // Close the video call component
     if (onClose) {
