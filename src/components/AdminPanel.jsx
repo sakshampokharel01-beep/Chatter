@@ -106,11 +106,18 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
       // Delete all their global messages
       const msgsSnap = await getDocs(query(collection(db, 'messages'), where('uid', '==', uid)));
       await Promise.all([
+        // Delete all their messages
         ...msgsSnap.docs.map(d => deleteDoc(d.ref)),
+        // Add to deletedUsers collection (permanent ban)
         setDoc(doc(db, 'deletedUsers', uid), { deletedAt: serverTimestamp(), deletedBy: adminUid }),
+        // Add to blockedUsers collection (prevent messaging)
         setDoc(doc(db, 'blockedUsers', uid), { blockedAt: serverTimestamp(), blockedBy: adminUid }),
+        // DELETE the user document from users collection (THIS WAS MISSING!)
+        deleteDoc(doc(db, 'users', uid)),
       ]);
+      console.log(`✅ User ${name} (${uid}) removed successfully`);
     } catch (e) {
+      console.error('Remove failed:', e);
       alert('Remove failed: ' + e.message);
     }
   };
