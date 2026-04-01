@@ -551,11 +551,6 @@ export default function VideoCall({
           </>
         )}
       </div>
-
-      <div className="call-info">
-        <small>Peer ID: {peerId || 'Connecting...'}</small>
-        <small>Status: {connected ? '✅ Connected' : calling ? '📞 Calling...' : '⏳ Ready'}</small>
-      </div>
     </div>
   );
 }
