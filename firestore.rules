@@ -48,7 +48,7 @@ service cloud.firestore {
         !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
         // Prevent updating too frequently (anti-spam)
         request.time > resource.data.lastSeen + duration.value(1, 's');
-      allow delete: if false;
+      allow delete: if isAdmin(); // Allow admins to delete user profiles
     }
 
     // 4. FRIEND REQUESTS (With Rate Limiting)
