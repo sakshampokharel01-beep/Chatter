@@ -33,16 +33,21 @@ export default function LandingPage({ onGetStarted }) {
     },
     {
       number: '02',
-      title: 'End-to-end security by default',
-      description: 'Your conversations are private. Enterprise-grade encryption protects every message. No data mining, no tracking, no third-party access.'
+      title: 'HD video & audio calls',
+      description: 'Crystal-clear video calls with your friends. Face-to-face conversations with smooth video, crisp audio, and reliable peer-to-peer connections.'
     },
     {
       number: '03',
+      title: 'End-to-end security by default',
+      description: 'Your conversations are private. Enterprise-grade encryption protects every message and call. No data mining, no tracking, no third-party access.'
+    },
+    {
+      number: '04',
       title: 'Works everywhere you do',
       description: 'Seamless experience across desktop, tablet, and mobile. Pick up conversations exactly where you left off, on any device.'
     },
     {
-      number: '04',
+      number: '05',
       title: 'Guest mode for instant access',
       description: 'No registration required to start chatting. Jump in as a guest, or create an account for the full experience. Your choice.'
     }
@@ -53,6 +58,11 @@ export default function LandingPage({ onGetStarted }) {
       label: 'Speed',
       title: 'Messages arrive in milliseconds',
       description: 'Built on cutting-edge infrastructure. Your messages travel at the speed of light, not the speed of bureaucracy.'
+    },
+    {
+      label: 'Video Calls',
+      title: 'Face-to-face conversations',
+      description: 'High-quality video and audio calls with your friends. Toggle camera and mic, all with smooth peer-to-peer connections.'
     },
     {
       label: 'Privacy',
@@ -131,8 +141,8 @@ export default function LandingPage({ onGetStarted }) {
               Connect with <em>Anyone, Anywhere</em>
             </h1>
             <p className="hero-subtitle animate-in">
-              Simple, fast, and secure messaging for everyone. No friction, no complexity. 
-              Just pure conversation.
+              Simple, fast, and secure messaging with HD video calls. Chat, call, and connect with friends. 
+              No friction, no complexity. Just pure conversation.
             </p>
             <button className="btn-primary animate-in" onClick={onGetStarted}>
               <span>Start Chatting</span>
@@ -213,8 +223,8 @@ export default function LandingPage({ onGetStarted }) {
             </div>
             <div className="step-item">
               <div className="step-number">02</div>
-              <h4 className="step-title">Start chatting</h4>
-              <p className="step-description">Join the global chat room or send private messages. Your choice, your conversation.</p>
+              <h4 className="step-title">Start chatting & calling</h4>
+              <p className="step-description">Join the global chat room, send private messages, or start a video call with friends. Your choice, your conversation.</p>
             </div>
             <div className="step-item">
               <div className="step-number">03</div>
@@ -231,7 +241,8 @@ export default function LandingPage({ onGetStarted }) {
           <div className="cta-card">
             <h2 className="cta-title">Ready to start?</h2>
             <p className="cta-subtitle">
-              Join thousands already connecting on Chatter. Free forever, no credit card required. Start your first conversation in the next 30 seconds.
+              Join thousands already connecting on Chatter. Free forever, no credit card required. 
+              Start messaging and video calling in the next 30 seconds.
             </p>
             <div className="cta-buttons">
               <button className="btn-primary" onClick={onGetStarted}>
