@@ -578,7 +578,11 @@ export default function DirectMessages({ user }) {
               </div>
               <button 
                 className="video-call-btn" 
-                onClick={() => setShowVideoCall(true)}
+                onClick={() => {
+                  setShowVideoCall(true);
+                  // Clear any incoming call state when initiating a new call
+                  setIncomingCall(null);
+                }}
                 title="Start video call"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -691,8 +695,8 @@ export default function DirectMessages({ user }) {
             setShowVideoCall(false);
             setIncomingCall(null); // Clear incoming call when closing
           }}
-          autoStart={incomingCall !== null} // Auto-start if accepting from notification
-          incomingPeerId={incomingCall?.peerId} // Pass the peer ID of the caller
+          autoStart={true} // Always auto-start (either new call or accepting incoming)
+          incomingPeerId={incomingCall?.peerId} // Pass the peer ID if accepting incoming call
         />
       )}
     </div>
