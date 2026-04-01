@@ -144,6 +144,24 @@ export const registerUser = async (user, retryCount = 0) => {
   }
 
   const userRef = doc(db, 'users', user.uid);
+  
+  // Check if user has been removed by admin
+  try {
+    const deletedUserDoc = await getDoc(doc(db, 'deletedUsers', user.uid));
+    if (deletedUserDoc.exists()) {
+      console.error("❌ Registration BLOCKED: User has been removed by admin");
+      // Sign out the user immediately
+      await signOut(auth);
+      throw new Error('Your account has been removed by an administrator. Please contact support if you believe this is an error.');
+    }
+  } catch (err) {
+    if (err.message.includes('removed by an administrator')) {
+      throw err; // Re-throw our custom error
+    }
+    // Ignore permission errors for deletedUsers check
+    console.warn('Could not check deletedUsers (may need Firestore rules)');
+  }
+  
   try {
     await setDoc(userRef, {
       uid: user.uid,
@@ -157,12 +175,17 @@ export const registerUser = async (user, retryCount = 0) => {
   } catch (err) {
     console.error("❌ Registration FAILED:", err);
     if (err.code === 'permission-denied') {
-      console.error("PERMISSION DENIED: Double-check if App Check is 'Enforced' in Firebase Console.");
+      console.error("PERMISSION DENIED: This account may have been removed by an administrator.");
+      // Sign out the user
+      await signOut(auth);
+      throw new Error('Your account has been removed. Please contact support.');
     }
     // Simple retry for network glitches
     if (retryCount < 2 && err.code !== 'permission-denied') {
       console.log(`Retrying registration (Attempt ${retryCount + 2})...`);
       setTimeout(() => registerUser(user, retryCount + 1), 2000);
+    } else {
+      throw err;
     }
   }
   console.log("----------------------------");

@@ -30,18 +30,22 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // 3. USER PROFILES (Secured + Rate Limit Tracking + Anti-Spam)
+    // 3. USER PROFILES (Secured + Rate Limit Tracking + Anti-Spam + Block Removed Users)
     match /users/{uid} {
       allow read: if isSignedIn();
       allow create: if isOwner(uid) &&
         request.resource.data.displayName is string &&
         request.resource.data.displayName.size() > 0 &&
         request.resource.data.displayName.size() <= 64 &&
+        // Prevent removed users from creating new profiles
+        !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
         // Prevent rapid account creation from same IP (Firebase limitation workaround)
         request.time > request.resource.data.get('createdAt', timestamp.value(0)) + duration.value(0, 's');
       allow update: if isOwner(uid) &&
         request.resource.data.displayName is string &&
         request.resource.data.displayName.size() <= 64 &&
+        // Prevent removed users from updating profiles
+        !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
         // Prevent updating too frequently (anti-spam)
         request.time > resource.data.lastSeen + duration.value(1, 's');
       allow delete: if false;
