@@ -253,12 +253,22 @@ export default function DirectMessages({ user }) {
       });
     };
 
+    const handleCallEnded = ({ from }) => {
+      console.log('📴 Call ended by:', from);
+      // Close video call if open
+      setShowVideoCall(false);
+      // Clear incoming call notification
+      setIncomingCall(null);
+    };
+
     socket.on('call-signal', handleCallSignal);
-    console.log('🎧 Listening for call-signal events');
+    socket.on('call-ended', handleCallEnded);
+    console.log('🎧 Listening for call-signal and call-ended events');
 
     return () => {
       socket.off('call-signal', handleCallSignal);
-      console.log('🔇 Stopped listening for call-signal events');
+      socket.off('call-ended', handleCallEnded);
+      console.log('🔇 Stopped listening for call events');
     };
   }, [user.uid, displayName, isGuest]); // Removed 'users' from dependencies
 

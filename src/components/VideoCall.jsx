@@ -48,12 +48,30 @@ export default function VideoCall({
       }
     };
 
+    // Listen for call ended signal
+    const handleCallEnded = ({ from }) => {
+      console.log(`📴 Call ended by ${from}`);
+      // Clean up local resources
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+      if (currentCallRef.current) {
+        currentCallRef.current.close();
+      }
+      // Close the video call modal
+      if (onClose) {
+        onClose();
+      }
+    };
+
     socketConnection.on('call-signal', handleCallSignal);
+    socketConnection.on('call-ended', handleCallEnded);
 
     return () => {
       socketConnection.off('call-signal', handleCallSignal);
+      socketConnection.off('call-ended', handleCallEnded);
     };
-  }, [user.uid, friendId, peer]);
+  }, [user.uid, friendId, peer, localStream, onClose]);
 
   // Initialize PeerJS with ExpressTURN
   useEffect(() => {
@@ -132,17 +150,33 @@ export default function VideoCall({
 
   // Auto-start call if autoStart prop is true
   useEffect(() => {
-    if (autoStart && peer && peerId && !calling && !connected && !localStream) {
-      console.log('🚀 Auto-starting call - getting media stream...');
-      getMediaStream().then(() => {
-        console.log('✅ Media stream ready for auto-start');
-        setCalling(true);
-      }).catch(err => {
-        console.error('❌ Auto-start failed:', err);
-        setError('Failed to access camera/microphone');
-      });
+    if (autoStart && peer && peerId && socket && !calling && !connected && !localStream) {
+      console.log('🚀 Auto-starting call - getting media stream and initiating call...');
+      
+      const initiateCall = async () => {
+        try {
+          // Get media stream first
+          const stream = await getMediaStream();
+          console.log('✅ Media stream ready, sending call signal...');
+          
+          // Send call signal via Socket.IO
+          socket.emit('call-signal', {
+            to: friendId,
+            from: user.uid,
+            peerId: peerId
+          });
+          
+          setCalling(true);
+          console.log('📞 Auto-start call signal sent');
+        } catch (err) {
+          console.error('❌ Auto-start failed:', err);
+          setError('Failed to access camera/microphone');
+        }
+      };
+      
+      initiateCall();
     }
-  }, [autoStart, peer, peerId, calling, connected, localStream]);
+  }, [autoStart, peer, peerId, socket, calling, connected, localStream, friendId, user.uid]);
 
   // Request camera and microphone access
   const getMediaStream = async () => {
