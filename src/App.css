@@ -1847,14 +1847,16 @@ body.no-scroll {
   background: rgba(91, 141, 238, 0.15);
   border: 1px solid rgba(91, 141, 238, 0.3);
   color: #5b8dee;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .video-call-btn:hover {
@@ -1888,7 +1890,7 @@ body.no-scroll {
 
 .video-call-header h3 {
   color: #e2e6ed;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
 }
 
@@ -1896,15 +1898,16 @@ body.no-scroll {
   background: rgba(255, 59, 48, 0.15);
   border: 1px solid rgba(255, 59, 48, 0.3);
   color: #ff3b30;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .close-btn:hover {
@@ -1916,10 +1919,10 @@ body.no-scroll {
   background: rgba(255, 59, 48, 0.15);
   border: 1px solid rgba(255, 59, 48, 0.3);
   color: #ff3b30;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 18px;
+  border-radius: 10px;
   margin-bottom: 16px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .video-grid {
@@ -1933,7 +1936,7 @@ body.no-scroll {
 .video-box {
   position: relative;
   background: #1a1d26;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -1949,48 +1952,59 @@ body.no-scroll {
 
 .video-label {
   position: absolute;
-  bottom: 12px;
-  left: 12px;
-  background: rgba(0, 0, 0, 0.7);
+  bottom: 16px;
+  left: 16px;
+  background: rgba(0, 0, 0, 0.75);
   color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .waiting-message {
   color: #8a8f9e;
-  font-size: 16px;
+  font-size: 18px;
   text-align: center;
+  padding: 20px;
 }
 
 .call-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
-  padding-top: 20px;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
 }
 
 .control-btn {
-  padding: 12px 24px;
-  border-radius: 8px;
-  border: 1px solid;
+  padding: 16px 28px;
+  border-radius: 12px;
+  border: 2px solid;
   cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-width: 56px;
+  min-height: 56px;
+  justify-content: center;
+}
+
+.control-btn svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .control-btn.start {
   background: rgba(91, 141, 238, 0.15);
-  border-color: rgba(91, 141, 238, 0.3);
+  border-color: rgba(91, 141, 238, 0.4);
   color: #5b8dee;
 }
 
@@ -2003,7 +2017,7 @@ body.no-scroll {
 .control-btn.unmuted,
 .control-btn.video-on {
   background: rgba(52, 199, 89, 0.15);
-  border-color: rgba(52, 199, 89, 0.3);
+  border-color: rgba(52, 199, 89, 0.4);
   color: #34c759;
 }
 
@@ -2017,7 +2031,7 @@ body.no-scroll {
 .control-btn.muted,
 .control-btn.video-off {
   background: rgba(255, 59, 48, 0.15);
-  border-color: rgba(255, 59, 48, 0.3);
+  border-color: rgba(255, 59, 48, 0.4);
   color: #ff3b30;
 }
 
@@ -2029,7 +2043,7 @@ body.no-scroll {
 
 .control-btn.end {
   background: rgba(255, 59, 48, 0.15);
-  border-color: rgba(255, 59, 48, 0.3);
+  border-color: rgba(255, 59, 48, 0.4);
   color: #ff3b30;
 }
 
@@ -2053,17 +2067,72 @@ body.no-scroll {
 
 /* Mobile responsive */
 @media (max-width: 768px) {
+  .video-call-container {
+    padding: 16px;
+  }
+
+  .video-call-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .video-call-header h3 {
+    font-size: 18px;
+  }
+
+  .close-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
   .video-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
-  
-  .video-call-container {
-    padding: 12px;
-  }
-  
-  .control-btn {
-    padding: 10px 16px;
+
+  .video-label {
+    bottom: 12px;
+    left: 12px;
+    padding: 6px 12px;
     font-size: 14px;
+  }
+
+  .waiting-message {
+    font-size: 16px;
+    padding: 16px;
+  }
+
+  .call-controls {
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+
+  .control-btn {
+    padding: 18px;
+    min-width: 64px;
+    min-height: 64px;
+    border-radius: 16px;
+    flex: 0 0 auto;
+  }
+
+  .control-btn svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Hide text labels on mobile, show only icons */
+  .control-btn span {
+    display: none;
+  }
+
+  .control-btn.start {
+    padding: 18px 24px;
+  }
+
+  .control-btn.start span {
+    display: inline;
   }
 }
 
