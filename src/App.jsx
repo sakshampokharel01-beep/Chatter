@@ -6,12 +6,14 @@ import { auth, db, registerUser, signOutUser } from './firebase';
 import LandingPage from './components/LandingPage';
 import AuthScreen from './components/AuthScreen';
 import ChatRoom from './components/ChatRoom';
+import EmailVerificationScreen from './components/EmailVerificationScreen';
 
 function App() {
   // undefined = still loading, null = signed out, object = signed in
   const [user, setUser] = useState(undefined);
   const [removed, setRemoved] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   useEffect(() => {
     // Subscribe to auth state. getRedirectResult is handled automatically
@@ -19,8 +21,21 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser ?? null);
       if (currentUser) {
-        registerUser(currentUser);
-        setShowLanding(false);
+        // Check if email verification is needed
+        // Skip verification check for anonymous users and Google sign-in
+        const isEmailPasswordUser = currentUser.providerData.some(
+          provider => provider.providerId === 'password'
+        );
+        
+        if (isEmailPasswordUser && !currentUser.emailVerified) {
+          setNeedsVerification(true);
+        } else {
+          setNeedsVerification(false);
+          registerUser(currentUser);
+          setShowLanding(false);
+        }
+      } else {
+        setNeedsVerification(false);
       }
     });
     return unsubscribe;
@@ -40,7 +55,7 @@ function App() {
 
   // Manage body scroll class
   useEffect(() => {
-    if (user) {
+    if (user && !needsVerification) {
       document.body.classList.add('no-scroll');
     } else {
       document.body.classList.remove('no-scroll');
@@ -50,7 +65,17 @@ function App() {
     return () => {
       document.body.classList.remove('no-scroll');
     };
-  }, [user]);
+  }, [user, needsVerification]);
+
+  const handleVerified = async () => {
+    // Reload user to get fresh emailVerified status
+    await user.reload();
+    if (user.emailVerified) {
+      setNeedsVerification(false);
+      registerUser(user);
+      setShowLanding(false);
+    }
+  };
 
   if (user === undefined) {
     return (
@@ -67,6 +92,11 @@ function App() {
         <p className="loading-text" style={{color:'#e05c6a'}}>Your account has been removed by an admin.</p>
       </div>
     );
+  }
+
+  // Show email verification screen if needed
+  if (user && needsVerification) {
+    return <EmailVerificationScreen user={user} onVerified={handleVerified} />;
   }
 
   // Show landing page for first-time visitors

@@ -462,6 +462,17 @@ body.no-scroll {
   text-align: left;
 }
 
+.success-msg {
+  background: rgba(52, 199, 89, 0.08);
+  border: 1px solid rgba(52, 199, 89, 0.25);
+  color: #6dd89a;
+  padding: 11px 14px;
+  border-radius: 9px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
 .auth-buttons {
   display: flex;
   flex-direction: column;

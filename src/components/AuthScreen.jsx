@@ -126,6 +126,7 @@ export default function AuthScreen({ onBack }) {
     setLoading('email'); setError('');
     try {
       await signUpWithEmail(emailName, emailAddr.trim(), emailPass);
+      // Success - user will be redirected to verification screen automatically
     } catch (err) {
       setError(mapEmailError(err.code));
     } finally {
