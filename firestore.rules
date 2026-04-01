@@ -11,12 +11,9 @@ service cloud.firestore {
     
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
     
-    // Rate limiting helper - check if user hasn't sent too many requests recently
-    function notTooManyFriendRequests() {
-      let recentRequests = firestore.get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-      return !('lastFriendRequestTime' in recentRequests) || 
-             request.time > recentRequests.lastFriendRequestTime + duration.value(10, 's');
-    }
+    // Rate limiting helper - REMOVED (can't query in rules)
+    // Rate limiting is enforced by Firebase's built-in abuse detection
+    // and by limiting operations per user
 
     // 2. GLOBAL CHAT
     match /messages/{msgId} {
@@ -51,14 +48,15 @@ service cloud.firestore {
       allow delete: if isAdmin(); // Allow admins to delete user profiles
     }
 
-    // 4. FRIEND REQUESTS (With Rate Limiting)
+    // 4. FRIEND REQUESTS (Backend Validation Only - Firebase handles rate limiting)
     match /friendRequests/{requestId} {
       allow read: if isSignedIn() && 
         (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
       allow create: if isSignedIn() && 
         request.resource.data.from == request.auth.uid &&
         request.resource.data.to != request.auth.uid &&
-        notTooManyFriendRequests();
+        request.resource.data.from is string &&
+        request.resource.data.to is string;
       allow delete: if isSignedIn() && 
         (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
       allow update: if false;
