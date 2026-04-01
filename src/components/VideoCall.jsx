@@ -132,11 +132,17 @@ export default function VideoCall({
 
   // Auto-start call if autoStart prop is true
   useEffect(() => {
-    if (autoStart && peer && peerId && !calling && !connected) {
-      console.log('🚀 Auto-starting call...');
-      startCall();
+    if (autoStart && peer && peerId && !calling && !connected && !localStream) {
+      console.log('🚀 Auto-starting call - getting media stream...');
+      getMediaStream().then(() => {
+        console.log('✅ Media stream ready for auto-start');
+        setCalling(true);
+      }).catch(err => {
+        console.error('❌ Auto-start failed:', err);
+        setError('Failed to access camera/microphone');
+      });
     }
-  }, [autoStart, peer, peerId, calling, connected]);
+  }, [autoStart, peer, peerId, calling, connected, localStream]);
 
   // Request camera and microphone access
   const getMediaStream = async () => {

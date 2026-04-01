@@ -2072,38 +2072,52 @@ body.no-scroll {
    ================================================================ */
 .incoming-call-notification {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 99999; /* Higher than video call modal */
-  animation: slideInRight 0.3s ease;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99999;
+  animation: scaleIn 0.3s ease;
 }
 
-@keyframes slideInRight {
+@keyframes scaleIn {
   from {
-    transform: translateX(400px);
+    transform: translate(-50%, -50%) scale(0.8);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
 }
 
+/* Backdrop overlay */
+.incoming-call-notification::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: -1;
+}
+
 .incoming-call-content {
-  background: #1a1d26;
-  border: 1px solid rgba(91, 141, 238, 0.3);
-  border-radius: 12px;
-  padding: 16px;
-  min-width: 320px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #1a1d26 0%, #1e2330 100%);
+  border: 2px solid rgba(91, 141, 238, 0.4);
+  border-radius: 20px;
+  padding: 32px;
+  min-width: 380px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(91, 141, 238, 0.1);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
+  text-align: center;
 }
 
 .incoming-call-icon {
-  font-size: 32px;
+  font-size: 64px;
   animation: pulse 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(91, 141, 238, 0.4));
 }
 
 @keyframes pulse {
@@ -2111,78 +2125,108 @@ body.no-scroll {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.15);
   }
 }
 
 .incoming-call-info {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 .incoming-call-info strong {
-  color: #e2e6ed;
-  font-size: 15px;
-  font-weight: 600;
+  color: #e8ecf4;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
 .incoming-call-info span {
   color: #8a8f9e;
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .incoming-call-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
 }
 
 .accept-call-btn,
 .reject-call-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid;
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: none;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 700;
   transition: all 0.2s;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  letter-spacing: 0.3px;
 }
 
 .accept-call-btn {
-  background: rgba(52, 199, 89, 0.15);
-  border-color: rgba(52, 199, 89, 0.3);
-  color: #34c759;
+  background: linear-gradient(135deg, #34c759 0%, #30b350 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
 }
 
 .accept-call-btn:hover {
-  background: rgba(52, 199, 89, 0.25);
-  border-color: #34c759;
+  background: linear-gradient(135deg, #30b350 0%, #2aa048 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 199, 89, 0.4);
+}
+
+.accept-call-btn:active {
+  transform: translateY(0);
 }
 
 .reject-call-btn {
   background: rgba(255, 59, 48, 0.15);
-  border-color: rgba(255, 59, 48, 0.3);
+  border: 2px solid rgba(255, 59, 48, 0.3);
   color: #ff3b30;
 }
 
 .reject-call-btn:hover {
   background: rgba(255, 59, 48, 0.25);
   border-color: #ff3b30;
+  transform: translateY(-2px);
+}
+
+.reject-call-btn:active {
+  transform: translateY(0);
 }
 
 /* Mobile responsive */
 @media (max-width: 640px) {
   .incoming-call-notification {
-    top: 10px;
-    right: 10px;
-    left: 10px;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 40px);
   }
   
   .incoming-call-content {
     min-width: auto;
     width: 100%;
+    padding: 24px;
+  }
+  
+  .incoming-call-icon {
+    font-size: 48px;
+  }
+  
+  .incoming-call-info strong {
+    font-size: 20px;
   }
   
   .incoming-call-actions {
