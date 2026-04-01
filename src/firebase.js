@@ -67,6 +67,16 @@ googleProvider.setCustomParameters({ prompt: 'select_account', login_hint: '' })
 export const signUpWithEmail = async (name, email, password) => {
   const result = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(result.user, { displayName: name.trim() || email.split('@')[0] });
+  
+  // Send email verification (anti-spam measure)
+  try {
+    const { sendEmailVerification } = await import('firebase/auth');
+    await sendEmailVerification(result.user);
+    console.log('✅ Verification email sent');
+  } catch (err) {
+    console.warn('⚠️ Could not send verification email:', err);
+  }
+  
   return result;
 };
 
