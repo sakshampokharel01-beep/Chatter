@@ -280,7 +280,7 @@ export default function DirectMessages({ user }) {
     if (caller) {
       setSelectedUser(caller);
       setShowVideoCall(true);
-      setIncomingCall(null);
+      // Don't clear incomingCall yet - pass it to VideoCall component
       setMobileView('chat');
     }
   }, [incomingCall, users]);
@@ -687,8 +687,12 @@ export default function DirectMessages({ user }) {
           user={user}
           friendId={selectedUser.id}
           friendName={selectedUser.displayName}
-          onClose={() => setShowVideoCall(false)}
+          onClose={() => {
+            setShowVideoCall(false);
+            setIncomingCall(null); // Clear incoming call when closing
+          }}
           autoStart={incomingCall !== null} // Auto-start if accepting from notification
+          incomingPeerId={incomingCall?.peerId} // Pass the peer ID of the caller
         />
       )}
     </div>
