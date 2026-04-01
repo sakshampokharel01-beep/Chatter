@@ -1395,13 +1395,15 @@ body.no-scroll {
   .auth-title { font-size: 30px; }
 
   .chat-header { 
-    padding: 12px 14px;
+    padding: 8px 10px;
     flex-wrap: nowrap;
-    gap: 10px;
+    gap: 6px;
+    overflow-x: hidden;
   }
   
   .header-brand {
     flex-shrink: 0;
+    min-width: 0;
   }
   
   .header-title { 
@@ -1409,7 +1411,7 @@ body.no-scroll {
   }
   
   .header-logo {
-    font-size: 22px;
+    font-size: 20px;
   }
   
   .admin-badge { 
@@ -1417,38 +1419,40 @@ body.no-scroll {
   }
   
   .header-tabs {
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 0;
-    gap: 4px;
-    padding: 4px;
-    border-radius: 12px;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 10px;
   }
   
   .tab-btn { 
-    padding: 10px 14px;
-    font-size: 13px;
+    padding: 8px 10px;
+    font-size: 12px;
     white-space: nowrap;
-    border-radius: 10px;
-    min-height: 44px;
+    border-radius: 8px;
+    min-height: 40px;
+    gap: 4px;
   }
   
   .tab-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
   
   .header-user {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
+    min-width: 0;
   }
   
   .user-avatar,
   .user-avatar-placeholder {
-    width: 36px;
-    height: 36px;
-    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
   }
   
   .user-name { 
@@ -1457,11 +1461,11 @@ body.no-scroll {
   
   .btn-signout {
     display: flex !important;
-    padding: 10px 16px;
-    font-size: 13px;
+    padding: 8px 12px;
+    font-size: 12px;
     white-space: nowrap;
-    min-height: 44px;
-    border-radius: 10px;
+    min-height: 40px;
+    border-radius: 8px;
   }
 
   /* DM Header Mobile */
@@ -1504,6 +1508,47 @@ body.no-scroll {
   .dm-chat { width: 100%; }
   .dm-mobile-hidden { display: none !important; }
   .dm-back-btn { display: flex !important; }
+}
+
+/* Extra small screens - even more compact */
+@media (max-width: 400px) {
+  .chat-header {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .header-logo {
+    font-size: 18px;
+  }
+
+  .header-tabs {
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .tab-btn {
+    padding: 6px 8px;
+    font-size: 11px;
+    min-height: 36px;
+  }
+
+  .tab-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .user-avatar,
+  .user-avatar-placeholder {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .btn-signout {
+    padding: 6px 10px;
+    font-size: 11px;
+    min-height: 36px;
+  }
 }
 
 /* Back to Landing Button */
