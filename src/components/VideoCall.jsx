@@ -164,6 +164,16 @@ export default function VideoCall({
             remoteStreamRef.current = remoteStream; // Store in ref
             setRemoteStream(remoteStream);
             setConnected(true);
+            
+            // Send initial media status to the other user
+            if (socket && friendId && user) {
+              socket.emit('media-status', {
+                to: friendId,
+                from: user.uid,
+                isMuted: isMuted,
+                isVideoOff: isVideoOff
+              });
+            }
           });
 
           call.on('close', () => {
@@ -332,6 +342,16 @@ export default function VideoCall({
           setRemoteStream(remoteStream);
           setConnected(true);
           setCalling(false);
+          
+          // Send initial media status to the other user
+          if (socket && friendId) {
+            socket.emit('media-status', {
+              to: friendId,
+              from: user.uid,
+              isMuted: isMuted,
+              isVideoOff: isVideoOff
+            });
+          }
         });
 
         call.on('close', () => {
@@ -361,6 +381,16 @@ export default function VideoCall({
         setRemoteStream(remoteStream);
         setConnected(true);
         setCalling(false);
+        
+        // Send initial media status to the other user
+        if (socket && friendId) {
+          socket.emit('media-status', {
+            to: friendId,
+            from: user.uid,
+            isMuted: isMuted,
+            isVideoOff: isVideoOff
+          });
+        }
       });
 
       call.on('close', () => {
