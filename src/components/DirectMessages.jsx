@@ -57,8 +57,10 @@ function formatTime(ts) {
 }
 
 /* ── DM Message ───────────────────────────────────────────── */
-function DmMessage({ message, isOwn, hideAvatar }) {
+function DmMessage({ message, isOwn, hideAvatar, friendId }) {
   const name = message.displayName || 'User';
+  const isSeen = message.seenBy && message.seenBy.includes(friendId);
+  
   return (
     <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`}>
       <div className="msg-avatar">
@@ -67,7 +69,17 @@ function DmMessage({ message, isOwn, hideAvatar }) {
       <div className="msg-content">
         {!isOwn && !hideAvatar && <span className="msg-sender">{name}</span>}
         <div className="msg-bubble">{message.text}</div>
-        <span className="msg-time">{formatTime(message.createdAt)}</span>
+        <div className="msg-time-row">
+          <span className="msg-time">{formatTime(message.createdAt)}</span>
+          {isOwn && isSeen && (
+            <span className="msg-seen-indicator" title="Seen">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+                <polyline points="20 6 9 17 4 12" transform="translate(3, 0)"/>
+              </svg>
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -214,9 +226,29 @@ export default function DirectMessages({ user }) {
       orderBy('createdAt', 'asc'),
       limit(DM_LIMIT),
     );
-    return onSnapshot(q, (snap) => {
-      setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    return onSnapshot(q, async (snap) => {
+      const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setMessages(msgs);
       setLoadingMsg(false);
+      
+      // Mark unread messages as seen
+      const unseenMessages = msgs.filter(msg => 
+        msg.uid !== user.uid && // Not my message
+        (!msg.seenBy || !msg.seenBy.includes(user.uid)) // Not seen by me yet
+      );
+      
+      // Update each unseen message
+      for (const msg of unseenMessages) {
+        try {
+          const msgRef = doc(db, 'dms', dmId, 'messages', msg.id);
+          await updateDoc(msgRef, {
+            seenBy: [...(msg.seenBy || []), user.uid],
+            seenAt: serverTimestamp()
+          });
+        } catch (err) {
+          console.error('Error marking message as seen:', err);
+        }
+      }
     }, (err) => {
       console.error('DM messages snapshot error:', err);
       setLoadingMsg(false);
@@ -612,7 +644,13 @@ export default function DirectMessages({ user }) {
                   const prev = messages[idx - 1];
                   const hideAvatar = !isOwn && prev?.uid === msg.uid;
                   return (
-                    <DmMessage key={msg.id} message={msg} isOwn={isOwn} hideAvatar={hideAvatar} />
+                    <DmMessage 
+                      key={msg.id} 
+                      message={msg} 
+                      isOwn={isOwn} 
+                      hideAvatar={hideAvatar}
+                      friendId={selectedUser.id}
+                    />
                   );
                 })
               )}

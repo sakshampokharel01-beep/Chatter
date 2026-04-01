@@ -1105,6 +1105,30 @@ body.no-scroll {
   color: #363c50;
   padding: 0 6px;
 }
+
+.msg-time-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+}
+
+.message-row.own .msg-time-row {
+  justify-content: flex-end;
+}
+
+.msg-seen-indicator {
+  color: #5b8dee;
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.msg-seen-indicator svg {
+  width: 14px;
+  height: 14px;
+}
+
 .message-row.own .msg-time { text-align: right; }
 
 .message-row.hide-avatar .msg-avatar { visibility: hidden; }
