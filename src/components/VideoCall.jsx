@@ -191,33 +191,65 @@ export default function VideoCall({
 
   // Answer an incoming call
   const answerCall = async (remotePeerId) => {
-    if (!peer || !localStream) {
-      console.log('⏳ Getting media stream...');
-      await getMediaStream();
-    }
-
-    console.log('📞 Calling peer:', remotePeerId);
+    console.log('📞 Answering call from peer:', remotePeerId);
     
-    const call = peer.call(remotePeerId, localStream);
-    currentCallRef.current = call;
+    // Make sure we have local stream first
+    if (!localStream) {
+      console.log('⏳ Getting media stream first...');
+      try {
+        const stream = await getMediaStream();
+        setLocalStream(stream);
+        
+        // Now call with the stream
+        const call = peer.call(remotePeerId, stream);
+        currentCallRef.current = call;
 
-    call.on('stream', (remoteStream) => {
-      console.log('✅ Connected! Receiving remote stream');
-      setRemoteStream(remoteStream);
-      setConnected(true);
-      setCalling(false);
-    });
+        call.on('stream', (remoteStream) => {
+          console.log('✅ Connected! Receiving remote stream');
+          setRemoteStream(remoteStream);
+          setConnected(true);
+          setCalling(false);
+        });
 
-    call.on('close', () => {
-      console.log('📴 Call ended');
-      endCall();
-    });
+        call.on('close', () => {
+          console.log('📴 Call ended');
+          endCall();
+        });
 
-    call.on('error', (err) => {
-      console.error('❌ Call error:', err);
-      setError('Call failed. Please try again.');
-      setCalling(false);
-    });
+        call.on('error', (err) => {
+          console.error('❌ Call error:', err);
+          setError('Call failed. Please try again.');
+          setCalling(false);
+        });
+      } catch (err) {
+        console.error('❌ Failed to get media:', err);
+        setError('Failed to access camera/microphone');
+        setCalling(false);
+      }
+    } else {
+      // We already have the stream
+      console.log('📞 Calling peer with existing stream');
+      const call = peer.call(remotePeerId, localStream);
+      currentCallRef.current = call;
+
+      call.on('stream', (remoteStream) => {
+        console.log('✅ Connected! Receiving remote stream');
+        setRemoteStream(remoteStream);
+        setConnected(true);
+        setCalling(false);
+      });
+
+      call.on('close', () => {
+        console.log('📴 Call ended');
+        endCall();
+      });
+
+      call.on('error', (err) => {
+        console.error('❌ Call error:', err);
+        setError('Call failed. Please try again.');
+        setCalling(false);
+      });
+    }
   };
 
   // End the call
