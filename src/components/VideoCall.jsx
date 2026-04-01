@@ -30,6 +30,8 @@ export default function VideoCall({
   const [error, setError] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
+  const [remoteMuted, setRemoteMuted] = useState(false);
+  const [remoteVideoOff, setRemoteVideoOff] = useState(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -94,12 +96,23 @@ export default function VideoCall({
       }
     };
 
+    // Listen for media status changes
+    const handleMediaStatus = ({ from, isMuted: remoteMutedStatus, isVideoOff: remoteVideoStatus }) => {
+      if (from === friendId) {
+        console.log(`📡 Media status from ${from}: muted=${remoteMutedStatus}, video=${remoteVideoStatus}`);
+        setRemoteMuted(remoteMutedStatus);
+        setRemoteVideoOff(remoteVideoStatus);
+      }
+    };
+
     socketConnection.on('call-signal', handleCallSignal);
     socketConnection.on('call-ended', handleCallEnded);
+    socketConnection.on('media-status', handleMediaStatus);
 
     return () => {
       socketConnection.off('call-signal', handleCallSignal);
       socketConnection.off('call-ended', handleCallEnded);
+      socketConnection.off('media-status', handleMediaStatus);
     };
   }, [user.uid, friendId, peer, connected, calling, onClose]);
 
@@ -426,7 +439,18 @@ export default function VideoCall({
       const audioTrack = localStream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
-        setIsMuted(!audioTrack.enabled);
+        const newMutedState = !audioTrack.enabled;
+        setIsMuted(newMutedState);
+        
+        // Notify the other user
+        if (socket && friendId) {
+          socket.emit('media-status', {
+            to: friendId,
+            from: user.uid,
+            isMuted: newMutedState,
+            isVideoOff: isVideoOff
+          });
+        }
       }
     }
   };
@@ -437,7 +461,18 @@ export default function VideoCall({
       const videoTrack = localStream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
-        setIsVideoOff(!videoTrack.enabled);
+        const newVideoState = !videoTrack.enabled;
+        setIsVideoOff(newVideoState);
+        
+        // Notify the other user
+        if (socket && friendId) {
+          socket.emit('media-status', {
+            to: friendId,
+            from: user.uid,
+            isMuted: isMuted,
+            isVideoOff: newVideoState
+          });
+        }
       }
     }
   };
@@ -479,6 +514,29 @@ export default function VideoCall({
                 className="video-element"
               />
               <div className="video-label">{friendName}</div>
+              
+              {/* Remote user status indicators */}
+              <div className="remote-status-indicators">
+                {remoteMuted && (
+                  <div className="status-indicator muted-indicator" title="Microphone muted">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                      <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/>
+                      <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/>
+                      <line x1="12" y1="19" x2="12" y2="23"/>
+                      <line x1="8" y1="23" x2="16" y2="23"/>
+                    </svg>
+                  </div>
+                )}
+                {remoteVideoOff && (
+                  <div className="status-indicator video-off-indicator" title="Camera off">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <div className="waiting-message">

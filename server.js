@@ -135,6 +135,32 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Handle media status changes (mute/video toggle)
+  socket.on('media-status', ({ to, from, isMuted, isVideoOff }) => {
+    // Validate input
+    if (!to || !from || typeof isMuted !== 'boolean' || typeof isVideoOff !== 'boolean') {
+      console.log('❌ Invalid media status data');
+      return;
+    }
+    
+    // Verify sender is authenticated
+    if (from !== userId) {
+      console.log('❌ Unauthorized media status');
+      return;
+    }
+    
+    console.log(`📡 Media status from ${from} to ${to}: muted=${isMuted}, video=${isVideoOff}`);
+    
+    const recipient = users.get(to);
+    if (recipient) {
+      io.to(recipient.socketId).emit('media-status', {
+        from: from,
+        isMuted: isMuted,
+        isVideoOff: isVideoOff
+      });
+    }
+  });
+
   // Handle disconnect
   socket.on('disconnect', () => {
     console.log('❌ User disconnected:', socket.id);
