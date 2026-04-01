@@ -111,6 +111,7 @@ service cloud.firestore {
     // 7. ADMIN DATA
     match /admins/{u}        { 
       allow read: if isSignedIn(); // Allow any signed-in user to check admin status
+      allow list: if isSignedIn(); // Allow listing admins collection
       allow write: if isAdmin(); 
     }
     match /blockedUsers/{u}  { allow read: if isOwner(u) || isAdmin(); allow write: if isAdmin(); }
