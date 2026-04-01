@@ -114,7 +114,15 @@ service cloud.firestore {
       allow list: if isSignedIn(); // Allow listing admins collection
       allow write: if isAdmin(); 
     }
-    match /blockedUsers/{u}  { allow read: if isOwner(u) || isAdmin(); allow write: if isAdmin(); }
-    match /deletedUsers/{u}  { allow read: if isOwner(u) || isAdmin(); allow write: if isAdmin(); }
+    match /blockedUsers/{u}  { 
+      allow read: if isOwner(u) || isAdmin(); 
+      allow list: if isAdmin(); // Allow admins to list blocked users
+      allow write: if isAdmin(); 
+    }
+    match /deletedUsers/{u}  { 
+      allow read: if isOwner(u) || isAdmin(); 
+      allow list: if isAdmin(); // Allow admins to list deleted users
+      allow write: if isAdmin(); 
+    }
   }
 }
