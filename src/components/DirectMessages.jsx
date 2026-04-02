@@ -464,7 +464,11 @@ export default function DirectMessages({ user }) {
       return;
     }
     
-    setMessages([]);
+    // Only clear messages if switching to a different user
+    if (selectedUser?.id !== u.id) {
+      setMessages([]);
+    }
+    
     const dmId = getDMId(user.uid, u.id);
     try {
       await setDoc(doc(db, 'dms', dmId), {
