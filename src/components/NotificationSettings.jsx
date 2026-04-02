@@ -33,7 +33,7 @@ export default function NotificationSettings({ onClose }) {
       saveNotificationPreference(true);
       showNotification('Notifications enabled!', {
         body: 'You will now receive notifications for new messages and calls.',
-      });
+      }, true); // Force show even if window is focused
     }
   };
 
@@ -44,14 +44,14 @@ export default function NotificationSettings({ onClose }) {
     if (value && permission === 'granted') {
       showNotification('Notifications enabled!', {
         body: 'You will receive notifications for new messages and calls.',
-      });
+      }, true); // Force show even if window is focused
     }
   };
 
   const handleTestNotification = () => {
     showNotification('Test Notification', {
       body: 'This is a test notification from Chatter!',
-    });
+    }, true); // Force show even if window is focused
   };
 
   if (!isNotificationSupported()) {

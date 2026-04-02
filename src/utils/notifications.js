@@ -37,7 +37,7 @@ export const requestNotificationPermission = async () => {
 };
 
 // Show a notification
-export const showNotification = (title, options = {}) => {
+export const showNotification = (title, options = {}, force = false) => {
   if (!isNotificationSupported()) {
     console.warn('Notifications not supported');
     return null;
@@ -48,8 +48,8 @@ export const showNotification = (title, options = {}) => {
     return null;
   }
 
-  // Don't show notification if window is focused
-  if (document.hasFocus()) {
+  // Don't show notification if window is focused (unless forced for testing)
+  if (!force && document.hasFocus()) {
     return null;
   }
 
