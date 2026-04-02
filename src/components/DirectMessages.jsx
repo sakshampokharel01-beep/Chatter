@@ -114,10 +114,13 @@ export default function DirectMessages({ user }) {
   const [showVideoCall, setShowVideoCall] = useState(false);
   const [incomingCall, setIncomingCall] = useState(null); // { from: userId, fromName: string }
   const [isAudioOnly, setIsAudioOnly] = useState(false); // Track if call is audio-only
+  const [friendTyping, setFriendTyping] = useState(false); // Track if friend is typing
+  const [typingTimeout, setTypingTimeout] = useState(null); // Timeout for typing indicator
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const lastSentRef = useRef(0);
+  const typingTimeoutRef = useRef(null); // Ref for typing timeout
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
 
@@ -287,14 +290,33 @@ export default function DirectMessages({ user }) {
       setIncomingCall(null);
     };
 
+    // Handle typing indicators
+    const handleTypingDM = ({ from, isTyping }) => {
+      if (selectedUser && from === selectedUser.id) {
+        setFriendTyping(isTyping);
+        
+        // Auto-hide typing indicator after 3 seconds
+        if (isTyping) {
+          if (typingTimeout) clearTimeout(typingTimeout);
+          const timeout = setTimeout(() => {
+            setFriendTyping(false);
+          }, 3000);
+          setTypingTimeout(timeout);
+        }
+      }
+    };
+
     socket.on('call-signal', handleCallSignal);
     socket.on('call-ended', handleCallEnded);
+    socket.on('typing-dm', handleTypingDM);
 
     return () => {
       socket.off('call-signal', handleCallSignal);
       socket.off('call-ended', handleCallEnded);
+      socket.off('typing-dm', handleTypingDM);
+      if (typingTimeout) clearTimeout(typingTimeout);
     };
-  }, [user.uid, displayName, isGuest]); // Removed 'users' from dependencies
+  }, [user.uid, displayName, isGuest, selectedUser, typingTimeout]); // Removed 'users' from dependencies
 
   /* ── Accept incoming call ── */
   const acceptIncomingCall = useCallback(() => {
@@ -387,6 +409,15 @@ export default function DirectMessages({ user }) {
     lastSentRef.current = now;
     setSending(true);
     setInputText('');
+    
+    // Stop typing indicator when sending
+    const socket = getSocket(user.uid, displayName);
+    socket.emit('typing-dm', {
+      to: selectedUser.id,
+      from: user.uid,
+      isTyping: false
+    });
+    
     const cu = auth.currentUser;
     try {
       await addDoc(
@@ -407,6 +438,34 @@ export default function DirectMessages({ user }) {
       inputRef.current?.focus();
     }
   }, [inputText, sending, user, selectedUser, displayName]);
+
+  /* ── Handle typing indicator ── */
+  const handleTyping = useCallback(() => {
+    if (!selectedUser) return;
+    
+    const socket = getSocket(user.uid, displayName);
+    
+    // Emit typing start
+    socket.emit('typing-dm', {
+      to: selectedUser.id,
+      from: user.uid,
+      isTyping: true
+    });
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set timeout to emit typing stop after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit('typing-dm', {
+        to: selectedUser.id,
+        from: user.uid,
+        isTyping: false
+      });
+    }, 2000);
+  }, [selectedUser, user.uid, displayName]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -662,6 +721,18 @@ export default function DirectMessages({ user }) {
                 })
               )}
               <div ref={messagesEndRef} />
+              
+              {/* Typing indicator */}
+              {friendTyping && (
+                <div className="typing-indicator-wrapper">
+                  <div className="typing-indicator">
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                  </div>
+                  <span className="typing-text">{selectedUser.displayName} is typing...</span>
+                </div>
+              )}
             </div>
 
             <div className="input-area">
@@ -672,7 +743,10 @@ export default function DirectMessages({ user }) {
                   placeholder={`Message ${selectedUser.displayName}…`}
                   rows={1}
                   value={inputText}
-                  onChange={e => setInputText(e.target.value.slice(0, MAX_CHARS))}
+                  onChange={e => {
+                    setInputText(e.target.value.slice(0, MAX_CHARS));
+                    handleTyping();
+                  }}
                   onKeyDown={handleKeyDown}
                   disabled={sending}
                 />

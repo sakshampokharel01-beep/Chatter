@@ -139,17 +139,13 @@ io.on('connection', (socket) => {
   socket.on('media-status', ({ to, from, isMuted, isVideoOff }) => {
     // Validate input
     if (!to || !from || typeof isMuted !== 'boolean' || typeof isVideoOff !== 'boolean') {
-      console.log('❌ Invalid media status data');
       return;
     }
     
     // Verify sender is authenticated
     if (from !== userId) {
-      console.log('❌ Unauthorized media status');
       return;
     }
-    
-    console.log(`📡 Media status from ${from} to ${to}: muted=${isMuted}, video=${isVideoOff}`);
     
     const recipient = users.get(to);
     if (recipient) {
@@ -159,6 +155,47 @@ io.on('connection', (socket) => {
         isVideoOff: isVideoOff
       });
     }
+  });
+
+  // Handle typing indicators for DMs
+  socket.on('typing-dm', ({ to, from, isTyping }) => {
+    // Validate input
+    if (!to || !from || typeof isTyping !== 'boolean') {
+      return;
+    }
+    
+    // Verify sender is authenticated
+    if (from !== userId) {
+      return;
+    }
+    
+    const recipient = users.get(to);
+    if (recipient) {
+      io.to(recipient.socketId).emit('typing-dm', {
+        from: from,
+        isTyping: isTyping
+      });
+    }
+  });
+
+  // Handle typing indicators for global chat
+  socket.on('typing-global', ({ from, userName, isTyping }) => {
+    // Validate input
+    if (!from || !userName || typeof isTyping !== 'boolean') {
+      return;
+    }
+    
+    // Verify sender is authenticated
+    if (from !== userId) {
+      return;
+    }
+    
+    // Broadcast to all users except sender
+    socket.broadcast.emit('typing-global', {
+      from: from,
+      userName: userName.slice(0, 64),
+      isTyping: isTyping
+    });
   });
 
   // Handle disconnect
