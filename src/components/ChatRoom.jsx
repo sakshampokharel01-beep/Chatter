@@ -178,6 +178,7 @@ export default function ChatRoom({ user }) {
   const [showProfile, setShowProfile] = useState(false); // Track profile modal visibility
   const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
   const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
+  const [showUserMenu, setShowUserMenu] = useState(false); // Track user dropdown menu visibility
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -188,6 +189,24 @@ export default function ChatRoom({ user }) {
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
   const [adminUser, setAdminUser] = useState(false);
+  const userMenuRef = useRef(null);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   // Cleanup session on sign out or browser close
   useEffect(() => {
@@ -542,11 +561,11 @@ export default function ChatRoom({ user }) {
           )}
         </div>
 
-        <div className="header-user">
+        <div className="header-user" ref={userMenuRef}>
           <button 
             className="user-profile-btn"
-            onClick={() => setShowProfile(true)}
-            title="Edit Profile"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            title="User Menu"
           >
             {user.photoURL ? (
               <img src={user.photoURL} alt={displayName} className="user-avatar" />
@@ -556,37 +575,93 @@ export default function ChatRoom({ user }) {
               </div>
             )}
             <span className="user-name" title={displayName}>{displayName}</span>
-          </button>
-          <button
-            className="btn-notifications"
-            onClick={() => setShowNotifications(true)}
-            title="Notification Settings"
-            aria-label="Notification settings"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: '4px' }}>
+              <polyline points="6 9 12 15 18 9"/>
             </svg>
           </button>
-          <button
-            className="btn-devices"
-            onClick={() => setShowDevices(true)}
-            title="Manage Devices"
-            aria-label="Manage devices"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-              <line x1="8" y1="21" x2="16" y2="21"/>
-              <line x1="12" y1="17" x2="12" y2="21"/>
-            </svg>
-          </button>
-          <button
-            className="btn-signout"
-            onClick={signOutUser}
-            aria-label="Sign out"
-          >
-            Sign Out
-          </button>
+
+          {/* User Dropdown Menu */}
+          {showUserMenu && (
+            <div className="user-dropdown-menu">
+              <div className="user-dropdown-header">
+                <div className="user-dropdown-avatar">
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt={displayName} />
+                  ) : (
+                    <div className="user-avatar-placeholder">
+                      {displayName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="user-dropdown-info">
+                  <div className="user-dropdown-name">{displayName}</div>
+                  {user.email && <div className="user-dropdown-email">{user.email}</div>}
+                </div>
+              </div>
+
+              <div className="user-dropdown-divider"></div>
+
+              <button
+                className="user-dropdown-item"
+                onClick={() => {
+                  setShowProfile(true);
+                  setShowUserMenu(false);
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Edit Profile
+              </button>
+
+              <button
+                className="user-dropdown-item"
+                onClick={() => {
+                  setShowNotifications(true);
+                  setShowUserMenu(false);
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                Notifications
+              </button>
+
+              <button
+                className="user-dropdown-item"
+                onClick={() => {
+                  setShowDevices(true);
+                  setShowUserMenu(false);
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                Active Sessions
+              </button>
+
+              <div className="user-dropdown-divider"></div>
+
+              <button
+                className="user-dropdown-item logout"
+                onClick={() => {
+                  setShowUserMenu(false);
+                  signOutUser();
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Log Out
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
