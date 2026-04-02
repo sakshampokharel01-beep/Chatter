@@ -2329,17 +2329,34 @@ body.no-scroll {
 }
 
 .incoming-call-icon {
-  font-size: 64px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(91, 141, 238, 0.15) 0%, rgba(91, 141, 238, 0.25) 100%);
+  border-radius: 50%;
   animation: pulse 1.5s ease-in-out infinite;
-  filter: drop-shadow(0 4px 12px rgba(91, 141, 238, 0.4));
+  box-shadow: 0 0 0 0 rgba(91, 141, 238, 0.4);
+}
+
+.incoming-call-icon svg {
+  stroke: #5b8dee;
+  filter: drop-shadow(0 2px 8px rgba(91, 141, 238, 0.3));
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0% {
     transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(91, 141, 238, 0.4);
   }
   50% {
-    transform: scale(1.15);
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(91, 141, 238, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(91, 141, 238, 0);
   }
 }
 
