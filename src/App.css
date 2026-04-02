@@ -1117,14 +1117,26 @@ body.no-scroll {
   justify-content: flex-end;
 }
 
-.msg-seen-indicator {
-  color: #5b8dee;
+.msg-status-indicator {
   display: flex;
   align-items: center;
   opacity: 0.8;
+  transition: all 0.2s ease;
 }
 
-.msg-seen-indicator svg {
+.msg-status-indicator.sent {
+  color: #606878;
+}
+
+.msg-status-indicator.delivered {
+  color: #606878;
+}
+
+.msg-status-indicator.seen {
+  color: #5b8dee;
+}
+
+.msg-status-indicator svg {
   width: 14px;
   height: 14px;
 }

@@ -60,6 +60,7 @@ function formatTime(ts) {
 function DmMessage({ message, isOwn, hideAvatar, friendId }) {
   const name = message.displayName || 'User';
   const isSeen = message.seenBy && message.seenBy.includes(friendId);
+  const isDelivered = message.deliveredTo && message.deliveredTo.includes(friendId);
   
   return (
     <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`}>
@@ -71,12 +72,24 @@ function DmMessage({ message, isOwn, hideAvatar, friendId }) {
         <div className="msg-bubble">{message.text}</div>
         <div className="msg-time-row">
           <span className="msg-time">{formatTime(message.createdAt)}</span>
-          {isOwn && isSeen && (
-            <span className="msg-seen-indicator" title="Seen">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="20 6 9 17 4 12"/>
-                <polyline points="20 6 9 17 4 12" transform="translate(3, 0)"/>
-              </svg>
+          {isOwn && (
+            <span className={`msg-status-indicator ${isSeen ? 'seen' : isDelivered ? 'delivered' : 'sent'}`} 
+                  title={isSeen ? 'Seen' : isDelivered ? 'Delivered' : 'Sent'}>
+              {isSeen ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                  <polyline points="20 6 9 17 4 12" transform="translate(4, 0)"/>
+                </svg>
+              ) : isDelivered ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                  <polyline points="20 6 9 17 4 12" transform="translate(4, 0)"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              )}
             </span>
           )}
         </div>
@@ -235,13 +248,31 @@ export default function DirectMessages({ user }) {
       setMessages(msgs);
       setLoadingMsg(false);
       
-      // Mark unread messages as seen
+      // Mark messages as delivered and seen
+      const undeliveredMessages = msgs.filter(msg => 
+        msg.uid !== user.uid && // Not my message
+        (!msg.deliveredTo || !msg.deliveredTo.includes(user.uid)) // Not delivered to me yet
+      );
+      
       const unseenMessages = msgs.filter(msg => 
         msg.uid !== user.uid && // Not my message
         (!msg.seenBy || !msg.seenBy.includes(user.uid)) // Not seen by me yet
       );
       
-      // Update each unseen message
+      // Update delivered status first
+      for (const msg of undeliveredMessages) {
+        try {
+          const msgRef = doc(db, 'dms', dmId, 'messages', msg.id);
+          await updateDoc(msgRef, {
+            deliveredTo: [...(msg.deliveredTo || []), user.uid],
+            deliveredAt: serverTimestamp()
+          });
+        } catch (err) {
+          // Silently fail - not critical
+        }
+      }
+      
+      // Update seen status
       for (const msg of unseenMessages) {
         try {
           const msgRef = doc(db, 'dms', dmId, 'messages', msg.id);
@@ -428,6 +459,8 @@ export default function DirectMessages({ user }) {
           displayName: (cu?.displayName || displayName).slice(0, 64),
           photoURL: safePhotoURL(cu?.photoURL),
           createdAt: serverTimestamp(),
+          deliveredTo: [], // Will be updated when friend opens chat
+          seenBy: [], // Will be updated when friend sees message
         },
       );
     } catch (err) {
