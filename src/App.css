@@ -3878,13 +3878,13 @@ input:checked + .toggle-slider:before {
 }
 
 .tab-btn-modern.active {
-  background: linear-gradient(135deg, #5b8dee 0%, #7b6ef6 100%);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(91, 141, 238, 0.3);
+  background: rgba(91, 141, 238, 0.15);
+  color: #5b8dee;
+  border: 1px solid rgba(91, 141, 238, 0.3);
 }
 
 .tab-btn-modern.active svg {
-  color: #fff;
+  color: #5b8dee;
 }
 
 .tab-btn-modern:hover:not(.active):not(:disabled) {
