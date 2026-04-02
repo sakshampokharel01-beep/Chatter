@@ -14,16 +14,21 @@ This document tracks all requested features for Chatter. Features will be implem
 
 ## 🎯 Feature List
 
-### 1. ⏳ Typing Indicators
-**Status:** Pending  
+### 1. ✅ Typing Indicators
+**Status:** Done  
 **Priority:** High  
 **Description:** Show "User is typing..." indicator in real-time when someone is composing a message.
 
-**Implementation Notes:**
-- Use Socket.IO for real-time typing events
-- Show indicator in both DMs and global chat
-- Auto-hide after 3 seconds of inactivity
-- Throttle typing events to avoid spam
+**Implementation Details:**
+- ✅ Socket.IO events for real-time typing (typing-dm, typing-global)
+- ✅ Typing indicator in Direct Messages
+- ✅ Typing indicator in Global Chat
+- ✅ Auto-hide after 3 seconds of inactivity
+- ✅ Throttled typing events (2 second debounce)
+- ✅ Animated dots UI with smooth animations
+- ✅ Shows multiple users typing in global chat
+
+**Completed:** April 2, 2026
 
 ---
 
