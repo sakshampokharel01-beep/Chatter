@@ -18,7 +18,8 @@ export default function VideoCall({
   friendName,
   onClose,
   autoStart = false, // New prop to auto-start call
-  incomingPeerId = null // Peer ID of incoming caller
+  incomingPeerId = null, // Peer ID of incoming caller
+  audioOnly = false // New prop for audio-only calls
 }) {
   const [peer, setPeer] = useState(null);
   const [socket, setSocket] = useState(null);
@@ -149,7 +150,10 @@ export default function VideoCall({
       console.log('📞 Receiving call...');
       
       // Get local stream first
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      navigator.mediaDevices.getUserMedia({ 
+        video: audioOnly ? false : true, 
+        audio: true 
+      })
         .then((localMediaStream) => {
           localStreamRef.current = localMediaStream; // Store in ref
           setLocalStream(localMediaStream);
@@ -269,7 +273,7 @@ export default function VideoCall({
   const getMediaStream = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
+        video: audioOnly ? false : {
           width: { ideal: 1280 },
           height: { ideal: 720 }
         },
@@ -284,7 +288,7 @@ export default function VideoCall({
       return stream;
     } catch (err) {
       console.error('❌ Media access error:', err);
-      setError('Failed to access camera/microphone. Please grant permissions.');
+      setError(`Failed to access ${audioOnly ? 'microphone' : 'camera/microphone'}. Please grant permissions.`);
       throw err;
     }
   };
@@ -510,7 +514,7 @@ export default function VideoCall({
   return (
     <div className="video-call-container">
       <div className="video-call-header">
-        <h3>Call with {friendName}</h3>
+        <h3>{audioOnly ? 'Audio Call' : 'Call'} with {friendName}</h3>
         <button className="close-btn" onClick={endCall}>✕</button>
       </div>
 
@@ -520,29 +524,61 @@ export default function VideoCall({
         </div>
       )}
 
-      <div className="video-grid">
-        {/* Local Video */}
+      <div className={`video-grid ${audioOnly ? 'audio-only-grid' : ''}`}>
+        {/* Local Video/Audio */}
         <div className="video-box local">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            muted
-            playsInline
-            className="video-element"
-          />
+          {audioOnly ? (
+            <div className="audio-only-avatar">
+              <div className="avatar-circle">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <div className="audio-wave">
+                {!isMuted && <div className="wave-bar"></div>}
+                {!isMuted && <div className="wave-bar"></div>}
+                {!isMuted && <div className="wave-bar"></div>}
+              </div>
+            </div>
+          ) : (
+            <video
+              ref={localVideoRef}
+              autoPlay
+              muted
+              playsInline
+              className="video-element"
+            />
+          )}
           <div className="video-label">You</div>
         </div>
 
-        {/* Remote Video */}
+        {/* Remote Video/Audio */}
         <div className="video-box remote">
           {remoteStream ? (
             <>
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="video-element"
-              />
+              {audioOnly ? (
+                <div className="audio-only-avatar">
+                  <div className="avatar-circle">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  <div className="audio-wave">
+                    {!remoteMuted && <div className="wave-bar"></div>}
+                    {!remoteMuted && <div className="wave-bar"></div>}
+                    {!remoteMuted && <div className="wave-bar"></div>}
+                  </div>
+                </div>
+              ) : (
+                <video
+                  ref={remoteVideoRef}
+                  autoPlay
+                  playsInline
+                  className="video-element"
+                />
+              )}
               <div className="video-label">{friendName}</div>
               
               {/* Remote user status indicators */}
@@ -558,7 +594,7 @@ export default function VideoCall({
                     </svg>
                   </div>
                 )}
-                {remoteVideoOff && (
+                {!audioOnly && remoteVideoOff && (
                   <div className="status-indicator video-off-indicator" title="Camera off">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/>
@@ -626,23 +662,25 @@ export default function VideoCall({
               )}
             </button>
             
-            <button 
-              className={`control-btn ${isVideoOff ? 'video-off' : 'video-on'}`} 
-              onClick={toggleVideo}
-              title={isVideoOff ? 'Turn on camera' : 'Turn off camera'}
-            >
-              {isVideoOff ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="23 7 16 12 23 17 23 7"/>
-                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                </svg>
-              )}
-            </button>
+            {!audioOnly && (
+              <button 
+                className={`control-btn ${isVideoOff ? 'video-off' : 'video-on'}`} 
+                onClick={toggleVideo}
+                title={isVideoOff ? 'Turn on camera' : 'Turn off camera'}
+              >
+                {isVideoOff ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="23 7 16 12 23 17 23 7"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                  </svg>
+                )}
+              </button>
+            )}
             
             <button className="control-btn end" onClick={endCall}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

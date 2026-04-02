@@ -113,6 +113,7 @@ export default function DirectMessages({ user }) {
   const [activeTab, setActiveTab] = useState('friends'); // 'friends' | 'all' | 'requests'
   const [showVideoCall, setShowVideoCall] = useState(false);
   const [incomingCall, setIncomingCall] = useState(null); // { from: userId, fromName: string }
+  const [isAudioOnly, setIsAudioOnly] = useState(false); // Track if call is audio-only
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -612,6 +613,7 @@ export default function DirectMessages({ user }) {
                 <button 
                   className="audio-call-btn" 
                   onClick={() => {
+                    setIsAudioOnly(true);
                     setShowVideoCall(true);
                     setIncomingCall(null);
                   }}
@@ -624,6 +626,7 @@ export default function DirectMessages({ user }) {
                 <button 
                   className="video-call-btn" 
                   onClick={() => {
+                    setIsAudioOnly(false);
                     setShowVideoCall(true);
                     setIncomingCall(null);
                   }}
@@ -749,9 +752,11 @@ export default function DirectMessages({ user }) {
           onClose={() => {
             setShowVideoCall(false);
             setIncomingCall(null); // Clear incoming call when closing
+            setIsAudioOnly(false); // Reset audio-only mode
           }}
           autoStart={true} // Always auto-start (either new call or accepting incoming)
           incomingPeerId={incomingCall?.peerId} // Pass the peer ID if accepting incoming call
+          audioOnly={isAudioOnly} // Pass audio-only mode
         />
       )}
     </div>
