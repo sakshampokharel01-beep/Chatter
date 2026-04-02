@@ -61,11 +61,6 @@ function DmMessage({ message, isOwn, hideAvatar, friendId }) {
   const name = message.displayName || 'User';
   const isSeen = message.seenBy && message.seenBy.includes(friendId);
   
-  // Debug logging
-  if (isOwn) {
-    console.log('Message:', message.text.substring(0, 20), 'seenBy:', message.seenBy, 'friendId:', friendId, 'isSeen:', isSeen);
-  }
-  
   return (
     <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`}>
       <div className="msg-avatar">
@@ -242,19 +237,16 @@ export default function DirectMessages({ user }) {
         (!msg.seenBy || !msg.seenBy.includes(user.uid)) // Not seen by me yet
       );
       
-      console.log('📧 Unseen messages to mark:', unseenMessages.length);
-      
       // Update each unseen message
       for (const msg of unseenMessages) {
         try {
           const msgRef = doc(db, 'dms', dmId, 'messages', msg.id);
-          console.log('✅ Marking message as seen:', msg.text.substring(0, 20));
           await updateDoc(msgRef, {
             seenBy: [...(msg.seenBy || []), user.uid],
             seenAt: serverTimestamp()
           });
         } catch (err) {
-          console.error('❌ Error marking message as seen:', err);
+          // Silently fail - not critical
         }
       }
     }, (err) => {
