@@ -17,15 +17,20 @@ const getDeviceInfo = () => {
   else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera';
 
   // Detect OS
-  if (ua.includes('Windows')) os = 'Windows';
+  if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('iPhone')) os = 'iOS';
+  else if (ua.includes('iPad')) os = 'iPadOS';
   else if (ua.includes('Mac')) os = 'macOS';
+  else if (ua.includes('Windows')) os = 'Windows';
   else if (ua.includes('Linux')) os = 'Linux';
-  else if (ua.includes('Android')) os = 'Android';
-  else if (ua.includes('iOS') || ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
 
-  // Detect device type
-  if (ua.includes('Mobile') || ua.includes('Android') || ua.includes('iPhone')) deviceType = 'Mobile';
-  else if (ua.includes('Tablet') || ua.includes('iPad')) deviceType = 'Tablet';
+  // Detect device type (check mobile/tablet first before desktop)
+  if (ua.includes('iPad')) deviceType = 'Tablet';
+  else if (ua.includes('Android') && ua.includes('Mobile')) deviceType = 'Mobile';
+  else if (ua.includes('Android')) deviceType = 'Tablet';
+  else if (ua.includes('iPhone') || ua.includes('iPod')) deviceType = 'Mobile';
+  else if (ua.includes('Mobile')) deviceType = 'Mobile';
+  else if (ua.includes('Tablet')) deviceType = 'Tablet';
 
   return { browser, os, deviceType };
 };

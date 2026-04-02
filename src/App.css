@@ -4070,6 +4070,9 @@ input:checked + .toggle-slider:before {
   .chat-header {
     padding: 10px 16px;
     gap: 12px;
+    position: relative;
+    min-height: 56px;
+    overflow: visible;
   }
 
   .header-brand {
@@ -4110,6 +4113,7 @@ input:checked + .toggle-slider:before {
   .chat-header {
     padding: 8px 12px;
     gap: 8px;
+    min-height: 52px;
   }
 
   .header-logo svg {
