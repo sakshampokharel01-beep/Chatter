@@ -21,7 +21,7 @@ import UserProfile from './UserProfile';
 import DeviceManagement from './DeviceManagement';
 import NotificationSettings from './NotificationSettings';
 import InAppNotification from './InAppNotification';
-import { useInAppNotifications } from '../hooks/useInAppNotifications';
+import { useInAppNotifications } from '../hooks/useInAppNotifications.jsx';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;

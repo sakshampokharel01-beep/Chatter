@@ -17,7 +17,7 @@ import {
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
 import { formatLastSeen, isUserActuallyOnline } from '../utils/formatLastSeen';
 import { areNotificationsEnabled } from '../utils/notifications';
-import { createMessageNotification, createCallNotification, createFriendRequestNotification } from '../hooks/useInAppNotifications';
+import { createMessageNotification, createCallNotification, createFriendRequestNotification } from '../hooks/useInAppNotifications.jsx';
 import VideoCall from './VideoCall';
 import { getSocket } from '../socket';
 
