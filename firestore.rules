@@ -48,12 +48,17 @@ service cloud.firestore {
         // Prevent rapid account creation from same IP (Firebase limitation workaround)
         request.time > request.resource.data.get('createdAt', timestamp.value(0)) + duration.value(0, 's');
       allow update: if isOwner(uid) &&
-        request.resource.data.displayName is string &&
-        request.resource.data.displayName.size() <= 64 &&
-        // Prevent removed users from updating profiles
-        !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
-        // Prevent updating too frequently (anti-spam)
-        request.time > resource.data.lastSeen + duration.value(1, 's');
+        (
+          // Allow updating profile info
+          (request.resource.data.displayName is string &&
+           request.resource.data.displayName.size() <= 64 &&
+           !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
+           request.time > resource.data.lastSeen + duration.value(1, 's'))
+          ||
+          // Allow updating online status and lastSeen (for presence tracking)
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['online', 'lastSeen']) &&
+           request.resource.data.online is bool)
+        );
       allow delete: if isAdmin(); // Allow admins to delete user profiles
     }
 

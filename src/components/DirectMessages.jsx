@@ -14,6 +14,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
+import { formatLastSeen } from '../utils/formatLastSeen';
 import VideoCall from './VideoCall';
 import { getSocket } from '../socket';
 
@@ -22,29 +23,33 @@ const MAX_CHARS = 500;
 const SEND_COOLDOWN_MS = 1000;
 
 /* ── Avatar ───────────────────────────────────────────────── */
-function Avatar({ displayName, photoURL, size = 32 }) {
+function Avatar({ displayName, photoURL, size = 32, isOnline, showOnlineIndicator = false }) {
   const initial = (displayName || '?').charAt(0).toUpperCase();
   const [imgError, setImgError] = useState(false);
 
-  if (photoURL && !imgError) {
-    return (
-      <img
-        src={photoURL}
-        alt={displayName}
-        style={{
-          width: size, height: size, borderRadius: '50%',
-          objectFit: 'cover', border: '1.5px solid rgba(99,102,241,0.3)', flexShrink: 0,
-        }}
-        onError={() => setImgError(true)}
-      />
-    );
-  }
   return (
-    <div
-      className="msg-avatar-placeholder"
-      style={{ width: size, height: size, fontSize: size * 0.42, flexShrink: 0 }}
-    >
-      {initial}
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      {photoURL && !imgError ? (
+        <img
+          src={photoURL}
+          alt={displayName}
+          style={{
+            width: size, height: size, borderRadius: '50%',
+            objectFit: 'cover', border: '1.5px solid rgba(99,102,241,0.3)', flexShrink: 0,
+          }}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div
+          className="msg-avatar-placeholder"
+          style={{ width: size, height: size, fontSize: size * 0.42, flexShrink: 0 }}
+        >
+          {initial}
+        </div>
+      )}
+      {showOnlineIndicator && isOnline && (
+        <span className="online-indicator" title="Online"></span>
+      )}
     </div>
   );
 }
@@ -732,9 +737,16 @@ export default function DirectMessages({ user }) {
                   className={`dm-user-item${selectedUser?.id === u.id ? ' dm-user-active' : ''}`}
                   onClick={() => openConversation(u)}
                 >
-                  <Avatar displayName={u.displayName} photoURL={u.photoURL} size={38} />
+                  <Avatar 
+                    displayName={u.displayName} 
+                    photoURL={u.photoURL} 
+                    size={38} 
+                    isOnline={u.online}
+                    showOnlineIndicator={true}
+                  />
                   <div className="dm-user-info">
                     <span className="dm-user-name">{u.displayName}</span>
+                    <span className="dm-user-status">{formatLastSeen(u.lastSeen, u.online)}</span>
                   </div>
                   {selectedUser?.id === u.id && <span className="dm-selected-dot" />}
                 </button>
@@ -834,10 +846,16 @@ export default function DirectMessages({ user }) {
                   <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
-              <Avatar displayName={selectedUser.displayName} photoURL={selectedUser.photoURL} size={34} />
+              <Avatar 
+                displayName={selectedUser.displayName} 
+                photoURL={selectedUser.photoURL} 
+                size={34}
+                isOnline={selectedUser.online}
+                showOnlineIndicator={true}
+              />
               <div className="dm-chat-info">
                 <span className="dm-chat-name">{selectedUser.displayName}</span>
-                <span className="dm-chat-sub">Private conversation</span>
+                <span className="dm-chat-sub">{formatLastSeen(selectedUser.lastSeen, selectedUser.online)}</span>
               </div>
               <div className="call-buttons-group">
                 <button 

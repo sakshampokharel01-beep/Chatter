@@ -115,8 +115,8 @@ This document tracks all requested features for Chatter. Features will be implem
 
 ---
 
-### 7. ⏳ Online/Offline Status & Last Seen
-**Status:** Pending  
+### 7. 🚧 Online/Offline Status & Last Seen
+**Status:** In Progress  
 **Priority:** Medium  
 **Description:** Show user online status and last seen timestamp.
 

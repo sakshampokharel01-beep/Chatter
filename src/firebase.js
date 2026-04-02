@@ -163,6 +163,7 @@ export const registerUser = async (user, retryCount = 0) => {
       email: email,
       photoURL: safePhotoURL(user.photoURL),
       lastSeen: serverTimestamp(),
+      online: true, // User is online when registering
       isAnonymous: isGuest,
     }, { merge: true });
   } catch (err) {

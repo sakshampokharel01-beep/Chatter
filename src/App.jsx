@@ -3,6 +3,7 @@ import './App.css';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db, registerUser, signOutUser } from './firebase';
+import { useUserPresence } from './hooks/useUserPresence';
 import LandingPage from './components/LandingPage';
 import AuthScreen from './components/AuthScreen';
 import ChatRoom from './components/ChatRoom';
@@ -14,6 +15,9 @@ function App() {
   const [removed, setRemoved] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
   const [needsVerification, setNeedsVerification] = useState(false);
+
+  // Track user online/offline status
+  useUserPresence(user);
 
   useEffect(() => {
     // Subscribe to auth state. getRedirectResult is handled automatically
