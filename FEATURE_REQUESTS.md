@@ -52,7 +52,7 @@ This document tracks all requested features for Chatter. Features will be implem
 
 ---
 
-### 3. ⏳ Message Reactions & Emojis
+### 3. ✅ Message Reactions & Emojis
 **Status:** Pending  
 **Priority:** Medium  
 **Description:** Allow users to react to messages with emojis (like, love, laugh, etc.)
@@ -65,21 +65,25 @@ This document tracks all requested features for Chatter. Features will be implem
 
 ---
 
-### 4. ⏳ Message Editing & Deletion
-**Status:** Pending (Deletion partially implemented for admins)  
+### 4. ✅ Message Editing & Deletion
+**Status:** Done  
 **Priority:** High  
 **Description:** Allow users to edit or delete their own messages.
 
-**Current State:**
-- ✅ Admins can delete any message in global chat
-- ⏳ Users can't edit their own messages
-- ⏳ Users can't delete their own messages
+**Implementation Details:**
+- ✅ Users can edit their own messages within 15 minutes
+- ✅ Users can delete their own messages within 1 hour
+- ✅ Edit button (pencil icon) appears on hover for own messages
+- ✅ Delete button appears on hover for own messages
+- ✅ Editing indicator bar shows "Editing message" with cancel button
+- ✅ Press Escape to cancel editing
+- ✅ Shows "(edited)" label on edited messages
+- ✅ Delete confirmation dialog
+- ✅ Implemented for both global chat and DMs
+- ✅ Firestore rules enforce time limits (15 min edit, 1 hour delete)
+- ✅ Admins can delete any message anytime
 
-**Implementation Notes:**
-- Edit within 15 minutes of sending
-- Show "edited" label on edited messages
-- Delete for everyone (within 1 hour)
-- Delete for me (anytime)
+**Completed:** April 2, 2026
 
 ---
 
