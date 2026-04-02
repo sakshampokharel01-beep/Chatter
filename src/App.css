@@ -1289,8 +1289,8 @@ body.no-scroll {
 }
 
 .dm-sidebar {
-  width: 260px;
-  min-width: 220px;
+  width: 280px;
+  min-width: 240px;
   flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
@@ -1300,35 +1300,37 @@ body.no-scroll {
 }
 
 .dm-sidebar-header {
-  padding: 18px 16px 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .dm-sidebar-title {
   display: block;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
-  color: #d0d8e8;
-  letter-spacing: -0.2px;
-  margin-bottom: 2px;
+  color: #e8ecf4;
+  letter-spacing: -0.3px;
 }
 
 .dm-sidebar-sub {
-  font-size: 11px;
-  color: #383e50;
+  font-size: 12px;
+  color: #505870;
 }
 
 .dm-search-wrap {
   position: relative;
-  padding: 10px 12px;
+  padding: 12px 14px;
   flex-shrink: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dm-search-icon {
   position: absolute;
-  left: 24px;
+  left: 26px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
@@ -1336,35 +1338,41 @@ body.no-scroll {
 
 .dm-search {
   width: 100%;
-  padding: 8px 11px 8px 30px;
+  padding: 10px 12px 10px 34px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 9px;
-  color: #d0d8e8;
-  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #e8ecf4;
+  font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
 }
-.dm-search:focus { border-color: rgba(91, 141, 238, 0.4); }
-.dm-search::placeholder { color: #2e3448; }
+.dm-search:focus { 
+  border-color: rgba(91, 141, 238, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+.dm-search::placeholder { color: #505870; }
 
 .dm-users-list {
   flex: 1;
   overflow-y: auto;
-  padding: 5px 0;
+  padding: 8px 0;
 }
-.dm-users-list::-webkit-scrollbar { width: 3px; }
+.dm-users-list::-webkit-scrollbar { width: 4px; }
 .dm-users-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.dm-users-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .dm-empty {
-  padding: 28px 16px;
+  padding: 32px 20px;
   text-align: center;
-  font-size: 13px;
-  color: #2e3448;
+  font-size: 14px;
+  color: #505870;
   line-height: 1.6;
   white-space: pre-line;
 }
@@ -1373,18 +1381,25 @@ body.no-scroll {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 10px 14px;
+  gap: 12px;
+  padding: 12px 16px;
   background: transparent;
   border: none;
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.15s ease;
+  transition: all 0.2s ease;
   position: relative;
   text-align: left;
+  border-radius: 0;
 }
-.dm-user-item:hover { background: rgba(255, 255, 255, 0.04); }
-.dm-user-item.dm-user-active { background: rgba(91, 141, 238, 0.1); }
+.dm-user-item:hover { 
+  background: rgba(255, 255, 255, 0.05);
+}
+.dm-user-item.dm-user-active { 
+  background: rgba(91, 141, 238, 0.12);
+  border-left: 3px solid #5b8dee;
+  padding-left: 13px;
+}
 
 .dm-user-info {
   flex: 1;
@@ -1393,39 +1408,41 @@ body.no-scroll {
 
 .dm-user-name {
   display: block;
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 600;
-  color: #c0ccd8;
+  color: #e8ecf4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 3px;
 }
 
 .dm-user-status {
   display: block;
-  font-size: 11px;
-  color: #505870;
+  font-size: 12px;
+  color: #7a7a8a;
   margin-top: 2px;
 }
 
 .online-indicator {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 2px;
+  right: 2px;
   width: 12px;
   height: 12px;
-  background: #4caf7d;
-  border: 2px solid #1a1e27;
+  background: #4caf50;
+  border: 2.5px solid #161921;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(76, 175, 125, 0.3);
+  box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.4);
 }
 
 .dm-selected-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #5b8dee;
   flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(91, 141, 238, 0.2);
 }
 
 .dm-chat {
@@ -1763,44 +1780,48 @@ body.no-scroll {
 
 .dm-tabs {
   display: flex;
-  gap: 4px;
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.02);
 }
 
 .dm-tab {
   flex: 1;
-  padding: 6px 8px;
+  padding: 8px 10px;
   background: transparent;
   border: none;
-  border-radius: 6px;
-  color: #606878;
-  font-size: 11px;
+  border-radius: 8px;
+  color: #7a7a8a;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .dm-tab:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: #8898b0;
+  background: rgba(255, 255, 255, 0.05);
+  color: #b8b8c8;
 }
 
 .dm-tab.active {
-  background: rgba(91, 141, 238, 0.12);
+  background: rgba(91, 141, 238, 0.15);
   color: #5b8dee;
 }
 
 .request-badge {
   background: #e05c6a;
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-  margin-left: 8px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  margin-left: 6px;
+  display: inline-block;
+  min-width: 18px;
+  text-align: center;
 }
 
 .dm-user-item-wrapper {
@@ -1809,7 +1830,7 @@ body.no-scroll {
 
 .friend-badge,
 .pending-badge {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
