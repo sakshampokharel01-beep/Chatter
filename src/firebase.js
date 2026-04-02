@@ -72,7 +72,6 @@ export const signUpWithEmail = async (name, email, password) => {
   try {
     const { sendEmailVerification } = await import('firebase/auth');
     await sendEmailVerification(result.user);
-    console.log('✅ Verification email sent');
   } catch (err) {
     console.warn('⚠️ Could not send verification email:', err);
   }
@@ -127,11 +126,6 @@ export const registerUser = async (user, retryCount = 0) => {
   
   const isGuest = user.isAnonymous;
   const email = user.email?.toLowerCase() || '';
-  console.log("--- REGISTRATION ATTEMPT ---");
-  console.log("Active Project ID:", import.meta.env.VITE_FIREBASE_PROJECT_ID);
-  console.log("Auth Provider:", isGuest ? 'anonymous' : (user.providerData[0]?.providerId || 'email'));
-  console.log("UID/DocID:", user.uid);
-  console.log("User Type:", isGuest ? 'Guest' : 'Registered');
 
   // 1. Anti-Spam: Block disposable/test domains (only for non-anonymous)
   const blockedDomains = [
@@ -171,7 +165,6 @@ export const registerUser = async (user, retryCount = 0) => {
       lastSeen: serverTimestamp(),
       isAnonymous: isGuest,
     }, { merge: true });
-    console.log(`✅ ${isGuest ? 'Guest' : 'User'} Registration SUCCESSFUL in Firestore`);
   } catch (err) {
     console.error("❌ Registration FAILED:", err);
     if (err.code === 'permission-denied') {
@@ -182,13 +175,11 @@ export const registerUser = async (user, retryCount = 0) => {
     }
     // Simple retry for network glitches
     if (retryCount < 2 && err.code !== 'permission-denied') {
-      console.log(`Retrying registration (Attempt ${retryCount + 2})...`);
       setTimeout(() => registerUser(user, retryCount + 1), 2000);
     } else {
       throw err;
     }
   }
-  console.log("----------------------------");
 };
 
 // ── Admin ───────────────────────────────────────────────

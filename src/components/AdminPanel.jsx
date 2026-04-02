@@ -16,7 +16,6 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
     const q = collection(db, 'users');
     return onSnapshot(q, snap => {
       const allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      console.log(`[AdminPanel] Received ${allUsers.length} total users from Firestore`);
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
       setUsers(allUsers);
       setLoading(false);
@@ -39,7 +38,6 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   useEffect(() => {
     return onSnapshot(collection(db, 'deletedUsers'), snap => {
       const ids = snap.docs.map(d => d.id);
-      console.log(`[AdminPanel] Detected ${ids.length} removed UIDs:`, ids);
       setRemoved(new Set(ids));
     }, (err) => {
       console.error('Deleted users snapshot error:', err);
@@ -115,7 +113,6 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
         // DELETE the user document from users collection (THIS WAS MISSING!)
         deleteDoc(doc(db, 'users', uid)),
       ]);
-      console.log(`✅ User ${name} (${uid}) removed successfully`);
     } catch (e) {
       console.error('Remove failed:', e);
       alert('Remove failed: ' + e.message);

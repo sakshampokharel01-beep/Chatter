@@ -26,11 +26,11 @@ export const getSocket = (userId, userName) => {
     });
 
     socket.on('connect', () => {
-      console.log('✅ Socket.IO connected:', socket.id);
+      // Socket connected
     });
 
     socket.on('disconnect', () => {
-      console.log('❌ Socket.IO disconnected');
+      // Socket disconnected
     });
 
     socket.on('connect_error', (error) => {

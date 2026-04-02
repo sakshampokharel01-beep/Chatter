@@ -48,7 +48,6 @@ export default function VideoCall({
 
     // Listen for incoming call signals
     const handleCallSignal = ({ from, peerId: remotePeerId }) => {
-      console.log(`📞 Incoming call from ${from}, peer ID: ${remotePeerId}`);
       // Auto-answer if it's from the friend we're chatting with
       if (from === friendId && peer && !connected && !calling) {
         answerCall(remotePeerId);
@@ -57,13 +56,10 @@ export default function VideoCall({
 
     // Listen for call ended signal
     const handleCallEnded = ({ from }) => {
-      console.log(`📴 Call ended by ${from}, cleaning up...`);
-      
       // Stop all local media tracks using ref
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach(track => {
           track.stop();
-          console.log('🛑 Stopped local track on call-ended:', track.kind);
         });
         localStreamRef.current = null;
       }
@@ -72,7 +68,6 @@ export default function VideoCall({
       if (remoteStreamRef.current) {
         remoteStreamRef.current.getTracks().forEach(track => {
           track.stop();
-          console.log('🛑 Stopped remote track on call-ended:', track.kind);
         });
         remoteStreamRef.current = null;
       }
@@ -100,7 +95,6 @@ export default function VideoCall({
     // Listen for media status changes
     const handleMediaStatus = ({ from, isMuted: remoteMutedStatus, isVideoOff: remoteVideoStatus }) => {
       if (from === friendId) {
-        console.log(`📡 Media status from ${from}: muted=${remoteMutedStatus}, video=${remoteVideoStatus}`);
         setRemoteMuted(remoteMutedStatus);
         setRemoteVideoOff(remoteVideoStatus);
       }
@@ -136,7 +130,6 @@ export default function VideoCall({
     });
 
     peerInstance.on('open', (id) => {
-      console.log('✅ PeerJS connected with ID:', id);
       setPeerId(id);
     });
 
@@ -147,8 +140,6 @@ export default function VideoCall({
 
     // Handle incoming calls
     peerInstance.on('call', (call) => {
-      console.log('📞 Receiving call...');
-      
       // Get local stream first
       navigator.mediaDevices.getUserMedia({ 
         video: audioOnly ? false : true, 
@@ -164,7 +155,6 @@ export default function VideoCall({
 
           // Receive remote stream
           call.on('stream', (remoteStream) => {
-            console.log('✅ Receiving remote stream');
             remoteStreamRef.current = remoteStream; // Store in ref
             setRemoteStream(remoteStream);
             setConnected(true);
@@ -181,7 +171,6 @@ export default function VideoCall({
           });
 
           call.on('close', () => {
-            console.log('📴 Call ended');
             endCall();
           });
         })
@@ -194,13 +183,10 @@ export default function VideoCall({
     setPeer(peerInstance);
 
     return () => {
-      console.log('🧹 Cleaning up PeerJS and media streams...');
-      
       // Stop all local media tracks using ref
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach(track => {
           track.stop();
-          console.log('🛑 Cleanup: Stopped local track:', track.kind);
         });
         localStreamRef.current = null;
       }
@@ -209,7 +195,6 @@ export default function VideoCall({
       if (remoteStreamRef.current) {
         remoteStreamRef.current.getTracks().forEach(track => {
           track.stop();
-          console.log('🛑 Cleanup: Stopped remote track:', track.kind);
         });
         remoteStreamRef.current = null;
       }
@@ -240,15 +225,12 @@ export default function VideoCall({
       
       if (incomingPeerId) {
         // We're accepting an incoming call - answer it
-        console.log('🚀 Auto-answering incoming call from peer:', incomingPeerId);
         answerCall(incomingPeerId);
       } else {
         // We're initiating a new call
-        console.log('🚀 Auto-starting new call...');
         const initiateCall = async () => {
           try {
             const stream = await getMediaStream();
-            console.log('✅ Media stream ready, sending call signal...');
             
             socket.emit('call-signal', {
               to: friendId,
@@ -257,7 +239,6 @@ export default function VideoCall({
             });
             
             setCalling(true);
-            console.log('📞 Auto-start call signal sent');
           } catch (err) {
             console.error('❌ Auto-start failed:', err);
             setError('Failed to access camera/microphone');
@@ -313,8 +294,6 @@ export default function VideoCall({
         from: user.uid,
         peerId: peerId
       });
-
-      console.log('📞 Call signal sent to', friendId);
       
       // Note: The actual peer connection will be established when
       // the other user responds via answerCall()
@@ -327,11 +306,8 @@ export default function VideoCall({
 
   // Answer an incoming call
   const answerCall = async (remotePeerId) => {
-    console.log('📞 Answering call from peer:', remotePeerId);
-    
     // Make sure we have local stream first
     if (!localStream) {
-      console.log('⏳ Getting media stream first...');
       try {
         const stream = await getMediaStream();
         setLocalStream(stream);
@@ -341,7 +317,6 @@ export default function VideoCall({
         currentCallRef.current = call;
 
         call.on('stream', (remoteStream) => {
-          console.log('✅ Connected! Receiving remote stream');
           remoteStreamRef.current = remoteStream; // Store in ref
           setRemoteStream(remoteStream);
           setConnected(true);
@@ -359,7 +334,6 @@ export default function VideoCall({
         });
 
         call.on('close', () => {
-          console.log('📴 Call ended');
           endCall();
         });
 
@@ -375,12 +349,10 @@ export default function VideoCall({
       }
     } else {
       // We already have the stream
-      console.log('📞 Calling peer with existing stream');
       const call = peer.call(remotePeerId, localStream);
       currentCallRef.current = call;
 
       call.on('stream', (remoteStream) => {
-        console.log('✅ Connected! Receiving remote stream');
         remoteStreamRef.current = remoteStream; // Store in ref
         setRemoteStream(remoteStream);
         setConnected(true);
@@ -398,7 +370,6 @@ export default function VideoCall({
       });
 
       call.on('close', () => {
-        console.log('📴 Call ended');
         endCall();
       });
 
@@ -412,13 +383,10 @@ export default function VideoCall({
 
   // End the call
   const endCall = () => {
-    console.log('📴 Ending call and cleaning up...');
-    
     // Stop all local media tracks using ref
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(track => {
         track.stop();
-        console.log('🛑 Stopped local track:', track.kind);
       });
       localStreamRef.current = null;
     }
@@ -427,7 +395,6 @@ export default function VideoCall({
     if (remoteStreamRef.current) {
       remoteStreamRef.current.getTracks().forEach(track => {
         track.stop();
-        console.log('🛑 Stopped remote track:', track.kind);
       });
       remoteStreamRef.current = null;
     }
@@ -441,7 +408,6 @@ export default function VideoCall({
     // Notify via Socket.IO
     if (socket && friendId && user.uid) {
       socket.emit('call-ended', { to: friendId, from: user.uid });
-      console.log('📤 Sent call-ended signal to', friendId);
     }
 
     // Reset all state

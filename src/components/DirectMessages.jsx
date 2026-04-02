@@ -268,18 +268,12 @@ export default function DirectMessages({ user }) {
     const socket = getSocket(user.uid, displayName);
 
     const handleCallSignal = ({ from, peerId }) => {
-      console.log('📞 Incoming call from:', from, 'peerId:', peerId);
-      
       // Find the user who's calling - use a callback to get latest users
       setUsers(currentUsers => {
         const caller = currentUsers.find(u => u.id === from);
-        console.log('👤 Caller found:', caller);
         
         if (caller) {
-          console.log('✅ Setting incoming call notification');
           setIncomingCall({ from, fromName: caller.displayName, peerId });
-        } else {
-          console.log('❌ Caller not found in users list');
         }
         
         return currentUsers; // Don't modify users array
@@ -287,7 +281,6 @@ export default function DirectMessages({ user }) {
     };
 
     const handleCallEnded = ({ from }) => {
-      console.log('📴 Call ended by:', from);
       // Close video call if open
       setShowVideoCall(false);
       // Clear incoming call notification
@@ -296,12 +289,10 @@ export default function DirectMessages({ user }) {
 
     socket.on('call-signal', handleCallSignal);
     socket.on('call-ended', handleCallEnded);
-    console.log('🎧 Listening for call-signal and call-ended events');
 
     return () => {
       socket.off('call-signal', handleCallSignal);
       socket.off('call-ended', handleCallEnded);
-      console.log('🔇 Stopped listening for call events');
     };
   }, [user.uid, displayName, isGuest]); // Removed 'users' from dependencies
 
