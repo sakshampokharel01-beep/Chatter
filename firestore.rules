@@ -108,8 +108,13 @@ service cloud.firestore {
       allow read: if isSignedIn() && isParticipant();
       allow create: if isSignedIn() && 
         isNewParticipant() &&
-        request.resource.data.participants.size() == 2;
-      allow update, delete: if false;
+        request.resource.data.participants.size() == 2 &&
+        request.resource.data.participants is list;
+      // Allow update only for merge operations (when doc already exists)
+      allow update: if isSignedIn() && 
+        isParticipant() &&
+        request.resource.data.participants == resource.data.participants;
+      allow delete: if false;
       
       match /messages/{mId} {
         allow read: if isSignedIn() && 

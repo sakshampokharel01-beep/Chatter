@@ -599,12 +599,23 @@ export default function DirectMessages({ user, showNotification }) {
     
     const dmId = getDMId(user.uid, u.id);
     try {
+      // Ensure participants array is properly formatted
+      const participants = [user.uid, u.id].filter(Boolean);
+      
+      if (participants.length !== 2) {
+        console.error('Invalid participants array:', participants);
+        return;
+      }
+      
       await setDoc(doc(db, 'dms', dmId), {
-        participants: [user.uid, u.id],
+        participants: participants,
         createdAt: serverTimestamp(),
       }, { merge: true });
     } catch (err) {
       console.error('Error creating DM doc:', err);
+      console.error('User ID:', user.uid);
+      console.error('Friend ID:', u.id);
+      console.error('DM ID:', dmId);
     }
     
     setTimeout(() => inputRef.current?.focus(), 150);
