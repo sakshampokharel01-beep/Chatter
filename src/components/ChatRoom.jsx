@@ -57,8 +57,16 @@ function Avatar({ displayName, photoURL, size = 30 }) {
 }
 
 /* ── Single Chat Message ──────────────────────────────────── */
-function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove }) {
+function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, onEdit }) {
   const name = message.displayName || (message.isAnonymous ? 'Guest' : 'User');
+  
+  // Check if message can be edited (within 15 minutes)
+  const canEdit = isOwn && message.createdAt && onEdit && 
+    (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 15 * 60 * 1000;
+  
+  // Check if message can be deleted by owner (within 1 hour)
+  const canDeleteOwn = isOwn && message.createdAt && 
+    (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
 
   return (
     <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`}>
@@ -74,8 +82,24 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove }
           </span>
         )}
         <div className="msg-bubble-wrap">
-          <div className="msg-bubble">{message.text}</div>
-          {onDelete && (
+          <div className="msg-bubble">
+            {message.text}
+            {message.edited && <span className="msg-edited-label"> (edited)</span>}
+          </div>
+          {canEdit && (
+            <button
+              className="msg-edit-btn"
+              onClick={() => onEdit(message.id, message.text)}
+              title="Edit message"
+              aria-label="Edit message"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+          )}
+          {(onDelete || canDeleteOwn) && (
             <button
               className="msg-delete-btn"
               onClick={() => onDelete(message.id)}
@@ -145,6 +169,8 @@ export default function ChatRoom({ user }) {
   const [sending, setSending] = useState(false);
   const [loadingMsgs, setLoadingMsgs] = useState(true);
   const [typingUsers, setTypingUsers] = useState(new Map()); // Map of userId -> userName
+  const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
+  const [editingText, setEditingText] = useState(''); // Track the edited text
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -199,14 +225,84 @@ export default function ChatRoom({ user }) {
     };
   }, [user.uid, displayName]);
 
-  /* ── Delete a global message (admin only) ── */
+  /* ── Delete a global message (admin only or own message within 1 hour) ── */
   const deleteMessage = useCallback(async (id) => {
+    const message = messages.find(m => m.id === id);
+    if (!message) return;
+    
+    // Check if user can delete (admin or own message within 1 hour)
+    const isOwn = message.uid === user.uid;
+    const canDeleteOwn = isOwn && message.createdAt && 
+      (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
+    
+    if (!adminUser && !canDeleteOwn) {
+      alert('You can only delete your own messages within 1 hour of sending');
+      return;
+    }
+    
+    if (isOwn && !adminUser) {
+      if (!window.confirm('Delete this message for everyone?')) return;
+    }
+    
     try {
       await deleteDoc(doc(db, 'messages', id));
+      // Clear edit state if deleting the message being edited
+      if (editingMessageId === id) {
+        setEditingMessageId(null);
+        setEditingText('');
+      }
     } catch (err) {
       console.error('Delete failed:', err);
+      alert('Failed to delete message');
     }
+  }, [adminUser, user.uid, messages, editingMessageId]);
+
+  /* ── Edit a message (own message within 15 minutes) ── */
+  const startEditMessage = useCallback((id, currentText) => {
+    setEditingMessageId(id);
+    setEditingText(currentText);
+    setInputText(currentText);
+    inputRef.current?.focus();
   }, []);
+
+  const cancelEdit = useCallback(() => {
+    setEditingMessageId(null);
+    setEditingText('');
+    setInputText('');
+  }, []);
+
+  const saveEdit = useCallback(async () => {
+    if (!editingMessageId || !editingText.trim()) return;
+    
+    const message = messages.find(m => m.id === editingMessageId);
+    if (!message) return;
+    
+    // Verify ownership and time limit
+    const isOwn = message.uid === user.uid;
+    const canEdit = isOwn && message.createdAt && 
+      (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 15 * 60 * 1000;
+    
+    if (!canEdit) {
+      alert('You can only edit your own messages within 15 minutes of sending');
+      cancelEdit();
+      return;
+    }
+    
+    setSending(true);
+    try {
+      await updateDoc(doc(db, 'messages', editingMessageId), {
+        text: editingText.trim().slice(0, MAX_CHARS),
+        edited: true,
+        editedAt: serverTimestamp()
+      });
+      cancelEdit();
+    } catch (err) {
+      console.error('Edit failed:', err);
+      alert('Failed to edit message');
+    } finally {
+      setSending(false);
+    }
+  }, [editingMessageId, editingText, messages, user.uid, cancelEdit]);
 
   /* ── Block a user (admin only) ── */
   const blockUser = useCallback(async (uid, name) => {
@@ -262,8 +358,14 @@ export default function ChatRoom({ user }) {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  /* ── Send a message ── */
+  /* ── Send or edit a message ── */
   const sendMessage = useCallback(async () => {
+    // If editing, save the edit instead
+    if (editingMessageId) {
+      await saveEdit();
+      return;
+    }
+    
     const text = inputText.trim();
     if (!text || sending) return;
     // client-side rate limit
@@ -292,6 +394,7 @@ export default function ChatRoom({ user }) {
         isAnonymous: user.isAnonymous ?? false,
         isAdmin: adminUser,
         createdAt: serverTimestamp(),
+        edited: false,
       });
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -301,7 +404,7 @@ export default function ChatRoom({ user }) {
       setSending(false);
       inputRef.current?.focus();
     }
-  }, [inputText, sending, user, displayName, adminUser]);
+  }, [inputText, sending, user, displayName, adminUser, editingMessageId, saveEdit]);
 
   /* ── Handle typing indicator for global chat ── */
   const handleTyping = useCallback(() => {
@@ -334,7 +437,23 @@ export default function ChatRoom({ user }) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    } else if (e.key === 'Escape' && editingMessageId) {
+      e.preventDefault();
+      cancelEdit();
     }
+  };
+
+  /* ── Handle input change ── */
+  const handleInputChange = (e) => {
+    const newText = e.target.value.slice(0, MAX_CHARS);
+    setInputText(newText);
+    if (editingMessageId) {
+      setEditingText(newText);
+    }
+    if (!editingMessageId) {
+      handleTyping();
+    }
+  };
   };
 
   /* ── Character count colour ── */
@@ -433,9 +552,10 @@ export default function ChatRoom({ user }) {
                     message={msg}
                     isOwn={isOwn}
                     hideAvatar={hideAvatar}
-                    onDelete={adminUser ? deleteMessage : null}
+                    onDelete={adminUser || isOwn ? deleteMessage : null}
                     onBlock={adminUser ? blockUser : null}
                     onRemove={adminUser ? removeUser : null}
+                    onEdit={isOwn ? startEditMessage : null}
                   />
                 );
               })
@@ -459,17 +579,25 @@ export default function ChatRoom({ user }) {
           </div>
 
           <div className="input-area">
+            {editingMessageId && (
+              <div className="editing-indicator">
+                <span>✏️ Editing message</span>
+                <button onClick={cancelEdit} className="cancel-edit-btn" title="Cancel editing">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+            )}
             <div className="input-wrapper">
               <textarea
                 ref={inputRef}
                 className="msg-input"
-                placeholder="Say something to the world…"
+                placeholder={editingMessageId ? "Edit your message…" : "Say something to the world…"}
                 rows={1}
                 value={inputText}
-                onChange={(e) => {
-                  setInputText(e.target.value.slice(0, MAX_CHARS));
-                  handleTyping();
-                }}
+                onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 disabled={sending}
                 autoFocus
@@ -486,7 +614,8 @@ export default function ChatRoom({ user }) {
                 className="btn-send"
                 onClick={sendMessage}
                 disabled={!inputText.trim() || sending}
-                aria-label="Send message"
+                aria-label={editingMessageId ? "Save edit" : "Send message"}
+                title={editingMessageId ? "Save edit" : "Send message"}
               >
                 <SendIcon />
               </button>

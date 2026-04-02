@@ -908,6 +908,61 @@ body.no-scroll {
 .message-row:hover .msg-delete-btn { opacity: 1; }
 .msg-delete-btn:hover { background: rgba(200, 60, 60, 0.1); }
 
+.msg-edit-btn {
+  flex-shrink: 0;
+  opacity: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #5b8dee;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  align-self: center;
+  margin-top: 2px;
+}
+.message-row:hover .msg-edit-btn { opacity: 1; }
+.msg-edit-btn:hover { background: rgba(91, 141, 238, 0.1); }
+
+.msg-edited-label {
+  font-size: 10px;
+  color: #505870;
+  font-style: italic;
+  margin-left: 4px;
+}
+
+.editing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(91, 141, 238, 0.08);
+  border-bottom: 1px solid rgba(91, 141, 238, 0.2);
+  font-size: 13px;
+  color: #5b8dee;
+  font-weight: 500;
+}
+
+.cancel-edit-btn {
+  background: transparent;
+  border: none;
+  color: #606878;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cancel-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #a0b0c8;
+}
+
 .header-badge {
   font-size: 11px;
   font-weight: 600;

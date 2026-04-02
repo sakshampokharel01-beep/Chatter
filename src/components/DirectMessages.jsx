@@ -57,10 +57,18 @@ function formatTime(ts) {
 }
 
 /* ── DM Message ───────────────────────────────────────────── */
-function DmMessage({ message, isOwn, hideAvatar, friendId }) {
+function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete }) {
   const name = message.displayName || 'User';
   const isSeen = message.seenBy && message.seenBy.includes(friendId);
   const isDelivered = message.deliveredTo && message.deliveredTo.includes(friendId);
+  
+  // Check if message can be edited (within 15 minutes)
+  const canEdit = isOwn && message.createdAt && onEdit && 
+    (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 15 * 60 * 1000;
+  
+  // Check if message can be deleted by owner (within 1 hour)
+  const canDelete = isOwn && message.createdAt && onDelete &&
+    (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
   
   return (
     <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`}>
@@ -69,7 +77,40 @@ function DmMessage({ message, isOwn, hideAvatar, friendId }) {
       </div>
       <div className="msg-content">
         {!isOwn && !hideAvatar && <span className="msg-sender">{name}</span>}
-        <div className="msg-bubble">{message.text}</div>
+        <div className="msg-bubble-wrap">
+          <div className="msg-bubble">
+            {message.text}
+            {message.edited && <span className="msg-edited-label"> (edited)</span>}
+          </div>
+          {canEdit && (
+            <button
+              className="msg-edit-btn"
+              onClick={() => onEdit(message.id, message.text)}
+              title="Edit message"
+              aria-label="Edit message"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+          )}
+          {canDelete && (
+            <button
+              className="msg-delete-btn"
+              onClick={() => onDelete(message.id)}
+              title="Delete message"
+              aria-label="Delete message"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
+        </div>
         <div className="msg-time-row">
           <span className="msg-time">{formatTime(message.createdAt)}</span>
           {isOwn && (
@@ -129,6 +170,8 @@ export default function DirectMessages({ user }) {
   const [isAudioOnly, setIsAudioOnly] = useState(false); // Track if call is audio-only
   const [friendTyping, setFriendTyping] = useState(false); // Track if friend is typing
   const [typingTimeout, setTypingTimeout] = useState(null); // Timeout for typing indicator
+  const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
+  const [editingText, setEditingText] = useState(''); // Track the edited text
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -431,8 +474,96 @@ export default function DirectMessages({ user }) {
     setTimeout(() => inputRef.current?.focus(), 150);
   };
 
+  /* ── Delete DM (own message within 1 hour) ── */
+  const deleteDM = useCallback(async (messageId) => {
+    if (!selectedUser) return;
+    
+    const message = messages.find(m => m.id === messageId);
+    if (!message) return;
+    
+    // Check if user can delete (own message within 1 hour)
+    const isOwn = message.uid === user.uid;
+    const canDelete = isOwn && message.createdAt && 
+      (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
+    
+    if (!canDelete) {
+      alert('You can only delete your own messages within 1 hour of sending');
+      return;
+    }
+    
+    if (!window.confirm('Delete this message for everyone?')) return;
+    
+    try {
+      const dmId = getDMId(user.uid, selectedUser.id);
+      await deleteDoc(doc(db, 'dms', dmId, 'messages', messageId));
+      // Clear edit state if deleting the message being edited
+      if (editingMessageId === messageId) {
+        setEditingMessageId(null);
+        setEditingText('');
+        setInputText('');
+      }
+    } catch (err) {
+      console.error('Delete DM failed:', err);
+      alert('Failed to delete message');
+    }
+  }, [selectedUser, user.uid, messages, editingMessageId]);
+
+  /* ── Edit DM (own message within 15 minutes) ── */
+  const startEditDM = useCallback((messageId, currentText) => {
+    setEditingMessageId(messageId);
+    setEditingText(currentText);
+    setInputText(currentText);
+    inputRef.current?.focus();
+  }, []);
+
+  const cancelEditDM = useCallback(() => {
+    setEditingMessageId(null);
+    setEditingText('');
+    setInputText('');
+  }, []);
+
+  const saveEditDM = useCallback(async () => {
+    if (!editingMessageId || !editingText.trim() || !selectedUser) return;
+    
+    const message = messages.find(m => m.id === editingMessageId);
+    if (!message) return;
+    
+    // Verify ownership and time limit
+    const isOwn = message.uid === user.uid;
+    const canEdit = isOwn && message.createdAt && 
+      (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 15 * 60 * 1000;
+    
+    if (!canEdit) {
+      alert('You can only edit your own messages within 15 minutes of sending');
+      cancelEditDM();
+      return;
+    }
+    
+    setSending(true);
+    try {
+      const dmId = getDMId(user.uid, selectedUser.id);
+      await updateDoc(doc(db, 'dms', dmId, 'messages', editingMessageId), {
+        text: editingText.trim().slice(0, MAX_CHARS),
+        edited: true,
+        editedAt: serverTimestamp()
+      });
+      cancelEditDM();
+    } catch (err) {
+      console.error('Edit DM failed:', err);
+      alert('Failed to edit message');
+    } finally {
+      setSending(false);
+    }
+  }, [editingMessageId, editingText, selectedUser, messages, user.uid, cancelEditDM]);
+
   /* ── Send DM ── */
   const sendDM = useCallback(async () => {
+    // If editing, save the edit instead
+    if (editingMessageId) {
+      await saveEditDM();
+      return;
+    }
+    
     const text = inputText.trim();
     if (!text || sending || !selectedUser) return;
     const now = Date.now();
@@ -461,6 +592,7 @@ export default function DirectMessages({ user }) {
           createdAt: serverTimestamp(),
           deliveredTo: [], // Will be updated when friend opens chat
           seenBy: [], // Will be updated when friend sees message
+          edited: false,
         },
       );
     } catch (err) {
@@ -470,7 +602,7 @@ export default function DirectMessages({ user }) {
       setSending(false);
       inputRef.current?.focus();
     }
-  }, [inputText, sending, user, selectedUser, displayName]);
+  }, [inputText, sending, user, selectedUser, displayName, editingMessageId, saveEditDM]);
 
   /* ── Handle typing indicator ── */
   const handleTyping = useCallback(() => {
@@ -504,6 +636,21 @@ export default function DirectMessages({ user }) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendDM();
+    } else if (e.key === 'Escape' && editingMessageId) {
+      e.preventDefault();
+      cancelEditDM();
+    }
+  };
+
+  /* ── Handle input change ── */
+  const handleInputChange = (e) => {
+    const newText = e.target.value.slice(0, MAX_CHARS);
+    setInputText(newText);
+    if (editingMessageId) {
+      setEditingText(newText);
+    }
+    if (!editingMessageId) {
+      handleTyping();
     }
   };
 
@@ -749,6 +896,8 @@ export default function DirectMessages({ user }) {
                       isOwn={isOwn} 
                       hideAvatar={hideAvatar}
                       friendId={selectedUser.id}
+                      onEdit={isOwn ? startEditDM : null}
+                      onDelete={isOwn ? deleteDM : null}
                     />
                   );
                 })
@@ -769,17 +918,25 @@ export default function DirectMessages({ user }) {
             </div>
 
             <div className="input-area">
+              {editingMessageId && (
+                <div className="editing-indicator">
+                  <span>✏️ Editing message</span>
+                  <button onClick={cancelEditDM} className="cancel-edit-btn" title="Cancel editing">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              )}
               <div className="input-wrapper">
                 <textarea
                   ref={inputRef}
                   className="msg-input"
-                  placeholder={`Message ${selectedUser.displayName}…`}
+                  placeholder={editingMessageId ? "Edit your message…" : `Message ${selectedUser.displayName}…`}
                   rows={1}
                   value={inputText}
-                  onChange={e => {
-                    setInputText(e.target.value.slice(0, MAX_CHARS));
-                    handleTyping();
-                  }}
+                  onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   disabled={sending}
                 />
@@ -790,6 +947,7 @@ export default function DirectMessages({ user }) {
                   className="btn-send"
                   onClick={sendDM}
                   disabled={!inputText.trim() || sending}
+                  title={editingMessageId ? "Save edit" : "Send message"}
                 >
                   <SendIcon />
                 </button>

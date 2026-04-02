@@ -23,8 +23,17 @@ service cloud.firestore {
         request.resource.data.text.size() > 0 &&
         request.resource.data.text.size() <= 500 &&
         request.resource.data.uid == request.auth.uid;
-      allow delete: if isAdmin();
-      allow update: if false;
+      allow delete: if isAdmin() || 
+        (isSignedIn() && 
+         resource.data.uid == request.auth.uid &&
+         request.time < resource.data.createdAt + duration.value(1, 'h'));
+      allow update: if isSignedIn() &&
+        resource.data.uid == request.auth.uid &&
+        request.time < resource.data.createdAt + duration.value(15, 'm') &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'edited', 'editedAt']) &&
+        request.resource.data.text is string &&
+        request.resource.data.text.size() > 0 &&
+        request.resource.data.text.size() <= 500;
     }
 
     // 3. USER PROFILES (Secured + Rate Limit Tracking + Anti-Spam + Block Removed Users)
@@ -100,12 +109,24 @@ service cloud.firestore {
           request.resource.data.uid == request.auth.uid;
         allow update: if isSignedIn() &&
           get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]) &&
-          // Only allow updating seenBy, seenAt, deliveredTo, and deliveredAt fields
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seenBy', 'seenAt', 'deliveredTo', 'deliveredAt']) &&
-          // Ensure user is adding themselves to seenBy or deliveredTo
-          (request.auth.uid in request.resource.data.get('seenBy', []) || 
-           request.auth.uid in request.resource.data.get('deliveredTo', []));
-        allow delete: if false;
+          (
+            // Allow updating seenBy, seenAt, deliveredTo, and deliveredAt fields
+            (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seenBy', 'seenAt', 'deliveredTo', 'deliveredAt']) &&
+             (request.auth.uid in request.resource.data.get('seenBy', []) || 
+              request.auth.uid in request.resource.data.get('deliveredTo', [])))
+            ||
+            // Allow editing own message within 15 minutes
+            (resource.data.uid == request.auth.uid &&
+             request.time < resource.data.createdAt + duration.value(15, 'm') &&
+             request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'edited', 'editedAt']) &&
+             request.resource.data.text is string &&
+             request.resource.data.text.size() > 0 &&
+             request.resource.data.text.size() <= 500)
+          );
+        allow delete: if isSignedIn() &&
+          get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]) &&
+          resource.data.uid == request.auth.uid &&
+          request.time < resource.data.createdAt + duration.value(1, 'h');
       }
     }
 
