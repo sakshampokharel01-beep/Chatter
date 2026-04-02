@@ -169,22 +169,26 @@ This document tracks all requested features for Chatter. Features will be implem
 
 ---
 
-### 10. ⏳ Customizable Profiles
-**Status:** Pending (Basic profiles exist)  
+### 10. ✅ Customizable Profiles
+**Status:** Done  
 **Priority:** Medium  
 **Description:** Allow users to customize their profiles.
 
-**Current State:**
-- ✅ Display name from Google/Email
-- ✅ Profile photo from Google
-- ⏳ Can't edit profile after signup
+**Implementation Details:**
+- ✅ Edit display name (up to 64 characters)
+- ✅ Add custom profile photo URL (HTTPS only)
+- ✅ Add bio/status message (up to 150 characters)
+- ✅ Profile modal with live preview
+- ✅ Click on user avatar/name in header to edit profile
+- ✅ View other users' profiles (click on their avatar in messages)
+- ✅ Real-time character count for name and bio
+- ✅ Profile updates sync across all devices
+- ✅ Guest users can edit profiles (temporary, lost on sign out)
+- ✅ Firestore rules updated to allow bio field
+- ⏳ Custom status (Available, Busy, Away) - not implemented
+- ⏳ Profile photo upload to Firebase Storage - not implemented
 
-**Implementation Notes:**
-- Edit display name
-- Upload custom profile photo
-- Add bio/status message
-- Set custom status (Available, Busy, Away)
-- Profile settings page
+**Completed:** April 2, 2026
 
 ---
 

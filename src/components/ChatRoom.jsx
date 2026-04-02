@@ -12,10 +12,12 @@ import {
   deleteDoc,
   setDoc,
   doc,
+  updateDoc,
 } from 'firebase/firestore';
 import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '../firebase';
 import DirectMessages from './DirectMessages';
 import AdminPanel from './AdminPanel';
+import UserProfile from './UserProfile';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;
@@ -171,6 +173,7 @@ export default function ChatRoom({ user }) {
   const [typingUsers, setTypingUsers] = useState(new Map()); // Map of userId -> userName
   const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
   const [editingText, setEditingText] = useState(''); // Track the edited text
+  const [showProfile, setShowProfile] = useState(false); // Track profile modal visibility
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -506,14 +509,20 @@ export default function ChatRoom({ user }) {
         </div>
 
         <div className="header-user">
-          {user.photoURL ? (
-            <img src={user.photoURL} alt={displayName} className="user-avatar" />
-          ) : (
-            <div className="user-avatar-placeholder">
-              {displayName.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <span className="user-name" title={displayName}>{displayName}</span>
+          <button 
+            className="user-profile-btn"
+            onClick={() => setShowProfile(true)}
+            title="Edit Profile"
+          >
+            {user.photoURL ? (
+              <img src={user.photoURL} alt={displayName} className="user-avatar" />
+            ) : (
+              <div className="user-avatar-placeholder">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="user-name" title={displayName}>{displayName}</span>
+          </button>
           <button
             className="btn-signout"
             onClick={signOutUser}
@@ -629,6 +638,9 @@ export default function ChatRoom({ user }) {
 
       {/* ── Admin Panel ── */}
       {activeTab === 'admin' && adminUser && <AdminPanel adminUid={user.uid} isSuperAdmin={adminUser} />}
+
+      {/* ── User Profile Modal ── */}
+      {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} />}
     </div>
   );
 }

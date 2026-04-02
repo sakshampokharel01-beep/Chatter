@@ -59,6 +59,13 @@ service cloud.firestore {
           ||
           // Allow updating only lastSeen (for presence tracking)
           (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeen']))
+          ||
+          // Allow updating profile fields (displayName, photoURL, bio)
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoURL', 'bio']) &&
+           request.resource.data.displayName is string &&
+           request.resource.data.displayName.size() > 0 &&
+           request.resource.data.displayName.size() <= 64 &&
+           (!request.resource.data.keys().hasAny(['bio']) || request.resource.data.bio.size() <= 150))
         );
       allow delete: if isAdmin(); // Allow admins to delete user profiles
     }
