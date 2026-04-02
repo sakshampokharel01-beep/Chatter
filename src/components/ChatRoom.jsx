@@ -20,6 +20,8 @@ import AdminPanel from './AdminPanel';
 import UserProfile from './UserProfile';
 import DeviceManagement from './DeviceManagement';
 import NotificationSettings from './NotificationSettings';
+import InAppNotification from './InAppNotification';
+import { useInAppNotifications } from '../hooks/useInAppNotifications';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;
@@ -185,6 +187,9 @@ export default function ChatRoom({ user }) {
   const containerRef = useRef(null);
   const lastSentRef = useRef(0);
   const typingTimeoutRef = useRef(null); // Ref for typing timeout
+  
+  // In-app notifications
+  const { notifications, showNotification, hideNotification } = useInAppNotifications();
 
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
@@ -780,7 +785,7 @@ export default function ChatRoom({ user }) {
       )}
 
       {/* ── Direct Messages ── */}
-      {activeTab === 'dms' && <DirectMessages user={user} />}
+      {activeTab === 'dms' && <DirectMessages user={user} showNotification={showNotification} />}
 
       {/* ── Admin Panel ── */}
       {activeTab === 'admin' && adminUser && <AdminPanel adminUid={user.uid} isSuperAdmin={adminUser} />}
@@ -793,6 +798,16 @@ export default function ChatRoom({ user }) {
 
       {/* ── Notification Settings Modal ── */}
       {showNotifications && <NotificationSettings onClose={() => setShowNotifications(false)} />}
+
+      {/* ── In-App Notifications ── */}
+      {notifications.map((notification) => (
+        <InAppNotification
+          key={notification.id}
+          notification={notification}
+          onClose={() => hideNotification(notification.id)}
+          onClick={notification.onClick}
+        />
+      ))}
     </div>
   );
 }

@@ -12,10 +12,12 @@ import {
   updateDoc,
   deleteDoc,
   where,
+  getDocs,
 } from 'firebase/firestore';
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
-import { formatLastSeen } from '../utils/formatLastSeen';
-import { showMessageNotification, showCallNotification, areNotificationsEnabled } from '../utils/notifications';
+import { formatLastSeen, isUserActuallyOnline } from '../utils/formatLastSeen';
+import { areNotificationsEnabled } from '../utils/notifications';
+import { createMessageNotification, createCallNotification, createFriendRequestNotification } from '../hooks/useInAppNotifications';
 import VideoCall from './VideoCall';
 import { getSocket } from '../socket';
 
@@ -156,7 +158,7 @@ function SendIcon() {
 }
 
 /* ── Direct Messages with Friend Requests ──────────────────────────────────────── */
-export default function DirectMessages({ user }) {
+export default function DirectMessages({ user, showNotification }) {
   const [users, setUsers] = useState([]);
   const [removed, setRemoved] = useState(new Set());
   const [friends, setFriends] = useState(new Set());
@@ -267,18 +269,21 @@ export default function DirectMessages({ user }) {
       const requests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
       // Show notification for new friend requests (skip first load)
-      if (!isFirstLoad && areNotificationsEnabled()) {
+      if (!isFirstLoad && showNotification) {
         snap.docChanges().forEach(change => {
           if (change.type === 'added') {
             const request = change.doc.data();
-            showMessageNotification(
-              'New Friend Request',
-              `${request.fromName} wants to be your friend`,
-              () => {
+            const notification = createFriendRequestNotification(
+              request.fromName,
+              request.fromPhotoURL
+            );
+            showNotification({
+              ...notification,
+              onClick: () => {
                 window.focus();
                 setActiveTab('requests');
               }
-            );
+            });
           }
         });
       }
@@ -322,20 +327,24 @@ export default function DirectMessages({ user }) {
       const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
       // Show notification for new messages (skip first load)
-      if (!isFirstLoad && areNotificationsEnabled()) {
+      if (!isFirstLoad && showNotification) {
         snap.docChanges().forEach(change => {
           if (change.type === 'added') {
             const msg = change.doc.data();
             // Only notify for messages from the other user
             if (msg.uid !== user.uid) {
-              showMessageNotification(
+              const notification = createMessageNotification(
                 selectedUser.displayName,
                 msg.text,
-                () => {
+                selectedUser.photoURL
+              );
+              showNotification({
+                ...notification,
+                onClick: () => {
                   // Focus the chat when notification is clicked
                   window.focus();
                 }
-              );
+              });
             }
           }
         });
@@ -345,18 +354,13 @@ export default function DirectMessages({ user }) {
       setMessages(msgs);
       setLoadingMsg(false);
       
-      // Mark messages as delivered and seen
+      // Mark messages as delivered (happens when chat is opened)
       const undeliveredMessages = msgs.filter(msg => 
         msg.uid !== user.uid && // Not my message
         (!msg.deliveredTo || !msg.deliveredTo.includes(user.uid)) // Not delivered to me yet
       );
       
-      const unseenMessages = msgs.filter(msg => 
-        msg.uid !== user.uid && // Not my message
-        (!msg.seenBy || !msg.seenBy.includes(user.uid)) // Not seen by me yet
-      );
-      
-      // Update delivered status first
+      // Update delivered status
       for (const msg of undeliveredMessages) {
         try {
           const msgRef = doc(db, 'dms', dmId, 'messages', msg.id);
@@ -369,22 +373,72 @@ export default function DirectMessages({ user }) {
         }
       }
       
-      // Update seen status
-      for (const msg of unseenMessages) {
-        try {
-          const msgRef = doc(db, 'dms', dmId, 'messages', msg.id);
-          await updateDoc(msgRef, {
-            seenBy: [...(msg.seenBy || []), user.uid],
-            seenAt: serverTimestamp()
-          });
-        } catch (err) {
-          // Silently fail - not critical
+      // Mark messages as seen (only if window is focused and user is viewing)
+      if (!document.hidden && document.hasFocus()) {
+        const unseenMessages = msgs.filter(msg => 
+          msg.uid !== user.uid && // Not my message
+          (!msg.seenBy || !msg.seenBy.includes(user.uid)) // Not seen by me yet
+        );
+        
+        for (const msg of unseenMessages) {
+          try {
+            const msgRef = doc(db, 'dms', dmId, 'messages', msg.id);
+            await updateDoc(msgRef, {
+              seenBy: [...(msg.seenBy || []), user.uid],
+              seenAt: serverTimestamp()
+            });
+          } catch (err) {
+            // Silently fail - not critical
+          }
         }
       }
     }, (err) => {
       console.error('DM messages snapshot error:', err);
       setLoadingMsg(false);
     });
+  }, [selectedUser, user.uid]);
+  
+  /* ── Mark messages as seen when window becomes visible ── */
+  useEffect(() => {
+    if (!selectedUser) return;
+    
+    const handleVisibilityChange = async () => {
+      if (!document.hidden && document.hasFocus()) {
+        // Window is now visible and focused, mark unseen messages as seen
+        const dmId = getDMId(user.uid, selectedUser.id);
+        const q = query(
+          collection(db, 'dms', dmId, 'messages'),
+          where('uid', '==', selectedUser.id),
+          orderBy('createdAt', 'desc'),
+          limit(50) // Only check recent messages
+        );
+        
+        try {
+          const snap = await getDocs(q);
+          for (const docSnap of snap.docs) {
+            const msgData = docSnap.data();
+            // Check if message is not already seen by current user
+            if (!msgData.seenBy || !msgData.seenBy.includes(user.uid)) {
+              const msgRef = doc(db, 'dms', dmId, 'messages', docSnap.id);
+              await updateDoc(msgRef, {
+                seenBy: [...(msgData.seenBy || []), user.uid],
+                seenAt: serverTimestamp()
+              });
+            }
+          }
+        } catch (err) {
+          // Silently fail - not critical
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
   }, [selectedUser, user.uid]);
 
   /* ── Auto-scroll ── */
@@ -407,23 +461,23 @@ export default function DirectMessages({ user }) {
           setIncomingCall({ from, fromName: caller.displayName, peerId });
           
           // Show notification for incoming call
-          if (areNotificationsEnabled()) {
-            showCallNotification(
+          if (showNotification) {
+            const notification = createCallNotification(
               caller.displayName,
               true, // isVideoCall
-              () => {
+              caller.photoURL
+            );
+            showNotification({
+              ...notification,
+              onClick: () => {
                 // Accept call when notification is clicked
                 window.focus();
                 setSelectedUser(caller);
                 setShowVideoCall(true);
                 setIncomingCall(null);
                 setMobileView('chat');
-              },
-              () => {
-                // Reject call
-                setIncomingCall(null);
               }
-            );
+            });
           }
         }
         
@@ -818,7 +872,7 @@ export default function DirectMessages({ user }) {
                     displayName={u.displayName} 
                     photoURL={u.photoURL} 
                     size={38} 
-                    isOnline={u.online}
+                    isOnline={isUserActuallyOnline(u.lastSeen, u.online)}
                     showOnlineIndicator={true}
                   />
                   <div className="dm-user-info">
@@ -927,7 +981,7 @@ export default function DirectMessages({ user }) {
                 displayName={selectedUser.displayName} 
                 photoURL={selectedUser.photoURL} 
                 size={34}
-                isOnline={selectedUser.online}
+                isOnline={isUserActuallyOnline(selectedUser.lastSeen, selectedUser.online)}
                 showOnlineIndicator={true}
               />
               <div className="dm-chat-info">

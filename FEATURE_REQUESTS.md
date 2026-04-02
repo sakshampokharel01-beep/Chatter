@@ -104,23 +104,22 @@ This document tracks all requested features for Chatter. Features will be implem
 ### 6. ✅ Push Notifications
 **Status:** Done  
 **Priority:** Medium  
-**Description:** Browser push notifications for new messages and calls.
+**Description:** In-app toast notifications for new messages and calls (Instagram/Messenger style).
 
 **Implementation Details:**
-- ✅ Web Notifications API integration
-- ✅ Request notification permission with user-friendly UI
-- ✅ Notification settings panel in header
-- ✅ Toggle to enable/disable notifications
-- ✅ Test notification button
+- ✅ In-app toast notifications that slide in from top
+- ✅ Shows avatar/icon, title, and message preview
+- ✅ Auto-closes after 5 seconds with progress bar animation
+- ✅ Click notification to open relevant chat
+- ✅ Close button to dismiss manually
 - ✅ Notifications for new direct messages
 - ✅ Notifications for incoming calls
 - ✅ Notifications for friend requests
-- ✅ Only show notifications when window is not focused
-- ✅ Auto-close notifications after 5 seconds
-- ✅ Click notification to focus window and open chat
-- ✅ Permission status indicator (Granted/Denied/Not Set)
-- ✅ User preference saved to localStorage
-- ✅ Graceful handling for unsupported browsers
+- ✅ Different colors for different notification types (message, call, friend request)
+- ✅ Smooth slide-in animation from top
+- ✅ Mobile responsive design
+- ✅ Multiple notifications stack properly
+- ✅ Browser notifications as fallback when window is not focused
 - ⏳ Mute/unmute per chat (not implemented)
 - ⏳ Notification for mentions in groups (not implemented - no groups yet)
 

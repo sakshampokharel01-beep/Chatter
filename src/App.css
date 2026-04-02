@@ -4139,3 +4139,178 @@ input:checked + .toggle-slider:before {
     height: 32px;
   }
 }
+
+
+/* ===========================
+   IN-APP NOTIFICATIONS
+   =========================== */
+.in-app-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(30, 30, 35, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  min-width: 320px;
+  max-width: 400px;
+  z-index: 10000;
+  cursor: pointer;
+  overflow: hidden;
+  animation: slideInFromTop 0.3s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.in-app-notification:hover {
+  background: rgba(35, 35, 40, 0.98);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.in-app-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.in-app-notification-avatar,
+.in-app-notification-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.in-app-notification-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.in-app-notification-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.in-app-notification-icon {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.in-app-notification.call .in-app-notification-icon {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.in-app-notification.friend-request .in-app-notification-icon {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a78bfa;
+}
+
+.in-app-notification-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.in-app-notification-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.in-app-notification-message {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.in-app-notification-close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.in-app-notification-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.in-app-notification-progress {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.in-app-notification-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  animation: progressBar 5s linear forwards;
+}
+
+.in-app-notification.call .in-app-notification-progress-bar {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.in-app-notification.friend-request .in-app-notification-progress-bar {
+  background: linear-gradient(90deg, #a855f7, #a78bfa);
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .in-app-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    max-width: none;
+  }
+}
