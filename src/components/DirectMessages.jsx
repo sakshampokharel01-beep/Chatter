@@ -65,7 +65,7 @@ function formatTime(ts) {
 }
 
 /* ── DM Message ───────────────────────────────────────────── */
-function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete }) {
+function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onReply, messages }) {
   const name = message.displayName || 'User';
   const isSeen = message.seenBy && message.seenBy.includes(friendId);
   const isDelivered = message.deliveredTo && message.deliveredTo.includes(friendId);
@@ -78,8 +78,11 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete }) {
   const canDelete = isOwn && message.createdAt && onDelete &&
     (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
   
+  // Find the replied message if this is a reply
+  const repliedMessage = message.replyTo ? messages.find(m => m.id === message.replyTo) : null;
+  
   return (
-    <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`}>
+    <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`} id={`dm-msg-${message.id}`}>
       <div className="msg-avatar">
         <Avatar displayName={name} photoURL={message.photoURL} size={30} />
       </div>
@@ -87,9 +90,39 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete }) {
         {!isOwn && !hideAvatar && <span className="msg-sender">{name}</span>}
         <div className="msg-bubble-wrap">
           <div className="msg-bubble">
+            {repliedMessage && (
+              <div 
+                className="msg-reply-preview" 
+                onClick={() => {
+                  const element = document.getElementById(`dm-msg-${repliedMessage.id}`);
+                  element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  element?.classList.add('msg-highlight');
+                  setTimeout(() => element?.classList.remove('msg-highlight'), 2000);
+                }}
+              >
+                <div className="msg-reply-line"></div>
+                <div className="msg-reply-content">
+                  <div className="msg-reply-name">{repliedMessage.displayName || 'User'}</div>
+                  <div className="msg-reply-text">{repliedMessage.text}</div>
+                </div>
+              </div>
+            )}
             {message.text}
             {message.edited && <span className="msg-edited-label"> (edited)</span>}
           </div>
+          {onReply && (
+            <button
+              className="msg-reply-btn"
+              onClick={() => onReply(message)}
+              title="Reply to message"
+              aria-label="Reply to message"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 14 4 9 9 4"/>
+                <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+              </svg>
+            </button>
+          )}
           {canEdit && (
             <button
               className="msg-edit-btn"
@@ -180,6 +213,7 @@ export default function DirectMessages({ user, showNotification }) {
   const [typingTimeout, setTypingTimeout] = useState(null); // Timeout for typing indicator
   const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
   const [editingText, setEditingText] = useState(''); // Track the edited text
+  const [replyingTo, setReplyingTo] = useState(null); // Track which message is being replied to
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -666,6 +700,18 @@ export default function DirectMessages({ user, showNotification }) {
     setInputText('');
   }, []);
 
+  /* ── Reply to DM ── */
+  const startReplyDM = useCallback((message) => {
+    setReplyingTo(message);
+    setEditingMessageId(null); // Clear edit when replying
+    setEditingText('');
+    inputRef.current?.focus();
+  }, []);
+
+  const cancelReplyDM = useCallback(() => {
+    setReplyingTo(null);
+  }, []);
+
   const saveEditDM = useCallback(async () => {
     if (!editingMessageId || !editingText.trim() || !selectedUser) return;
     
@@ -726,19 +772,31 @@ export default function DirectMessages({ user, showNotification }) {
     
     const cu = auth.currentUser;
     try {
+      const messageData = {
+        text: text.slice(0, MAX_CHARS),
+        uid: user.uid,
+        displayName: (cu?.displayName || displayName).slice(0, 64),
+        photoURL: safePhotoURL(cu?.photoURL),
+        createdAt: serverTimestamp(),
+        deliveredTo: [], // Will be updated when friend opens chat
+        seenBy: [], // Will be updated when friend sees message
+        edited: false,
+      };
+      
+      // Add reply reference if replying to a message
+      if (replyingTo) {
+        messageData.replyTo = replyingTo.id;
+        messageData.replyToText = replyingTo.text.slice(0, 100);
+        messageData.replyToUser = replyingTo.displayName;
+      }
+      
       await addDoc(
         collection(db, 'dms', getDMId(user.uid, selectedUser.uid), 'messages'),
-        {
-          text: text.slice(0, MAX_CHARS),
-          uid: user.uid,
-          displayName: (cu?.displayName || displayName).slice(0, 64),
-          photoURL: safePhotoURL(cu?.photoURL),
-          createdAt: serverTimestamp(),
-          deliveredTo: [], // Will be updated when friend opens chat
-          seenBy: [], // Will be updated when friend sees message
-          edited: false,
-        },
+        messageData
       );
+      
+      // Clear reply state after sending
+      setReplyingTo(null);
     } catch (err) {
       console.error('DM send failed:', err);
       setInputText(text);
@@ -746,7 +804,7 @@ export default function DirectMessages({ user, showNotification }) {
       setSending(false);
       inputRef.current?.focus();
     }
-  }, [inputText, sending, user, selectedUser, displayName, editingMessageId, saveEditDM]);
+  }, [inputText, sending, user, selectedUser, displayName, editingMessageId, replyingTo, saveEditDM]);
 
   /* ── Handle typing indicator ── */
   const handleTyping = useCallback(() => {
@@ -783,6 +841,9 @@ export default function DirectMessages({ user, showNotification }) {
     } else if (e.key === 'Escape' && editingMessageId) {
       e.preventDefault();
       cancelEditDM();
+    } else if (e.key === 'Escape' && replyingTo) {
+      e.preventDefault();
+      cancelReplyDM();
     }
   };
 
@@ -1055,6 +1116,8 @@ export default function DirectMessages({ user, showNotification }) {
                       friendId={selectedUser.id}
                       onEdit={isOwn ? startEditDM : null}
                       onDelete={isOwn ? deleteDM : null}
+                      onReply={startReplyDM}
+                      messages={messages}
                     />
                   );
                 })
@@ -1086,11 +1149,31 @@ export default function DirectMessages({ user, showNotification }) {
                   </button>
                 </div>
               )}
+              {replyingTo && (
+                <div className="replying-indicator">
+                  <div className="replying-content">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 14 4 9 9 4"/>
+                      <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+                    </svg>
+                    <div className="replying-text">
+                      <span className="replying-to">Replying to {replyingTo.displayName}</span>
+                      <span className="replying-msg">{replyingTo.text.slice(0, 50)}{replyingTo.text.length > 50 ? '...' : ''}</span>
+                    </div>
+                  </div>
+                  <button onClick={cancelReplyDM} className="cancel-reply-btn" title="Cancel reply">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              )}
               <div className="input-wrapper">
                 <textarea
                   ref={inputRef}
                   className="msg-input"
-                  placeholder={editingMessageId ? "Edit your message…" : `Message ${selectedUser.displayName}…`}
+                  placeholder={editingMessageId ? "Edit your message…" : replyingTo ? "Write a reply…" : `Message ${selectedUser.displayName}…`}
                   rows={1}
                   value={inputText}
                   onChange={handleInputChange}
