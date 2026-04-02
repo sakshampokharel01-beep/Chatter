@@ -1058,14 +1058,65 @@ body.no-scroll {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  color: #2e3240;
-  font-size: 14px;
-  padding: 40px 0;
+  gap: 16px;
+  color: #7a7a8a;
+  font-size: 15px;
+  padding: 60px 32px;
   text-align: center;
+  background: radial-gradient(ellipse at center, rgba(91, 141, 238, 0.03) 0%, transparent 70%);
+  position: relative;
+  overflow: hidden;
 }
+
+.welcome-msg::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(91, 141, 238, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.welcome-msg strong {
+  position: relative;
+  z-index: 1;
+  font-size: 22px;
+  font-weight: 700;
+  color: #e8ecf4;
+  letter-spacing: -0.3px;
+}
+
+.welcome-msg p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #9090a8;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 360px;
+}
+
 .welcome-icon {
-  font-size: 48px;
+  position: relative;
+  z-index: 1;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(91, 141, 238, 0.1) 0%, rgba(123, 110, 246, 0.1) 100%);
+  border-radius: 50%;
+  border: 2px solid rgba(91, 141, 238, 0.2);
+  animation: float 3s ease-in-out infinite;
+}
+
+.welcome-icon svg {
+  color: #5b8dee;
+  filter: drop-shadow(0 0 8px rgba(91, 141, 238, 0.3));
 }
 
 /* -- Individual Messages ----------------------------------------- */
@@ -1506,11 +1557,86 @@ body.no-scroll {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  color: #2e3448;
-  font-size: 14px;
+  gap: 16px;
+  color: #7a7a8a;
+  font-size: 15px;
   text-align: center;
-  padding: 40px 24px;
+  padding: 60px 32px;
+  background: radial-gradient(ellipse at center, rgba(91, 141, 238, 0.03) 0%, transparent 70%);
+  position: relative;
+  overflow: hidden;
+}
+
+.dm-welcome::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(91, 141, 238, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+.dm-welcome .welcome-icon {
+  position: relative;
+  z-index: 1;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(91, 141, 238, 0.1) 0%, rgba(123, 110, 246, 0.1) 100%);
+  border-radius: 50%;
+  border: 2px solid rgba(91, 141, 238, 0.2);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.dm-welcome .welcome-icon svg {
+  color: #5b8dee;
+  filter: drop-shadow(0 0 8px rgba(91, 141, 238, 0.3));
+}
+
+.dm-welcome strong {
+  position: relative;
+  z-index: 1;
+  font-size: 20px;
+  font-weight: 700;
+  color: #e8ecf4;
+  margin-top: 8px;
+  letter-spacing: -0.3px;
+}
+
+.dm-welcome p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #9090a8;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 320px;
 }
 
 /* Typing Indicator */
