@@ -19,6 +19,7 @@ import DirectMessages from './DirectMessages';
 import AdminPanel from './AdminPanel';
 import UserProfile from './UserProfile';
 import DeviceManagement from './DeviceManagement';
+import NotificationSettings from './NotificationSettings';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;
@@ -176,6 +177,7 @@ export default function ChatRoom({ user }) {
   const [editingText, setEditingText] = useState(''); // Track the edited text
   const [showProfile, setShowProfile] = useState(false); // Track profile modal visibility
   const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
+  const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -556,6 +558,17 @@ export default function ChatRoom({ user }) {
             <span className="user-name" title={displayName}>{displayName}</span>
           </button>
           <button
+            className="btn-notifications"
+            onClick={() => setShowNotifications(true)}
+            title="Notification Settings"
+            aria-label="Notification settings"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </button>
+          <button
             className="btn-devices"
             onClick={() => setShowDevices(true)}
             title="Manage Devices"
@@ -688,6 +701,9 @@ export default function ChatRoom({ user }) {
 
       {/* ── Device Management Modal ── */}
       {showDevices && <DeviceManagement user={user} onClose={() => setShowDevices(false)} />}
+
+      {/* ── Notification Settings Modal ── */}
+      {showNotifications && <NotificationSettings onClose={() => setShowNotifications(false)} />}
     </div>
   );
 }

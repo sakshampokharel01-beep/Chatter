@@ -101,17 +101,30 @@ This document tracks all requested features for Chatter. Features will be implem
 
 ---
 
-### 6. ⏳ Push Notifications
-**Status:** Pending  
+### 6. ✅ Push Notifications
+**Status:** Done  
 **Priority:** Medium  
 **Description:** Browser push notifications for new messages and calls.
 
-**Implementation Notes:**
-- Request notification permission
-- Notify on new DM
-- Notify on incoming call
-- Notify on mentions (in groups)
-- Mute/unmute notifications per chat
+**Implementation Details:**
+- ✅ Web Notifications API integration
+- ✅ Request notification permission with user-friendly UI
+- ✅ Notification settings panel in header
+- ✅ Toggle to enable/disable notifications
+- ✅ Test notification button
+- ✅ Notifications for new direct messages
+- ✅ Notifications for incoming calls
+- ✅ Notifications for friend requests
+- ✅ Only show notifications when window is not focused
+- ✅ Auto-close notifications after 5 seconds
+- ✅ Click notification to focus window and open chat
+- ✅ Permission status indicator (Granted/Denied/Not Set)
+- ✅ User preference saved to localStorage
+- ✅ Graceful handling for unsupported browsers
+- ⏳ Mute/unmute per chat (not implemented)
+- ⏳ Notification for mentions in groups (not implemented - no groups yet)
+
+**Completed:** April 2, 2026
 
 ---
 

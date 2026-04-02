@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
 import { formatLastSeen } from '../utils/formatLastSeen';
+import { showMessageNotification, showCallNotification, areNotificationsEnabled } from '../utils/notifications';
 import VideoCall from './VideoCall';
 import { getSocket } from '../socket';
 
@@ -259,8 +260,31 @@ export default function DirectMessages({ user }) {
       collection(db, 'friendRequests'),
       where('to', '==', user.uid)
     );
+    
+    let isFirstLoad = true;
+    
     return onSnapshot(q, (snap) => {
-      setIncomingRequests(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const requests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      
+      // Show notification for new friend requests (skip first load)
+      if (!isFirstLoad && areNotificationsEnabled()) {
+        snap.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const request = change.doc.data();
+            showMessageNotification(
+              'New Friend Request',
+              `${request.fromName} wants to be your friend`,
+              () => {
+                window.focus();
+                setActiveTab('requests');
+              }
+            );
+          }
+        });
+      }
+      
+      isFirstLoad = false;
+      setIncomingRequests(requests);
     });
   }, [user.uid]);
 
@@ -291,8 +315,33 @@ export default function DirectMessages({ user }) {
       orderBy('createdAt', 'asc'),
       limit(DM_LIMIT),
     );
+    
+    let isFirstLoad = true;
+    
     return onSnapshot(q, async (snap) => {
       const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      
+      // Show notification for new messages (skip first load)
+      if (!isFirstLoad && areNotificationsEnabled()) {
+        snap.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const msg = change.doc.data();
+            // Only notify for messages from the other user
+            if (msg.uid !== user.uid) {
+              showMessageNotification(
+                selectedUser.displayName,
+                msg.text,
+                () => {
+                  // Focus the chat when notification is clicked
+                  window.focus();
+                }
+              );
+            }
+          }
+        });
+      }
+      
+      isFirstLoad = false;
       setMessages(msgs);
       setLoadingMsg(false);
       
@@ -356,6 +405,26 @@ export default function DirectMessages({ user }) {
         
         if (caller) {
           setIncomingCall({ from, fromName: caller.displayName, peerId });
+          
+          // Show notification for incoming call
+          if (areNotificationsEnabled()) {
+            showCallNotification(
+              caller.displayName,
+              true, // isVideoCall
+              () => {
+                // Accept call when notification is clicked
+                window.focus();
+                setSelectedUser(caller);
+                setShowVideoCall(true);
+                setIncomingCall(null);
+                setMobileView('chat');
+              },
+              () => {
+                // Reject call
+                setIncomingCall(null);
+              }
+            );
+          }
         }
         
         return currentUsers; // Don't modify users array
