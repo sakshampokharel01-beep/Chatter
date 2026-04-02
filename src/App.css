@@ -1510,6 +1510,11 @@ body.no-scroll {
     height: 20px;
   }
 
+  .call-buttons-group {
+    gap: 6px;
+  }
+
+  .audio-call-btn,
   .video-call-btn {
     padding: 10px 14px;
     min-width: 44px;
@@ -1518,6 +1523,7 @@ body.no-scroll {
     font-size: 14px;
   }
 
+  .audio-call-btn svg,
   .video-call-btn svg {
     width: 20px;
     height: 20px;
@@ -1958,8 +1964,15 @@ body.no-scroll {
 /* ================================================================
    VIDEO CALL
    ================================================================ */
-.video-call-btn {
+.call-buttons-group {
+  display: flex;
+  gap: 8px;
   margin-left: auto;
+  flex-shrink: 0;
+}
+
+.audio-call-btn,
+.video-call-btn {
   background: rgba(91, 141, 238, 0.15);
   border: 1px solid rgba(91, 141, 238, 0.3);
   color: #5b8dee;
@@ -1975,6 +1988,7 @@ body.no-scroll {
   min-height: 44px;
 }
 
+.audio-call-btn:hover,
 .video-call-btn:hover {
   background: rgba(91, 141, 238, 0.25);
   border-color: #5b8dee;
