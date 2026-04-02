@@ -524,144 +524,158 @@ export default function ChatRoom({ user }) {
     <div className="chat-room">
       {/* ── Header ── */}
       <header className="chat-header">
-        <div className="header-brand">
-          <span className="header-logo" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="14" fill="#5b8dee"/><path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="#fff" fillOpacity=".92"/><circle cx="19" cy="24" r="1.5" fill="#5b8dee"/><circle cx="24" cy="24" r="1.5" fill="#5b8dee"/><circle cx="29" cy="24" r="1.5" fill="#5b8dee"/></svg>
-          </span>
-          <span className="header-title">Chatter</span>
-          {adminUser && <span className="admin-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'-1px',marginRight:'3px'}}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin</span>}
+        <div className="header-left">
+          <div className="header-brand">
+            <span className="header-logo" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="14" fill="#5b8dee"/><path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="#fff" fillOpacity=".92"/><circle cx="19" cy="24" r="1.5" fill="#5b8dee"/><circle cx="24" cy="24" r="1.5" fill="#5b8dee"/><circle cx="29" cy="24" r="1.5" fill="#5b8dee"/></svg>
+            </span>
+            <span className="header-title">Chatter</span>
+            {adminUser && <span className="admin-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'-1px',marginRight:'3px'}}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin</span>}
+          </div>
         </div>
 
-        <div className="header-tabs">
-          <button
-            className={`tab-btn${activeTab === 'global' ? ' active' : ''}`}
-            onClick={() => setActiveTab('global')}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            Global
-          </button>
-          <button
-            className={`tab-btn${activeTab === 'dms' ? ' active' : ''}`}
-            onClick={() => !isGuest && setActiveTab('dms')}
-            disabled={isGuest}
-            title={isGuest ? 'Sign in with Google to use Direct Messages' : 'Direct Messages'}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            DMs{isGuest ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginLeft:'4px',verticalAlign:'-1px'}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> : ''}
-          </button>
-          {adminUser && (
+        <div className="header-center">
+          <div className="header-tabs-modern">
             <button
-              className={`tab-btn${activeTab === 'admin' ? ' active' : ''}`}
-              onClick={() => setActiveTab('admin')}
-              title="Admin Panel"
+              className={`tab-btn-modern${activeTab === 'global' ? ' active' : ''}`}
+              onClick={() => setActiveTab('global')}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              Users
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+              <span>Global</span>
             </button>
-          )}
+            <button
+              className={`tab-btn-modern${activeTab === 'dms' ? ' active' : ''}`}
+              onClick={() => !isGuest && setActiveTab('dms')}
+              disabled={isGuest}
+              title={isGuest ? 'Sign in with Google to use Direct Messages' : 'Direct Messages'}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>DMs</span>
+              {isGuest && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginLeft:'4px'}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>}
+            </button>
+            {adminUser && (
+              <button
+                className={`tab-btn-modern${activeTab === 'admin' ? ' active' : ''}`}
+                onClick={() => setActiveTab('admin')}
+                title="Admin Panel"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span>Users</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="header-user" ref={userMenuRef}>
-          <button 
-            className="user-profile-btn"
-            onClick={() => setShowUserMenu(!showUserMenu)}
-            title="User Menu"
-          >
-            {user.photoURL ? (
-              <img src={user.photoURL} alt={displayName} className="user-avatar" />
-            ) : (
-              <div className="user-avatar-placeholder">
-                {displayName.charAt(0).toUpperCase()}
+        <div className="header-right">
+          <div className="header-user" ref={userMenuRef}>
+            <button 
+              className="user-profile-btn-modern"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              title="User Menu"
+            >
+              {user.photoURL ? (
+                <img src={user.photoURL} alt={displayName} className="user-avatar-modern" />
+              ) : (
+                <div className="user-avatar-placeholder-modern">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </button>
+
+            {/* User Dropdown Menu */}
+            {showUserMenu && (
+              <div className="user-dropdown-menu">
+                <div className="user-dropdown-header">
+                  <div className="user-dropdown-avatar">
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt={displayName} />
+                    ) : (
+                      <div className="user-avatar-placeholder">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="user-dropdown-info">
+                    <div className="user-dropdown-name">{displayName}</div>
+                    {user.email && <div className="user-dropdown-email">{user.email}</div>}
+                  </div>
+                </div>
+
+                <div className="user-dropdown-divider"></div>
+
+                <button
+                  className="user-dropdown-item"
+                  onClick={() => {
+                    setShowProfile(true);
+                    setShowUserMenu(false);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  Edit Profile
+                </button>
+
+                <button
+                  className="user-dropdown-item"
+                  onClick={() => {
+                    setShowNotifications(true);
+                    setShowUserMenu(false);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                  Notifications
+                </button>
+
+                <button
+                  className="user-dropdown-item"
+                  onClick={() => {
+                    setShowDevices(true);
+                    setShowUserMenu(false);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                  </svg>
+                  Active Sessions
+                </button>
+
+                <div className="user-dropdown-divider"></div>
+
+                <button
+                  className="user-dropdown-item logout"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    signOutUser();
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
+                  Log Out
+                </button>
               </div>
             )}
-            <span className="user-name" title={displayName}>{displayName}</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: '4px' }}>
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </button>
-
-          {/* User Dropdown Menu */}
-          {showUserMenu && (
-            <div className="user-dropdown-menu">
-              <div className="user-dropdown-header">
-                <div className="user-dropdown-avatar">
-                  {user.photoURL ? (
-                    <img src={user.photoURL} alt={displayName} />
-                  ) : (
-                    <div className="user-avatar-placeholder">
-                      {displayName.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-                <div className="user-dropdown-info">
-                  <div className="user-dropdown-name">{displayName}</div>
-                  {user.email && <div className="user-dropdown-email">{user.email}</div>}
-                </div>
-              </div>
-
-              <div className="user-dropdown-divider"></div>
-
-              <button
-                className="user-dropdown-item"
-                onClick={() => {
-                  setShowProfile(true);
-                  setShowUserMenu(false);
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                Edit Profile
-              </button>
-
-              <button
-                className="user-dropdown-item"
-                onClick={() => {
-                  setShowNotifications(true);
-                  setShowUserMenu(false);
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-                Notifications
-              </button>
-
-              <button
-                className="user-dropdown-item"
-                onClick={() => {
-                  setShowDevices(true);
-                  setShowUserMenu(false);
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                  <line x1="8" y1="21" x2="16" y2="21"/>
-                  <line x1="12" y1="17" x2="12" y2="21"/>
-                </svg>
-                Active Sessions
-              </button>
-
-              <div className="user-dropdown-divider"></div>
-
-              <button
-                className="user-dropdown-item logout"
-                onClick={() => {
-                  setShowUserMenu(false);
-                  signOutUser();
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                  <polyline points="16 17 21 12 16 7"/>
-                  <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-                Log Out
-              </button>
-            </div>
-          )}
+          </div>
         </div>
       </header>
 

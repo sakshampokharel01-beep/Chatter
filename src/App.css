@@ -3797,3 +3797,198 @@ input:checked + .toggle-slider:before {
     min-width: 260px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MODERN HEADER LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+
+.header-left,
+.header-center,
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  flex-shrink: 0;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.header-right {
+  flex-shrink: 0;
+}
+
+/* Modern Tab Buttons */
+.header-tabs-modern {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.tab-btn-modern {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #7a7a8a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab-btn-modern svg {
+  transition: all 0.2s ease;
+}
+
+.tab-btn-modern.active {
+  background: linear-gradient(135deg, #5b8dee 0%, #7b6ef6 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(91, 141, 238, 0.3);
+}
+
+.tab-btn-modern.active svg {
+  color: #fff;
+}
+
+.tab-btn-modern:hover:not(.active):not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: #b8b8c8;
+}
+
+.tab-btn-modern:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Modern User Profile Button */
+.user-profile-btn-modern {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-profile-btn-modern:hover {
+  border-color: rgba(91, 141, 238, 0.5);
+  transform: scale(1.05);
+  box-shadow: 0 0 0 4px rgba(91, 141, 238, 0.1);
+}
+
+.user-avatar-modern {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.user-avatar-placeholder-modern {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #5b8dee 0%, #7b6ef6 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+/* Mobile responsive for modern header */
+@media (max-width: 768px) {
+  .chat-header {
+    padding: 10px 16px;
+    gap: 12px;
+  }
+
+  .header-brand {
+    gap: 8px;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .header-tabs-modern {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .tab-btn-modern {
+    padding: 8px 14px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .tab-btn-modern span {
+    display: none;
+  }
+
+  .tab-btn-modern svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .user-profile-btn-modern {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-header {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .header-logo svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  .admin-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .header-tabs-modern {
+    padding: 2px;
+  }
+
+  .tab-btn-modern {
+    padding: 6px 10px;
+  }
+
+  .user-profile-btn-modern {
+    width: 32px;
+    height: 32px;
+  }
+}
