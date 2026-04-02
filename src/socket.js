@@ -18,23 +18,31 @@ export const getSocket = (userId, userName) => {
   // Create new socket connection
   if (!socket) {
     currentUserId = userId;
-    socket = io(import.meta.env.VITE_SOCKET_SERVER_URL || 'http://localhost:3001', {
+    const serverUrl = import.meta.env.VITE_SOCKET_SERVER_URL || 'http://localhost:3001';
+    
+    socket = io(serverUrl, {
       auth: {
         userId: userId,
         userName: userName
-      }
+      },
+      timeout: 5000, // 5 second timeout
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 3
     });
 
     socket.on('connect', () => {
-      // Socket connected
+      console.log('✅ Socket.IO connected');
     });
 
     socket.on('disconnect', () => {
-      // Socket disconnected
+      console.log('⚠️ Socket.IO disconnected');
     });
 
     socket.on('connect_error', (error) => {
-      console.error('❌ Socket.IO connection error:', error);
+      console.warn('⚠️ Socket.IO connection error (video calls and typing indicators will not work):', error.message);
+      // Don't show error to user - features will just be disabled
     });
   }
 
