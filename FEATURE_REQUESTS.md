@@ -115,17 +115,25 @@ This document tracks all requested features for Chatter. Features will be implem
 
 ---
 
-### 7. 🚧 Online/Offline Status & Last Seen
-**Status:** In Progress  
+### 7. ✅ Online/Offline Status & Last Seen
+**Status:** Done  
 **Priority:** Medium  
 **Description:** Show user online status and last seen timestamp.
 
-**Implementation Notes:**
-- Green dot for online users
-- "Last seen X minutes ago"
-- Privacy settings (hide last seen)
-- Update status on activity
-- Show in user list and chat header
+**Implementation Details:**
+- ✅ Green dot indicator for online users
+- ✅ "Last seen X minutes ago" timestamp display
+- ✅ Real-time presence tracking with 30-second updates
+- ✅ Automatic offline status when user closes tab/browser
+- ✅ Automatic offline status when tab becomes inactive
+- ✅ Shows in user list (friends tab)
+- ✅ Shows in chat header
+- ✅ Human-readable time format (minutes, hours, days ago)
+- ✅ Guest users not tracked (privacy consideration)
+- ✅ Firestore rules updated for online/lastSeen updates
+- ⏳ Privacy settings to hide last seen (not implemented)
+
+**Completed:** April 2, 2026
 
 ---
 
