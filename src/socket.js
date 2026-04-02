@@ -33,16 +33,16 @@ export const getSocket = (userId, userName) => {
     });
 
     socket.on('connect', () => {
-      console.log('✅ Socket.IO connected');
+      // Socket connected - video calls and typing indicators enabled
     });
 
     socket.on('disconnect', () => {
-      console.log('⚠️ Socket.IO disconnected');
+      // Socket disconnected
     });
 
     socket.on('connect_error', (error) => {
-      console.warn('⚠️ Socket.IO connection error (video calls and typing indicators will not work):', error.message);
-      // Don't show error to user - features will just be disabled
+      // Silently fail - video calls and typing indicators will not work
+      // This is expected when the Socket.IO server is sleeping (Render free tier)
     });
   }
 
