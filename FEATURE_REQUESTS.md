@@ -1,0 +1,249 @@
+# Chatter - Feature Requests & Implementation Tracker
+
+This document tracks all requested features for Chatter. Features will be implemented one by one and marked as complete.
+
+---
+
+## 📋 Feature Status Legend
+- ⏳ **Pending** - Not yet started
+- 🚧 **In Progress** - Currently being implemented
+- ✅ **Done** - Implemented and deployed
+- ❌ **Cancelled** - Not implementing
+
+---
+
+## 🎯 Feature List
+
+### 1. ⏳ Typing Indicators
+**Status:** Pending  
+**Priority:** High  
+**Description:** Show "User is typing..." indicator in real-time when someone is composing a message.
+
+**Implementation Notes:**
+- Use Socket.IO for real-time typing events
+- Show indicator in both DMs and global chat
+- Auto-hide after 3 seconds of inactivity
+- Throttle typing events to avoid spam
+
+---
+
+### 2. ⏳ Read Receipts & Delivery Status
+**Status:** Pending (Partially implemented for DMs)  
+**Priority:** High  
+**Description:** Show message delivery and read status with visual indicators.
+
+**Current State:**
+- ✅ DM seen indicators (double checkmark) already implemented
+- ⏳ Need delivery status (single checkmark when delivered)
+- ⏳ Need read receipts for global chat
+
+**Implementation Notes:**
+- Single checkmark (✓) = Delivered
+- Double checkmark (✓✓) = Seen/Read
+- Blue checkmarks for read (optional)
+
+---
+
+### 3. ⏳ Message Reactions & Emojis
+**Status:** Pending  
+**Priority:** Medium  
+**Description:** Allow users to react to messages with emojis (like, love, laugh, etc.)
+
+**Implementation Notes:**
+- Quick reactions: 👍 ❤️ 😂 😮 😢 🙏
+- Show reaction count below message
+- Click to add/remove reaction
+- Show who reacted (on hover/click)
+
+---
+
+### 4. ⏳ Message Editing & Deletion
+**Status:** Pending (Deletion partially implemented for admins)  
+**Priority:** High  
+**Description:** Allow users to edit or delete their own messages.
+
+**Current State:**
+- ✅ Admins can delete any message in global chat
+- ⏳ Users can't edit their own messages
+- ⏳ Users can't delete their own messages
+
+**Implementation Notes:**
+- Edit within 15 minutes of sending
+- Show "edited" label on edited messages
+- Delete for everyone (within 1 hour)
+- Delete for me (anytime)
+
+---
+
+### 5. ⏳ Group Chats & Channels
+**Status:** Pending  
+**Priority:** High  
+**Description:** Create group conversations with multiple users.
+
+**Implementation Notes:**
+- Create group with name and icon
+- Add/remove members
+- Group admin roles
+- Group settings (mute, leave, etc.)
+- Public channels vs private groups
+
+---
+
+### 6. ⏳ Push Notifications
+**Status:** Pending  
+**Priority:** Medium  
+**Description:** Browser push notifications for new messages and calls.
+
+**Implementation Notes:**
+- Request notification permission
+- Notify on new DM
+- Notify on incoming call
+- Notify on mentions (in groups)
+- Mute/unmute notifications per chat
+
+---
+
+### 7. ⏳ Online/Offline Status & Last Seen
+**Status:** Pending  
+**Priority:** Medium  
+**Description:** Show user online status and last seen timestamp.
+
+**Implementation Notes:**
+- Green dot for online users
+- "Last seen X minutes ago"
+- Privacy settings (hide last seen)
+- Update status on activity
+- Show in user list and chat header
+
+---
+
+### 8. ⏳ Message Search
+**Status:** Pending  
+**Priority:** Medium  
+**Description:** Search through message history.
+
+**Implementation Notes:**
+- Search in current chat
+- Search across all chats
+- Filter by date, sender, media type
+- Highlight search results
+- Jump to message in conversation
+
+---
+
+### 9. ⏳ Dark Mode Toggle
+**Status:** Pending (App is already dark by default)  
+**Priority:** Low  
+**Description:** Toggle between light and dark themes.
+
+**Current State:**
+- ✅ App uses dark theme by default
+- ⏳ No light mode available
+- ⏳ No theme toggle
+
+**Implementation Notes:**
+- Add theme toggle in settings
+- Save preference to localStorage
+- Smooth theme transition
+- Consider system preference (prefers-color-scheme)
+
+---
+
+### 10. ⏳ Customizable Profiles
+**Status:** Pending (Basic profiles exist)  
+**Priority:** Medium  
+**Description:** Allow users to customize their profiles.
+
+**Current State:**
+- ✅ Display name from Google/Email
+- ✅ Profile photo from Google
+- ⏳ Can't edit profile after signup
+
+**Implementation Notes:**
+- Edit display name
+- Upload custom profile photo
+- Add bio/status message
+- Set custom status (Available, Busy, Away)
+- Profile settings page
+
+---
+
+### 11. ⏳ Message Threads / Replies
+**Status:** Pending  
+**Priority:** Low  
+**Description:** Reply to specific messages and create conversation threads.
+
+**Implementation Notes:**
+- Click "Reply" on any message
+- Show quoted message in reply
+- Thread view for grouped replies
+- Navigate to original message
+- Reply count indicator
+
+---
+
+### 12. ⏳ Link Previews
+**Status:** Pending  
+**Priority:** Low  
+**Description:** Automatically generate previews for shared links.
+
+**Implementation Notes:**
+- Detect URLs in messages
+- Fetch Open Graph metadata
+- Show title, description, image
+- Click to open link
+- Support YouTube, Twitter, etc.
+
+---
+
+### 13. ⏳ Multiple Device Sync
+**Status:** Pending  
+**Priority:** Low  
+**Description:** Sync messages and state across multiple devices.
+
+**Current State:**
+- ✅ Messages sync via Firestore
+- ⏳ No device management
+- ⏳ No active sessions view
+
+**Implementation Notes:**
+- Track active sessions
+- Show logged-in devices
+- Remote logout from other devices
+- Sync read status across devices
+- Sync typing indicators
+
+---
+
+## 📊 Implementation Priority
+
+### Phase 1 (High Priority)
+1. Typing Indicators
+2. Read Receipts & Delivery Status
+3. Message Editing & Deletion
+4. Group Chats & Channels
+
+### Phase 2 (Medium Priority)
+5. Push Notifications
+6. Online/Offline Status & Last Seen
+7. Message Search
+8. Customizable Profiles
+
+### Phase 3 (Low Priority)
+9. Dark Mode Toggle
+10. Message Threads / Replies
+11. Link Previews
+12. Multiple Device Sync
+
+---
+
+## 📝 Notes
+
+- Features will be implemented one by one
+- Each feature will be tested before marking as done
+- Breaking changes will be documented
+- User feedback will influence priority
+
+---
+
+**Last Updated:** April 2, 2026
