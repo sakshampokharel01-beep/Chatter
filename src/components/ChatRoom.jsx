@@ -16,6 +16,7 @@ import {
 import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '../firebase';
 import DirectMessages from './DirectMessages';
 import AdminPanel from './AdminPanel';
+import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;
 const MESSAGES_LIMIT = 150;
@@ -143,11 +144,13 @@ export default function ChatRoom({ user }) {
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
   const [loadingMsgs, setLoadingMsgs] = useState(true);
+  const [typingUsers, setTypingUsers] = useState(new Map()); // Map of userId -> userName
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const containerRef = useRef(null);
   const lastSentRef = useRef(0);
+  const typingTimeoutRef = useRef(null); // Ref for typing timeout
 
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
@@ -161,6 +164,40 @@ export default function ChatRoom({ user }) {
       console.error('Admin status snapshot error:', err);
     });
   }, [user.uid]);
+
+  // Listen for typing indicators in global chat
+  useEffect(() => {
+    const socket = getSocket(user.uid, displayName);
+
+    const handleTypingGlobal = ({ from, userName, isTyping }) => {
+      if (from === user.uid) return; // Ignore own typing
+      
+      setTypingUsers(prev => {
+        const newMap = new Map(prev);
+        if (isTyping) {
+          newMap.set(from, userName);
+          
+          // Auto-remove after 3 seconds
+          setTimeout(() => {
+            setTypingUsers(current => {
+              const updated = new Map(current);
+              updated.delete(from);
+              return updated;
+            });
+          }, 3000);
+        } else {
+          newMap.delete(from);
+        }
+        return newMap;
+      });
+    };
+
+    socket.on('typing-global', handleTypingGlobal);
+
+    return () => {
+      socket.off('typing-global', handleTypingGlobal);
+    };
+  }, [user.uid, displayName]);
 
   /* ── Delete a global message (admin only) ── */
   const deleteMessage = useCallback(async (id) => {
@@ -237,6 +274,14 @@ export default function ChatRoom({ user }) {
     setSending(true);
     setInputText('');
 
+    // Stop typing indicator when sending
+    const socket = getSocket(user.uid, displayName);
+    socket.emit('typing-global', {
+      from: user.uid,
+      userName: displayName,
+      isTyping: false
+    });
+
     try {
       const cu = auth.currentUser;
       await addDoc(collection(db, 'messages'), {
@@ -257,6 +302,32 @@ export default function ChatRoom({ user }) {
       inputRef.current?.focus();
     }
   }, [inputText, sending, user, displayName, adminUser]);
+
+  /* ── Handle typing indicator for global chat ── */
+  const handleTyping = useCallback(() => {
+    const socket = getSocket(user.uid, displayName);
+    
+    // Emit typing start
+    socket.emit('typing-global', {
+      from: user.uid,
+      userName: displayName,
+      isTyping: true
+    });
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set timeout to emit typing stop after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit('typing-global', {
+        from: user.uid,
+        userName: displayName,
+        isTyping: false
+      });
+    }, 2000);
+  }, [user.uid, displayName]);
 
   /* ── Keyboard handler ── */
   const handleKeyDown = (e) => {
@@ -370,6 +441,21 @@ export default function ChatRoom({ user }) {
               })
             )}
             <div ref={messagesEndRef} />
+            
+            {/* Typing indicators for global chat */}
+            {typingUsers.size > 0 && (
+              <div className="typing-indicator-wrapper">
+                <div className="typing-indicator">
+                  <span className="typing-dot"></span>
+                  <span className="typing-dot"></span>
+                  <span className="typing-dot"></span>
+                </div>
+                <span className="typing-text">
+                  {Array.from(typingUsers.values()).slice(0, 3).join(', ')}
+                  {typingUsers.size === 1 ? ' is' : ' are'} typing...
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="input-area">
@@ -380,7 +466,10 @@ export default function ChatRoom({ user }) {
                 placeholder="Say something to the world…"
                 rows={1}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value.slice(0, MAX_CHARS))}
+                onChange={(e) => {
+                  setInputText(e.target.value.slice(0, MAX_CHARS));
+                  handleTyping();
+                }}
                 onKeyDown={handleKeyDown}
                 disabled={sending}
                 autoFocus
