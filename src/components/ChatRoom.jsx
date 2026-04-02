@@ -454,7 +454,6 @@ export default function ChatRoom({ user }) {
       handleTyping();
     }
   };
-  };
 
   /* ── Character count colour ── */
   const charCount = inputText.length;

@@ -464,9 +464,14 @@ export default function DirectMessages({ user }) {
       return;
     }
     
+    // Always set the selected user first
+    setSelectedUser(u);
+    setMobileView('chat');
+    
     // Only clear messages if switching to a different user
     if (selectedUser?.id !== u.id) {
       setMessages([]);
+      setLoadingMsg(true);
     }
     
     const dmId = getDMId(user.uid, u.id);
@@ -474,12 +479,11 @@ export default function DirectMessages({ user }) {
       await setDoc(doc(db, 'dms', dmId), {
         participants: [user.uid, u.id],
         createdAt: serverTimestamp(),
-      });
-    } catch {
-      // doc already exists
+      }, { merge: true });
+    } catch (err) {
+      console.error('Error creating DM doc:', err);
     }
-    setSelectedUser(u);
-    setMobileView('chat');
+    
     setTimeout(() => inputRef.current?.focus(), 150);
   };
 
