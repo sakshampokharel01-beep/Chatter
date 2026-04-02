@@ -4340,3 +4340,180 @@ input:checked + .toggle-slider:before {
     max-width: none;
   }
 }
+
+
+/* ===========================
+   MESSAGE REPLY FEATURE
+   =========================== */
+
+/* Reply button on messages */
+.msg-reply-btn {
+  opacity: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-left: 4px;
+}
+
+.msg-bubble-wrap:hover .msg-reply-btn {
+  opacity: 1;
+}
+
+.msg-reply-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.1);
+}
+
+/* Reply preview in message bubble */
+.msg-reply-preview {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid #5b8dee;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  gap: 8px;
+}
+
+.msg-reply-preview:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.msg-reply-line {
+  width: 3px;
+  background: #5b8dee;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.msg-reply-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.msg-reply-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5b8dee;
+  margin-bottom: 2px;
+}
+
+.msg-reply-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Replying indicator above input */
+.replying-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(91, 141, 238, 0.1);
+  border-left: 3px solid #5b8dee;
+  border-radius: 8px 8px 0 0;
+  gap: 12px;
+}
+
+.replying-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.replying-content svg {
+  color: #5b8dee;
+  flex-shrink: 0;
+}
+
+.replying-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.replying-to {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5b8dee;
+  margin-bottom: 2px;
+}
+
+.replying-message {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cancel-reply-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.cancel-reply-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Message highlight animation when scrolling to replied message */
+.msg-highlight {
+  animation: highlightPulse 2s ease-out;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    background: transparent;
+  }
+  50% {
+    background: rgba(91, 141, 238, 0.2);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .msg-reply-preview {
+    padding: 6px 8px;
+    margin-bottom: 6px;
+  }
+  
+  .msg-reply-name,
+  .replying-to {
+    font-size: 11px;
+  }
+  
+  .msg-reply-text,
+  .replying-message {
+    font-size: 12px;
+  }
+  
+  .replying-indicator {
+    padding: 8px 12px;
+  }
+}

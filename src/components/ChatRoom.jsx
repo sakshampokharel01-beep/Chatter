@@ -63,7 +63,7 @@ function Avatar({ displayName, photoURL, size = 30 }) {
 }
 
 /* ── Single Chat Message ──────────────────────────────────── */
-function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, onEdit }) {
+function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, onEdit, onReply, messages }) {
   const name = message.displayName || (message.isAnonymous ? 'Guest' : 'User');
   
   // Check if message can be edited (within 15 minutes)
@@ -74,8 +74,11 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, 
   const canDeleteOwn = isOwn && message.createdAt && 
     (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
 
+  // Find the replied message if this is a reply
+  const repliedMessage = message.replyTo ? messages.find(m => m.id === message.replyTo) : null;
+
   return (
-    <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`}>
+    <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`} id={`msg-${message.id}`}>
       <div className="msg-avatar">
         <Avatar displayName={name} photoURL={message.photoURL} size={30} />
       </div>
@@ -89,9 +92,39 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, 
         )}
         <div className="msg-bubble-wrap">
           <div className="msg-bubble">
+            {repliedMessage && (
+              <div 
+                className="msg-reply-preview" 
+                onClick={() => {
+                  const element = document.getElementById(`msg-${repliedMessage.id}`);
+                  element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  element?.classList.add('msg-highlight');
+                  setTimeout(() => element?.classList.remove('msg-highlight'), 2000);
+                }}
+              >
+                <div className="msg-reply-line"></div>
+                <div className="msg-reply-content">
+                  <div className="msg-reply-name">{repliedMessage.displayName || 'User'}</div>
+                  <div className="msg-reply-text">{repliedMessage.text}</div>
+                </div>
+              </div>
+            )}
             {message.text}
             {message.edited && <span className="msg-edited-label"> (edited)</span>}
           </div>
+          {onReply && (
+            <button
+              className="msg-reply-btn"
+              onClick={() => onReply(message)}
+              title="Reply to message"
+              aria-label="Reply to message"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 14 4 9 9 4"/>
+                <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+              </svg>
+            </button>
+          )}
           {canEdit && (
             <button
               className="msg-edit-btn"
@@ -177,6 +210,7 @@ export default function ChatRoom({ user }) {
   const [typingUsers, setTypingUsers] = useState(new Map()); // Map of userId -> userName
   const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
   const [editingText, setEditingText] = useState(''); // Track the edited text
+  const [replyingTo, setReplyingTo] = useState(null); // Track which message is being replied to
   const [showProfile, setShowProfile] = useState(false); // Track profile modal visibility
   const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
   const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
@@ -323,6 +357,7 @@ export default function ChatRoom({ user }) {
     setEditingMessageId(id);
     setEditingText(currentText);
     setInputText(currentText);
+    setReplyingTo(null); // Clear reply when editing
     inputRef.current?.focus();
   }, []);
 
@@ -330,6 +365,18 @@ export default function ChatRoom({ user }) {
     setEditingMessageId(null);
     setEditingText('');
     setInputText('');
+  }, []);
+  
+  /* ── Reply to a message ── */
+  const startReply = useCallback((message) => {
+    setReplyingTo(message);
+    setEditingMessageId(null); // Clear edit when replying
+    setEditingText('');
+    inputRef.current?.focus();
+  }, []);
+  
+  const cancelReply = useCallback(() => {
+    setReplyingTo(null);
   }, []);
 
   const saveEdit = useCallback(async () => {
@@ -447,7 +494,7 @@ export default function ChatRoom({ user }) {
 
     try {
       const cu = auth.currentUser;
-      await addDoc(collection(db, 'messages'), {
+      const messageData = {
         text: text.slice(0, MAX_CHARS),
         uid: user.uid,
         displayName: (cu?.displayName || displayName).slice(0, 64),
@@ -456,7 +503,19 @@ export default function ChatRoom({ user }) {
         isAdmin: adminUser,
         createdAt: serverTimestamp(),
         edited: false,
-      });
+      };
+      
+      // Add reply reference if replying to a message
+      if (replyingTo) {
+        messageData.replyTo = replyingTo.id;
+        messageData.replyToText = replyingTo.text.slice(0, 100);
+        messageData.replyToUser = replyingTo.displayName;
+      }
+      
+      await addDoc(collection(db, 'messages'), messageData);
+      
+      // Clear reply state after sending
+      setReplyingTo(null);
     } catch (err) {
       console.error('Failed to send message:', err);
       alert('Error sending message: ' + err.message);
@@ -465,7 +524,7 @@ export default function ChatRoom({ user }) {
       setSending(false);
       inputRef.current?.focus();
     }
-  }, [inputText, sending, user, displayName, adminUser, editingMessageId, saveEdit]);
+  }, [inputText, sending, user, displayName, adminUser, editingMessageId, replyingTo, saveEdit]);
 
   /* ── Handle typing indicator for global chat ── */
   const handleTyping = useCallback(() => {
@@ -715,6 +774,8 @@ export default function ChatRoom({ user }) {
                     onBlock={adminUser ? blockUser : null}
                     onRemove={adminUser ? removeUser : null}
                     onEdit={isOwn ? startEditMessage : null}
+                    onReply={startReply}
+                    messages={messages}
                   />
                 );
               })
@@ -749,11 +810,31 @@ export default function ChatRoom({ user }) {
                 </button>
               </div>
             )}
+            {replyingTo && (
+              <div className="replying-indicator">
+                <div className="replying-content">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="9 14 4 9 9 4"/>
+                    <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+                  </svg>
+                  <div className="replying-text">
+                    <div className="replying-to">Replying to {replyingTo.displayName}</div>
+                    <div className="replying-message">{replyingTo.text}</div>
+                  </div>
+                </div>
+                <button onClick={cancelReply} className="cancel-reply-btn" title="Cancel reply">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+            )}
             <div className="input-wrapper">
               <textarea
                 ref={inputRef}
                 className="msg-input"
-                placeholder={editingMessageId ? "Edit your message…" : "Say something to the world…"}
+                placeholder={editingMessageId ? "Edit your message…" : replyingTo ? "Write a reply…" : "Say something to the world…"}
                 rows={1}
                 value={inputText}
                 onChange={handleInputChange}
