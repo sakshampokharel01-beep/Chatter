@@ -18,6 +18,7 @@ import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '..
 import DirectMessages from './DirectMessages';
 import AdminPanel from './AdminPanel';
 import UserProfile from './UserProfile';
+import DeviceManagement from './DeviceManagement';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;
@@ -174,6 +175,7 @@ export default function ChatRoom({ user }) {
   const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
   const [editingText, setEditingText] = useState(''); // Track the edited text
   const [showProfile, setShowProfile] = useState(false); // Track profile modal visibility
+  const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -524,6 +526,18 @@ export default function ChatRoom({ user }) {
             <span className="user-name" title={displayName}>{displayName}</span>
           </button>
           <button
+            className="btn-devices"
+            onClick={() => setShowDevices(true)}
+            title="Manage Devices"
+            aria-label="Manage devices"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </button>
+          <button
             className="btn-signout"
             onClick={signOutUser}
             aria-label="Sign out"
@@ -641,6 +655,9 @@ export default function ChatRoom({ user }) {
 
       {/* ── User Profile Modal ── */}
       {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} />}
+
+      {/* ── Device Management Modal ── */}
+      {showDevices && <DeviceManagement user={user} onClose={() => setShowDevices(false)} />}
     </div>
   );
 }

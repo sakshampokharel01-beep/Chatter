@@ -159,5 +159,14 @@ service cloud.firestore {
       allow list: if isAdmin(); // Allow admins to list deleted users
       allow write: if isAdmin(); 
     }
+
+    // 8. SESSIONS (Device Management)
+    match /sessions/{sessionId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastActive']);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
   }
 }
