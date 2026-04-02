@@ -44,20 +44,21 @@ service cloud.firestore {
         request.resource.data.displayName.size() > 0 &&
         request.resource.data.displayName.size() <= 64 &&
         // Prevent removed users from creating new profiles
-        !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
-        // Prevent rapid account creation from same IP (Firebase limitation workaround)
-        request.time > request.resource.data.get('createdAt', timestamp.value(0)) + duration.value(0, 's');
+        !exists(/databases/$(database)/documents/deletedUsers/$(uid));
       allow update: if isOwner(uid) &&
+        !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
         (
-          // Allow updating profile info
+          // Allow updating profile info (with rate limit)
           (request.resource.data.displayName is string &&
            request.resource.data.displayName.size() <= 64 &&
-           !exists(/databases/$(database)/documents/deletedUsers/$(uid)) &&
-           request.time > resource.data.lastSeen + duration.value(1, 's'))
+           request.time > resource.data.get('lastSeen', timestamp.value(0)) + duration.value(1, 's'))
           ||
-          // Allow updating online status and lastSeen (for presence tracking)
+          // Allow updating online status and lastSeen (for presence tracking, no rate limit)
           (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['online', 'lastSeen']) &&
            request.resource.data.online is bool)
+          ||
+          // Allow updating only lastSeen (for presence tracking)
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeen']))
         );
       allow delete: if isAdmin(); // Allow admins to delete user profiles
     }

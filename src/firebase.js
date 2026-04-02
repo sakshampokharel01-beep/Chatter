@@ -167,16 +167,37 @@ export const registerUser = async (user, retryCount = 0) => {
       isAnonymous: isGuest,
     }, { merge: true });
   } catch (err) {
-    console.error("❌ Registration FAILED:", err);
+    console.error("❌ Registration FAILED:", err.code || err.message);
+    
+    // Only sign out if explicitly permission-denied AND user is in deletedUsers
     if (err.code === 'permission-denied') {
-      console.error("PERMISSION DENIED: This account may have been removed by an administrator.");
-      // Sign out the user
-      await signOut(auth);
-      throw new Error('Your account has been removed. Please contact support.');
+      try {
+        const deletedUserDoc = await getDoc(doc(db, 'deletedUsers', user.uid));
+        if (deletedUserDoc.exists()) {
+          console.error("PERMISSION DENIED: Account has been removed by an administrator.");
+          await signOut(auth);
+          throw new Error('Your account has been removed. Please contact support.');
+        } else {
+          // Permission denied but not in deletedUsers - might be a rules issue
+          console.warn('Permission denied but user not in deletedUsers. Check Firestore rules.');
+          // Don't sign out - let user continue
+        }
+      } catch (checkErr) {
+        if (checkErr.message && checkErr.message.includes('removed')) {
+          throw checkErr; // Re-throw if it's our custom error
+        }
+        // Can't check deletedUsers - don't sign out
+        console.warn('Cannot verify deletion status:', checkErr.code);
+      }
     }
-    // Simple retry for network glitches
+    
+    // Simple retry for network glitches (but not permission errors)
     if (retryCount < 2 && err.code !== 'permission-denied') {
+      console.log(`Retrying registration (attempt ${retryCount + 1})...`);
       setTimeout(() => registerUser(user, retryCount + 1), 2000);
+    } else if (err.code === 'permission-denied') {
+      // Don't retry permission errors, but don't throw either
+      console.warn('Skipping registration due to permission error. User can still use the app.');
     } else {
       throw err;
     }
