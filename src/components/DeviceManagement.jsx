@@ -70,12 +70,19 @@ export default function DeviceManagement({ user, onClose }) {
             lastActive: serverTimestamp(),
             createdAt: serverTimestamp(),
           });
+        } else {
+          // Update existing session
+          const sessionDoc = existingSessions.docs[0];
+          await updateDoc(doc(db, 'sessions', sessionDoc.id), {
+            lastActive: serverTimestamp(),
+          });
         }
       } catch (err) {
         console.error('Failed to register session:', err);
       }
     };
 
+    // Only register once when component mounts
     registerSession();
 
     // Subscribe to user's sessions
@@ -105,7 +112,7 @@ export default function DeviceManagement({ user, onClose }) {
     });
 
     return unsubscribe;
-  }, [user, currentSessionId]);
+  }, [user]); // Remove currentSessionId from dependencies
 
   // Update current session's lastActive every 30 seconds
   useEffect(() => {
@@ -126,24 +133,8 @@ export default function DeviceManagement({ user, onClose }) {
 
     const interval = setInterval(updateActivity, 30000); // 30 seconds
     
-    // Cleanup session on unmount/close
-    const cleanup = async () => {
-      try {
-        const currentSession = sessions.find(s => s.sessionId === currentSessionId);
-        if (currentSession) {
-          await deleteDoc(doc(db, 'sessions', currentSession.id));
-        }
-      } catch (err) {
-        // Silently fail
-      }
-    };
-
-    window.addEventListener('beforeunload', cleanup);
-    
     return () => {
       clearInterval(interval);
-      window.removeEventListener('beforeunload', cleanup);
-      cleanup();
     };
   }, [user, sessions, currentSessionId]);
 

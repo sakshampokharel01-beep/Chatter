@@ -187,6 +187,36 @@ export default function ChatRoom({ user }) {
   const isGuest = user.isAnonymous;
   const [adminUser, setAdminUser] = useState(false);
 
+  // Cleanup session on sign out or browser close
+  useEffect(() => {
+    if (!user) return;
+
+    const sessionId = sessionStorage.getItem('sessionId');
+    if (!sessionId) return;
+
+    const cleanup = async () => {
+      try {
+        // Find and delete the current session
+        const q = query(
+          collection(db, 'sessions'),
+          where('userId', '==', user.uid),
+          where('sessionId', '==', sessionId)
+        );
+        const snapshot = await getDocs(q);
+        snapshot.docs.forEach(doc => deleteDoc(doc.ref));
+      } catch (err) {
+        // Silently fail
+      }
+    };
+
+    // Cleanup on browser close/refresh
+    window.addEventListener('beforeunload', cleanup);
+
+    return () => {
+      window.removeEventListener('beforeunload', cleanup);
+    };
+  }, [user]);
+
   // Real-time admin status — check the admins collection
   useEffect(() => {
     return onSnapshot(collection(db, 'admins'), snap => {
