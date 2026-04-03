@@ -226,48 +226,20 @@ export default function AuthScreen({ onBack }) {
       <div className="auth-orb auth-orb--2" />
       <div className="auth-orb auth-orb--3" />
 
-      {/* Left side phone mockup */}
-      <div className="auth-phone-mockup auth-phone-left">
-        <div className="phone-frame">
-          <img 
-            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=800&fit=crop" 
-            alt="Person using chat app"
-            className="phone-image"
-          />
-          <div className="phone-overlay">
-            <div className="phone-chat-bubble">
-              <div className="bubble-avatar">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=faces" alt="" />
-              </div>
-              <div className="bubble-content">
-                <div className="bubble-name">Sarah</div>
-                <div className="bubble-text">Hey! How are you?</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Left side image */}
+      <div className="auth-side-image auth-image-left">
+        <img 
+          src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=900&fit=crop" 
+          alt="Person using chat"
+        />
       </div>
 
-      {/* Right side phone mockup */}
-      <div className="auth-phone-mockup auth-phone-right">
-        <div className="phone-frame">
-          <img 
-            src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&h=800&fit=crop" 
-            alt="Person using chat app"
-            className="phone-image"
-          />
-          <div className="phone-overlay">
-            <div className="phone-chat-bubble">
-              <div className="bubble-avatar">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=faces" alt="" />
-              </div>
-              <div className="bubble-content">
-                <div className="bubble-name">Mike</div>
-                <div className="bubble-text">Let's video call!</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Right side image */}
+      <div className="auth-side-image auth-image-right">
+        <img 
+          src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=600&h=900&fit=crop" 
+          alt="Person chatting"
+        />
       </div>
 
       <div className="auth-card">
