@@ -222,13 +222,14 @@
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2.75rem, 5.5vw, 4.5rem);
   font-weight: 800;
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
   margin-bottom: 1.5rem;
   animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .gradient-text {
@@ -240,12 +241,13 @@
 }
 
 .hero-subtitle {
-  font-size: clamp(1rem, 1.5vw, 1.125rem);
-  line-height: 1.7;
+  font-size: clamp(1.0625rem, 1.75vw, 1.25rem);
+  line-height: 1.75;
   color: var(--text-secondary);
   margin-bottom: 2.5rem;
   max-width: 540px;
   animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  font-weight: 400;
 }
 
 .hero-buttons {
@@ -315,20 +317,21 @@
 }
 
 .stat-mini-value {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 0.25rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  font-family: 'Inter', sans-serif;
 }
 
 .stat-mini-label {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-/* Hero Visual */
+/* Hero Visual - Redesigned with Real Photos */
 .hero-visual {
   position: relative;
   animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
@@ -351,7 +354,7 @@
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  aspect-ratio: 4/3;
+  padding: 2.5rem;
   animation: float 6s ease-in-out infinite;
 }
 
@@ -364,25 +367,24 @@
   }
 }
 
-.hero-image-placeholder {
-  width: 100%;
-  height: 100%;
+.hero-chat-mockup {
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
-  gap: 2rem;
-  padding: 3rem;
-  color: white;
+  gap: 1.5rem;
+  width: 100%;
 }
 
-.chat-bubble-demo {
-  background: rgba(255, 255, 255, 0.15);
+.chat-message-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
   padding: 1.5rem;
-  max-width: 320px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
   animation: slideUp 0.6s ease both;
 }
 
@@ -397,43 +399,53 @@
   }
 }
 
-.chat-bubble-demo:nth-child(2) {
-  animation-delay: 0.2s;
-  align-self: flex-end;
+.chat-message-card:nth-child(1) {
+  animation-delay: 0.1s;
 }
 
-.chat-bubble-demo:nth-child(3) {
-  animation-delay: 0.4s;
+.chat-message-card:nth-child(2) {
+  animation-delay: 0.3s;
 }
 
-.bubble-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+.chat-message-card:nth-child(3) {
+  animation-delay: 0.5s;
 }
 
-.bubble-avatar {
-  width: 32px;
-  height: 32px;
+.chat-message-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.chat-user-photo {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
+  object-fit: cover;
+  border: 3px solid rgba(0, 149, 246, 0.2);
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.bubble-name {
-  font-weight: 600;
-  font-size: 0.9375rem;
+.chat-message-content {
+  flex: 1;
+  min-width: 0;
 }
 
-.bubble-text {
+.chat-user-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.375rem;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.chat-message-text {
   font-size: 0.9375rem;
   line-height: 1.5;
-  opacity: 0.95;
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Decorative Elements */
@@ -1731,7 +1743,25 @@
     font-size: 1.5rem;
   }
 
-  .chat-bubble-demo {
-    max-width: 100%;
+  .hero-image-container {
+    padding: 1.5rem;
+  }
+
+  .chat-message-card {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .chat-user-photo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .chat-user-name {
+    font-size: 0.9375rem;
+  }
+
+  .chat-message-text {
+    font-size: 0.875rem;
   }
 }

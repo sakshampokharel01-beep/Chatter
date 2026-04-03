@@ -195,27 +195,39 @@ export default function LandingPage({ onGetStarted }) {
             
             <div className="hero-visual">
               <div className="hero-image-container">
-                <div className="hero-image-placeholder">
-                  <div className="chat-bubble-demo">
-                    <div className="bubble-header">
-                      <div className="bubble-avatar">A</div>
-                      <div className="bubble-name">Alex</div>
+                <div className="hero-chat-mockup">
+                  <div className="chat-message-card">
+                    <img 
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" 
+                      alt="User" 
+                      className="chat-user-photo"
+                    />
+                    <div className="chat-message-content">
+                      <div className="chat-user-name">Alex Johnson</div>
+                      <div className="chat-message-text">Hey! Ready for our video call?</div>
                     </div>
-                    <div className="bubble-text">Hey! Ready for our video call?</div>
                   </div>
-                  <div className="chat-bubble-demo">
-                    <div className="bubble-header">
-                      <div className="bubble-avatar">S</div>
-                      <div className="bubble-name">Sarah</div>
+                  <div className="chat-message-card">
+                    <img 
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" 
+                      alt="User" 
+                      className="chat-user-photo"
+                    />
+                    <div className="chat-message-content">
+                      <div className="chat-user-name">Sarah Miller</div>
+                      <div className="chat-message-text">Yes! Starting now...</div>
                     </div>
-                    <div className="bubble-text">Yes! Starting now...</div>
                   </div>
-                  <div className="chat-bubble-demo">
-                    <div className="bubble-header">
-                      <div className="bubble-avatar">M</div>
-                      <div className="bubble-name">Mike</div>
+                  <div className="chat-message-card">
+                    <img 
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces" 
+                      alt="User" 
+                      className="chat-user-photo"
+                    />
+                    <div className="chat-message-content">
+                      <div className="chat-user-name">Mike Chen</div>
+                      <div className="chat-message-text">Count me in! 🎉</div>
                     </div>
-                    <div className="bubble-text">Count me in!</div>
                   </div>
                 </div>
               </div>
