@@ -1921,9 +1921,9 @@ body.no-scroll {
 
 /* Back to Landing Button */
 .back-to-landing {
-  position: fixed;
-  top: 24px;
-  left: 24px;
+  position: absolute;
+  top: 32px;
+  left: 32px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1936,7 +1936,7 @@ body.no-scroll {
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 100;
+  z-index: 10;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
