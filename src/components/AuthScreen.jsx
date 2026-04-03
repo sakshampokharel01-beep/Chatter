@@ -226,22 +226,6 @@ export default function AuthScreen({ onBack }) {
       <div className="auth-orb auth-orb--2" />
       <div className="auth-orb auth-orb--3" />
 
-      {/* Left side image */}
-      <div className="auth-side-image auth-image-left">
-        <img 
-          src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=900&fit=crop" 
-          alt="Person using chat"
-        />
-      </div>
-
-      {/* Right side image */}
-      <div className="auth-side-image auth-image-right">
-        <img 
-          src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=600&h=900&fit=crop" 
-          alt="Person chatting"
-        />
-      </div>
-
       <div className="auth-card">
         {onBack && (
           <button className="back-to-landing" onClick={onBack} aria-label="Back to home">
