@@ -1783,14 +1783,8 @@ body.no-scroll {
 
 .typing-text {
   font-size: 12px;
-  color: #737373;
+  color: var(--text-secondary);
   margin-left: 4px;
-}
-}
-
-.typing-text {
-  font-size: 12px;
-  color: #606878;
   font-style: italic;
 }
 
@@ -4916,9 +4910,6 @@ input:checked + .toggle-slider:before {
 .mutual-name {
   font-size: 14px;
   color: var(--text-primary);
-  text-align: center;
-}
-  color: #e8e9f3;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
