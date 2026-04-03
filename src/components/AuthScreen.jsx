@@ -230,7 +230,7 @@ export default function AuthScreen({ onBack }) {
       <div className="auth-phone-mockup auth-phone-left">
         <div className="phone-frame">
           <img 
-            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=800&fit=crop&crop=faces" 
+            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=800&fit=crop" 
             alt="Person using chat app"
             className="phone-image"
           />
@@ -252,7 +252,7 @@ export default function AuthScreen({ onBack }) {
       <div className="auth-phone-mockup auth-phone-right">
         <div className="phone-frame">
           <img 
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=800&fit=crop&crop=faces" 
+            src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&h=800&fit=crop" 
             alt="Person using chat app"
             className="phone-image"
           />
