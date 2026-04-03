@@ -228,152 +228,160 @@ export default function LandingPage({ onGetStarted }) {
       <section className="app-preview" id="preview" data-reveal>
         <div className="container">
           <div className="section-header">
-            <span className="section-tag">App Preview</span>
-            <h2 className="section-title">See Chatter in Action</h2>
+            <span className="section-tag">See It In Action</span>
+            <h2 className="section-title">Experience Chatter</h2>
             <p className="section-subtitle">Beautiful, intuitive interface designed for seamless communication</p>
           </div>
           
-          <div className="preview-grid">
-            {/* Messages Preview */}
-            <div className="preview-card">
-              <div className="preview-label">Private Messages</div>
-              <div className="app-screenshot">
-                <div className="screenshot-header">
-                  <div className="screenshot-title">Messages</div>
-                </div>
-                <div className="screenshot-tabs">
-                  <div className="tab active">Friends (9)</div>
-                  <div className="tab">All Users</div>
-                  <div className="tab">Requests</div>
-                </div>
-                <div className="screenshot-search">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.35-4.35"/>
+          <div className="preview-showcase">
+            {/* Feature Highlight 1 */}
+            <div className="feature-showcase">
+              <div className="showcase-content">
+                <div className="showcase-badge">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
-                  <span>Search...</span>
+                  <span>Instant Messaging</span>
                 </div>
-                <div className="screenshot-list">
-                  <div className="chat-item">
-                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>A</div>
-                    <div className="chat-info">
-                      <div className="chat-name">Alex Johnson</div>
-                      <div className="chat-preview">Hey! How are you doing?</div>
+                <h3 className="showcase-title">Chat with Anyone, Instantly</h3>
+                <p className="showcase-description">
+                  Send messages that arrive in milliseconds. Real-time conversations with friends, 
+                  family, and colleagues. No delays, just pure connection.
+                </p>
+                <ul className="showcase-features">
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Real-time delivery</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Read receipts</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Message reactions</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="showcase-visual">
+                <div className="visual-card">
+                  <div className="visual-header">
+                    <div className="visual-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
                     </div>
-                    <div className="chat-time">2m ago</div>
+                    <span className="visual-title">Messages</span>
                   </div>
-                  <div className="chat-item">
-                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'}}>S</div>
-                    <div className="chat-info">
-                      <div className="chat-name">Sarah Miller</div>
-                      <div className="chat-preview">
-                        See you tomorrow!
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{display: 'inline', marginLeft: '4px', verticalAlign: 'middle'}}>
-                          <path d="M7 10.5L12 15.5L17 10.5H7Z"/>
-                        </svg>
+                  <div className="visual-content">
+                    {/* Chat preview mockup */}
+                    <div className="mock-chat-list">
+                      <div className="mock-chat-item">
+                        <div className="mock-avatar" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>A</div>
+                        <div className="mock-chat-info">
+                          <div className="mock-name">Alex Johnson</div>
+                          <div className="mock-message">Hey! How are you?</div>
+                        </div>
+                        <div className="mock-time">2m</div>
+                      </div>
+                      <div className="mock-chat-item">
+                        <div className="mock-avatar" style={{background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'}}>S</div>
+                        <div className="mock-chat-info">
+                          <div className="mock-name">Sarah Miller</div>
+                          <div className="mock-message">See you tomorrow!</div>
+                        </div>
+                        <div className="mock-time">1h</div>
+                      </div>
+                      <div className="mock-chat-item">
+                        <div className="mock-avatar" style={{background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'}}>M</div>
+                        <div className="mock-chat-info">
+                          <div className="mock-name">Mike Chen</div>
+                          <div className="mock-message">Thanks for the help!</div>
+                        </div>
+                        <div className="mock-time">3h</div>
                       </div>
                     </div>
-                    <div className="chat-time">1h ago</div>
-                  </div>
-                  <div className="chat-item">
-                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'}}>M</div>
-                    <div className="chat-info">
-                      <div className="chat-name">Mike Chen</div>
-                      <div className="chat-preview">Thanks for the help!</div>
-                    </div>
-                    <div className="chat-time">3h ago</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Chat Preview */}
-            <div className="preview-card">
-              <div className="preview-label">Real-time Chat</div>
-              <div className="app-screenshot">
-                <div className="screenshot-header">
-                  <div className="screenshot-back">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M19 12H5M12 19l-7-7 7-7"/>
+            {/* Feature Highlight 2 */}
+            <div className="feature-showcase reverse">
+              <div className="showcase-content">
+                <div className="showcase-badge">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 7l-7 5 7 5V7z"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                  </svg>
+                  <span>Video Calls</span>
+                </div>
+                <h3 className="showcase-title">Face-to-Face Conversations</h3>
+                <p className="showcase-description">
+                  Crystal-clear HD video calls with your friends and family. Connect face-to-face 
+                  from anywhere in the world with smooth, reliable connections.
+                </p>
+                <ul className="showcase-features">
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                  </div>
-                  <div className="screenshot-user">
-                    <div className="user-avatar-small" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>A</div>
-                    <div>
-                      <div className="user-name-small">Alex Johnson</div>
-                      <div className="user-status-small">● Online</div>
-                    </div>
-                  </div>
-                  <div className="screenshot-actions">
-                    <div className="action-btn">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                      </svg>
-                    </div>
-                    <div className="action-btn">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M23 7l-7 5 7 5V7z"/>
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="screenshot-messages">
-                  <div className="message-bubble received">
-                    <div className="bubble-text">Hey! How's your day going?</div>
-                    <div className="bubble-time">10:30 AM</div>
-                  </div>
-                  <div className="message-bubble sent">
-                    <div className="bubble-text">Great! Just finished a project</div>
-                    <div className="bubble-time">10:32 AM</div>
-                  </div>
-                  <div className="message-bubble received">
-                    <div className="bubble-text">
-                      That's awesome!
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{display: 'inline', marginLeft: '4px', verticalAlign: 'middle'}}>
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                    </div>
-                    <div className="bubble-time">10:33 AM</div>
-                  </div>
-                </div>
-                <div className="screenshot-input">
-                  <div className="input-field">Type a message...</div>
-                  <div className="send-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                    <span>HD video quality</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                  </div>
-                </div>
+                    <span>Screen sharing</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Group calls</span>
+                  </li>
+                </ul>
               </div>
-            </div>
-
-            {/* Video Call Preview */}
-            <div className="preview-card">
-              <div className="preview-label">Video Calls</div>
-              <div className="app-screenshot">
-                <div className="screenshot-video">
-                  <div className="video-placeholder">
-                    <div className="video-avatar" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>A</div>
-                    <div className="video-name">Alex Johnson</div>
-                    <div className="video-status">Connected</div>
+              <div className="showcase-visual">
+                <div className="visual-card">
+                  <div className="visual-header">
+                    <div className="visual-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                    <span className="visual-title">Video Call</span>
                   </div>
-                  <div className="video-controls">
-                    <div className="control-btn">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                      </svg>
+                  <div className="visual-content video-call-mock">
+                    <div className="video-participant">
+                      <div className="participant-avatar" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+                        <span>A</span>
+                      </div>
+                      <div className="participant-name">Alex Johnson</div>
+                      <div className="participant-status">● Connected</div>
                     </div>
-                    <div className="control-btn red">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
-                      </svg>
-                    </div>
-                    <div className="control-btn">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                      </svg>
+                    <div className="video-controls-mock">
+                      <div className="control-mock">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        </svg>
+                      </div>
+                      <div className="control-mock danger">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+                        </svg>
+                      </div>
+                      <div className="control-mock">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>
