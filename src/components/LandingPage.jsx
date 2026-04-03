@@ -27,32 +27,63 @@ export default function LandingPage({ onGetStarted }) {
 
   const features = [
     {
-      icon: '💬',
+      icon: (
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      ),
       title: 'Instant Messaging',
       description: 'Send messages that arrive in milliseconds. Real-time conversations with friends and groups.'
     },
     {
-      icon: '📹',
+      icon: (
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M23 7l-7 5 7 5V7z"/>
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        </svg>
+      ),
       title: 'Video & Audio Calls',
       description: 'Crystal-clear HD video calls and voice chats. Connect face-to-face from anywhere.'
     },
     {
-      icon: '🔒',
+      icon: (
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      ),
       title: 'Secure & Private',
       description: 'End-to-end encryption keeps your conversations private. Your data stays yours.'
     },
     {
-      icon: '🌐',
+      icon: (
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      ),
       title: 'Global Chat Rooms',
       description: 'Join public conversations or create private spaces. Connect with people worldwide.'
     },
     {
-      icon: '👥',
+      icon: (
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      ),
       title: 'Friend Requests',
       description: 'Build your network with friend requests. Stay connected with the people you care about.'
     },
     {
-      icon: '⚡',
+      icon: (
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      ),
       title: 'Lightning Fast',
       description: 'Built for speed. No lag, no delays. Messages and calls work instantly.'
     }
@@ -119,7 +150,10 @@ export default function LandingPage({ onGetStarted }) {
         <div className="container">
           <div className="hero-content">
             <div className="hero-badge animate-in">
-              <span>✨ Free Forever</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Free Forever</span>
             </div>
             <h1 className="hero-title animate-in">
               Connect with Friends<br />
@@ -189,7 +223,7 @@ export default function LandingPage({ onGetStarted }) {
                 </div>
                 <div className="screenshot-list">
                   <div className="chat-item">
-                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>A</div>
+                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>A</div>
                     <div className="chat-info">
                       <div className="chat-name">Alex Johnson</div>
                       <div className="chat-preview">Hey! How are you doing?</div>
@@ -197,15 +231,20 @@ export default function LandingPage({ onGetStarted }) {
                     <div className="chat-time">2m ago</div>
                   </div>
                   <div className="chat-item">
-                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>S</div>
+                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'}}>S</div>
                     <div className="chat-info">
                       <div className="chat-name">Sarah Miller</div>
-                      <div className="chat-preview">See you tomorrow! 👋</div>
+                      <div className="chat-preview">
+                        See you tomorrow!
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{display: 'inline', marginLeft: '4px', verticalAlign: 'middle'}}>
+                          <path d="M7 10.5L12 15.5L17 10.5H7Z"/>
+                        </svg>
+                      </div>
                     </div>
                     <div className="chat-time">1h ago</div>
                   </div>
                   <div className="chat-item">
-                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'}}>M</div>
+                    <div className="chat-avatar" style={{background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'}}>M</div>
                     <div className="chat-info">
                       <div className="chat-name">Mike Chen</div>
                       <div className="chat-preview">Thanks for the help!</div>
@@ -221,17 +260,30 @@ export default function LandingPage({ onGetStarted }) {
               <div className="preview-label">Real-time Chat</div>
               <div className="app-screenshot">
                 <div className="screenshot-header">
-                  <div className="screenshot-back">←</div>
+                  <div className="screenshot-back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                  </div>
                   <div className="screenshot-user">
-                    <div className="user-avatar-small" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>A</div>
+                    <div className="user-avatar-small" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>A</div>
                     <div>
                       <div className="user-name-small">Alex Johnson</div>
                       <div className="user-status-small">● Online</div>
                     </div>
                   </div>
                   <div className="screenshot-actions">
-                    <div className="action-btn">📞</div>
-                    <div className="action-btn">📹</div>
+                    <div className="action-btn">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      </svg>
+                    </div>
+                    <div className="action-btn">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M23 7l-7 5 7 5V7z"/>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
                 <div className="screenshot-messages">
@@ -244,7 +296,12 @@ export default function LandingPage({ onGetStarted }) {
                     <div className="bubble-time">10:32 AM</div>
                   </div>
                   <div className="message-bubble received">
-                    <div className="bubble-text">That's awesome! 🎉</div>
+                    <div className="bubble-text">
+                      That's awesome!
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{display: 'inline', marginLeft: '4px', verticalAlign: 'middle'}}>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </div>
                     <div className="bubble-time">10:33 AM</div>
                   </div>
                 </div>
@@ -265,14 +322,27 @@ export default function LandingPage({ onGetStarted }) {
               <div className="app-screenshot">
                 <div className="screenshot-video">
                   <div className="video-placeholder">
-                    <div className="video-avatar" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>A</div>
+                    <div className="video-avatar" style={{background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}}>A</div>
                     <div className="video-name">Alex Johnson</div>
                     <div className="video-status">Connected</div>
                   </div>
                   <div className="video-controls">
-                    <div className="control-btn">🎤</div>
-                    <div className="control-btn red">📞</div>
-                    <div className="control-btn">📹</div>
+                    <div className="control-btn">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                      </svg>
+                    </div>
+                    <div className="control-btn red">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+                      </svg>
+                    </div>
+                    <div className="control-btn">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
