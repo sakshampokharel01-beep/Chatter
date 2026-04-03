@@ -1272,7 +1272,7 @@ body.no-scroll {
 .msg-status-indicator {
   display: flex;
   align-items: center;
-  opacity: 0.8;
+  opacity: 1;
   transition: all 0.2s ease;
 }
 
@@ -4407,8 +4407,8 @@ input:checked + .toggle-slider:before {
 
 /* Reply preview in message bubble */
 .msg-reply-preview {
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 3px solid #5b8dee;
+  background: rgba(0, 0, 0, 0.15);
+  border-left: 3px solid rgba(255, 255, 255, 0.4);
   border-radius: 6px;
   padding: 8px 10px;
   margin-bottom: 8px;
@@ -4419,12 +4419,12 @@ input:checked + .toggle-slider:before {
 }
 
 .msg-reply-preview:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .msg-reply-line {
   width: 3px;
-  background: #5b8dee;
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 2px;
   flex-shrink: 0;
 }
@@ -4437,16 +4437,38 @@ input:checked + .toggle-slider:before {
 .msg-reply-name {
   font-size: 12px;
   font-weight: 600;
-  color: #5b8dee;
+  color: #ffffff;
   margin-bottom: 2px;
 }
 
 .msg-reply-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Reply preview in received messages - different styling */
+.message-row.other .msg-reply-preview {
+  background: rgba(0, 0, 0, 0.08);
+  border-left-color: var(--accent-primary);
+}
+
+.message-row.other .msg-reply-preview:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.message-row.other .msg-reply-line {
+  background: var(--accent-primary);
+}
+
+.message-row.other .msg-reply-name {
+  color: var(--accent-primary);
+}
+
+.message-row.other .msg-reply-text {
+  color: var(--text-primary);
 }
 
 /* Replying indicator above input */
@@ -4488,7 +4510,7 @@ input:checked + .toggle-slider:before {
 
 .replying-message {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.95);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
