@@ -151,7 +151,7 @@ export default function LandingPage({ onGetStarted }) {
         <div className="hero-decoration"></div>
         <div className="container">
           <div className="hero-content">
-            <div className="hero-text">
+            <div className="hero-text-card">
               <div className="hero-badge animate-in">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12"/>
@@ -195,8 +195,8 @@ export default function LandingPage({ onGetStarted }) {
             
             <div className="hero-visual">
               <div className="hero-image-container">
-                <div className="hero-chat-mockup">
-                  <div className="chat-message-card">
+                <div className="hero-chat-card">
+                  <div className="chat-message-item">
                     <img 
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" 
                       alt="User" 
@@ -207,7 +207,7 @@ export default function LandingPage({ onGetStarted }) {
                       <div className="chat-message-text">Hey! Ready for our video call?</div>
                     </div>
                   </div>
-                  <div className="chat-message-card">
+                  <div className="chat-message-item">
                     <img 
                       src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" 
                       alt="User" 
@@ -218,7 +218,7 @@ export default function LandingPage({ onGetStarted }) {
                       <div className="chat-message-text">Yes! Starting now...</div>
                     </div>
                   </div>
-                  <div className="chat-message-card">
+                  <div className="chat-message-item">
                     <img 
                       src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces" 
                       alt="User" 
