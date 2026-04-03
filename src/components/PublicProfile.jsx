@@ -17,20 +17,17 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
   const loadProfileData = async () => {
     try {
       setLoading(true);
-      console.log('Loading profile for userId:', userId, 'currentUserId:', currentUserId);
 
       // Load user data
       const usersSnap = await getDocs(collection(db, 'users'));
       const user = usersSnap.docs.find(doc => doc.id === userId);
       
       if (!user) {
-        console.log('User not found');
         setLoading(false);
         return;
       }
 
       const userData = { id: user.id, ...user.data() };
-      console.log('User data:', userData);
       setProfileData(userData);
 
       // Load friend count
@@ -39,7 +36,6 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
         where('users', 'array-contains', userId)
       );
       const friendsSnap = await getDocs(friendsQuery);
-      console.log('Friend count:', friendsSnap.size);
       setFriendCount(friendsSnap.size);
 
       // Check if current user is friends with this user
@@ -47,7 +43,6 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
         const users = doc.data().users;
         return users.includes(currentUserId);
       });
-      console.log('Is friend:', isFriendCheck);
       setIsFriend(isFriendCheck);
 
       // Load mutual friends
@@ -70,7 +65,6 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
         });
 
         const mutualIds = [...currentUserFriendIds].filter(id => targetUserFriendIds.has(id));
-        console.log('Mutual friend IDs:', mutualIds);
         
         // Load mutual friend details
         const mutualFriendData = [];
@@ -80,7 +74,6 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
             mutualFriendData.push({ id: mutualUser.id, ...mutualUser.data() });
           }
         }
-        console.log('Mutual friends:', mutualFriendData);
         setMutualFriends(mutualFriendData);
       }
 
@@ -91,7 +84,6 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
         where('to', '==', userId)
       );
       const pendingSnap = await getDocs(pendingQuery);
-      console.log('Has pending request:', !pendingSnap.empty);
       setHasPendingRequest(!pendingSnap.empty);
 
       setLoading(false);
