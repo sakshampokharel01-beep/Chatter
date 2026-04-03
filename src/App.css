@@ -94,21 +94,21 @@ body.no-scroll {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  background: #111318;
+  background: var(--bg-primary);
 }
 
 .loader {
   width: 36px;
   height: 36px;
-  border: 2.5px solid rgba(255, 255, 255, 0.08);
-  border-top-color: #5b8dee;
+  border: 2.5px solid var(--border-primary);
+  border-top-color: var(--accent-primary);
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
 }
 
 .loading-text {
   font-size: 13px;
-  color: #4a5060;
+  color: var(--text-secondary);
   font-weight: 500;
   letter-spacing: 0.3px;
 }
@@ -311,13 +311,15 @@ body.no-scroll {
 .crafted-footer {
   text-align: center;
   font-size: 11px;
-  color: #555b70;
-  margin-top: 10px;
+  color: var(--text-secondary);
+  padding: 12px 16px;
   letter-spacing: 0.3px;
   user-select: none;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-secondary);
 }
 .crafted-footer a {
-  color: #5b8dee;
+  color: var(--accent-primary);
   font-weight: 700;
   text-decoration: none;
   position: relative;
@@ -330,13 +332,12 @@ body.no-scroll {
   bottom: -1px;
   width: 0;
   height: 1.5px;
-  background: #5b8dee;
+  background: var(--accent-primary);
   border-radius: 1px;
   transition: width .3s ease;
 }
 .crafted-footer a:hover {
-  color: #7fadff;
-  text-shadow: 0 0 8px rgba(91,141,238,.45);
+  color: var(--accent-hover);
 }
 .crafted-footer a:hover::after {
   width: 100%;
@@ -1088,17 +1089,17 @@ body.no-scroll {
   gap: 2px;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
-  background: #000000;
+  background: var(--bg-primary);
 }
 
 .messages-container::-webkit-scrollbar { width: 6px; }
 .messages-container::-webkit-scrollbar-track { background: transparent; }
 .messages-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--text-secondary);
   border-radius: 4px;
 }
 .messages-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--text-tertiary);
 }
 
 .welcome-msg {
@@ -1108,26 +1109,13 @@ body.no-scroll {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  color: #7a7a8a;
+  color: var(--text-secondary);
   font-size: 15px;
   padding: 60px 32px;
   text-align: center;
-  background: radial-gradient(ellipse at center, rgba(91, 141, 238, 0.03) 0%, transparent 70%);
+  background: var(--bg-primary);
   position: relative;
   overflow: hidden;
-}
-
-.welcome-msg::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(91, 141, 238, 0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: pulse 4s ease-in-out infinite;
 }
 
 .welcome-msg strong {
@@ -1135,7 +1123,7 @@ body.no-scroll {
   z-index: 1;
   font-size: 22px;
   font-weight: 700;
-  color: #e8ecf4;
+  color: var(--text-primary);
   letter-spacing: -0.3px;
 }
 
@@ -1143,7 +1131,7 @@ body.no-scroll {
   position: relative;
   z-index: 1;
   margin: 0;
-  color: #9090a8;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
   max-width: 360px;
@@ -1475,14 +1463,14 @@ body.no-scroll {
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  color: #737373;
+  color: var(--text-secondary);
 }
 
 .dm-empty {
   padding: 40px 24px;
   text-align: center;
   font-size: 14px;
-  color: #737373;
+  color: var(--text-secondary);
   line-height: 1.6;
   white-space: pre-line;
 }
@@ -1613,11 +1601,11 @@ body.no-scroll {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  color: #737373;
+  color: var(--text-secondary);
   font-size: 14px;
   text-align: center;
   padding: 60px 32px;
-  background: #000000;
+  background: var(--bg-primary);
   position: relative;
   overflow: hidden;
 }
@@ -1632,11 +1620,11 @@ body.no-scroll {
   justify-content: center;
   background: transparent;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--border-primary);
 }
 
 .dm-welcome .welcome-icon svg {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .dm-welcome strong {
@@ -1644,7 +1632,7 @@ body.no-scroll {
   z-index: 1;
   font-size: 22px;
   font-weight: 300;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-top: 8px;
   letter-spacing: -0.3px;
 }
@@ -1653,7 +1641,7 @@ body.no-scroll {
   position: relative;
   z-index: 1;
   margin: 0;
-  color: #737373;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
   max-width: 350px;
