@@ -2388,12 +2388,17 @@ body.no-scroll {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
+  background: var(--bg-primary);
   z-index: 9999;
   display: flex;
   flex-direction: column;
   padding: 20px;
   animation: fadeUp 0.3s ease;
+}
+
+/* Dark theme specific overlay */
+:root[data-theme="dark"] .video-call-container {
+  background: rgba(0, 0, 0, 0.98);
 }
 
 .video-call-header {
@@ -2402,11 +2407,11 @@ body.no-scroll {
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .video-call-header h3 {
-  color: #e2e6ed;
+  color: var(--text-primary);
   font-size: 20px;
   font-weight: 600;
 }
@@ -2430,6 +2435,19 @@ body.no-scroll {
 .close-btn:hover {
   background: rgba(255, 59, 48, 0.25);
   border-color: #ff3b30;
+  transform: scale(1.05);
+}
+
+/* Light theme - brighter close button */
+:root[data-theme="light"] .close-btn {
+  background: #ff3b30;
+  border-color: #ff3b30;
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .close-btn:hover {
+  background: #e6342a;
+  border-color: #e6342a;
 }
 
 .call-error {
