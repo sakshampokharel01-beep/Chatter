@@ -2460,6 +2460,13 @@ body.no-scroll {
   font-size: 15px;
 }
 
+/* Light theme - brighter error message */
+:root[data-theme="light"] .call-error {
+  background: rgba(255, 59, 48, 0.1);
+  border-color: rgba(255, 59, 48, 0.4);
+  color: #dc3545;
+}
+
 .video-grid {
   flex: 1;
   display: grid;
@@ -2542,13 +2549,19 @@ body.no-scroll {
 
 .video-box {
   position: relative;
-  background: #1a1d26;
+  background: var(--bg-elevated);
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Dark theme - darker video boxes */
+:root[data-theme="dark"] .video-box {
+  background: #1a1d26;
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .video-element {
@@ -2567,6 +2580,12 @@ body.no-scroll {
   border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
+}
+
+/* Light theme - semi-transparent label */
+:root[data-theme="light"] .video-label {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
 }
 
 .remote-status-indicators {
@@ -2588,6 +2607,12 @@ body.no-scroll {
   backdrop-filter: blur(4px);
 }
 
+/* Light theme status indicators */
+:root[data-theme="light"] .status-indicator {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+}
+
 .status-indicator.muted-indicator {
   color: #ff3b30;
   border: 1px solid rgba(255, 59, 48, 0.3);
@@ -2599,7 +2624,7 @@ body.no-scroll {
 }
 
 .waiting-message {
-  color: #8a8f9e;
+  color: var(--text-secondary);
   font-size: 18px;
   text-align: center;
   padding: 20px;
@@ -2610,7 +2635,7 @@ body.no-scroll {
 }
 
 .waiting-message svg {
-  color: #5b8dee;
+  color: var(--accent-primary);
   opacity: 0.8;
 }
 
@@ -2640,7 +2665,7 @@ body.no-scroll {
   gap: 16px;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-primary);
   flex-wrap: wrap;
 }
 
