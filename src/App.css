@@ -791,41 +791,40 @@ body.no-scroll {
    CHAT ROOM
    ================================================================ */
 
-/* -- Header Tabs ------------------------------------------------- */
+/* -- Header Tabs - Instagram Style ------------------------------------------------- */
 .header-tabs {
   display: flex;
-  gap: 3px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 11px;
-  padding: 3px;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .tab-btn {
-  padding: 7px 18px;
+  padding: 8px 16px;
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #505870;
-  font-size: 13px;
+  color: #737373;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: background 0.15s ease, color 0.15s ease;
+  gap: 8px;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .tab-btn.active {
-  background: #5b8dee;
-  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .tab-btn:hover:not(.active):not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
-  color: #8898b0;
+  color: #ffffff;
 }
 
 .tab-btn:disabled {
@@ -837,19 +836,19 @@ body.no-scroll {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #111318;
+  background: #000000;
   animation: fadeUp 0.25s ease both;
 }
 
-/* -- Header ------------------------------------------------------ */
+/* -- Header - Instagram Style ------------------------------------------------------ */
 .chat-header {
   display: flex !important;
   align-items: center;
   justify-content: space-between;
-  padding: 13px 22px;
-  background: #1a1e27;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  padding: 16px 24px;
+  background: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none;
   flex-shrink: 0;
   z-index: 20;
   width: 100%;
@@ -859,30 +858,30 @@ body.no-scroll {
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .header-logo {
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1;
 }
 
 .header-title {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  color: #e8ecf4;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #ffffff;
 }
 
 .admin-badge {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: rgba(200, 150, 50, 0.12);
-  color: #c8a050;
-  padding: 3px 9px;
-  border-radius: 20px;
-  border: 1px solid rgba(200, 150, 50, 0.28);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
 }
 
 .msg-bubble-wrap {
@@ -1034,24 +1033,28 @@ body.no-scroll {
   border-color: rgba(200, 60, 60, 0.22);
 }
 
-/* -- Messages Container ------------------------------------------ */
+/* -- Messages Container - Instagram Style ------------------------------------------ */
 .messages-container {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 22px 18px 8px;
+  padding: 20px 20px 8px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
+  background: #000000;
 }
 
-.messages-container::-webkit-scrollbar { width: 4px; }
+.messages-container::-webkit-scrollbar { width: 6px; }
 .messages-container::-webkit-scrollbar-track { background: transparent; }
 .messages-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
+}
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .welcome-msg {
@@ -1253,27 +1256,27 @@ body.no-scroll {
 
 .message-row.hide-avatar .msg-avatar { visibility: hidden; }
 
-/* -- Input Area -------------------------------------------------- */
+/* -- Input Area - Instagram Style -------------------------------------------------- */
 .input-area {
   flex-shrink: 0;
-  padding: 12px 18px 16px;
-  background: #1a1e27;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px 20px 20px;
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .input-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #13161e;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 16px;
-  padding: 7px 7px 7px 16px;
+  gap: 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 22px;
+  padding: 10px 10px 10px 18px;
   transition: border-color 0.2s ease;
 }
 
 .input-wrapper:focus-within {
-  border-color: rgba(91, 141, 238, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .msg-input {
@@ -1281,7 +1284,7 @@ body.no-scroll {
   background: transparent;
   border: none;
   outline: none;
-  color: #e2e6ed;
+  color: #ffffff;
   font-size: 14px;
   font-family: inherit;
   resize: none;
@@ -1289,42 +1292,42 @@ body.no-scroll {
   max-height: 120px;
   overflow-y: auto;
 }
-.msg-input::placeholder { color: #2e3448; }
-.msg-input::-webkit-scrollbar { width: 3px; }
+.msg-input::placeholder { color: #737373; }
+.msg-input::-webkit-scrollbar { width: 4px; }
 .msg-input::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 
 .char-count {
   font-size: 11px;
-  color: #2e3448;
+  color: #737373;
   white-space: nowrap;
   flex-shrink: 0;
-  padding-right: 2px;
+  padding-right: 4px;
   transition: color 0.2s;
 }
-.char-count.warn   { color: #c89040; }
-.char-count.danger { color: #c84040; }
+.char-count.warn   { color: #ffaa00; }
+.char-count.danger { color: #ff3040; }
 
 .btn-send {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
-  border-radius: 11px;
-  background: #5b8dee;
+  border-radius: 50%;
+  background: #0095f6;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 .btn-send:hover:not(:disabled) {
-  background: #4a7dde;
-  transform: scale(1.06);
+  background: #1aa1f7;
+  transform: scale(1.05);
 }
-.btn-send:active:not(:disabled) { transform: scale(0.96); }
+.btn-send:active:not(:disabled) { transform: scale(0.95); }
 .btn-send:disabled {
   opacity: 0.3;
   cursor: not-allowed;
@@ -3105,7 +3108,7 @@ body.no-scroll {
   cursor: not-allowed;
 }
 
-/* User profile button in header */
+/* User profile button in header - Instagram Style */
 .user-profile-btn {
   display: flex;
   align-items: center;
@@ -3113,13 +3116,13 @@ body.no-scroll {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
   transition: all 0.2s;
 }
 
 .user-profile-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 @keyframes slideUp {
