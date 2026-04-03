@@ -147,45 +147,77 @@ export default function LandingPage({ onGetStarted }) {
 
       {/* Hero Section */}
       <section className="hero" id="hero">
+        <div className="hero-decoration"></div>
+        <div className="hero-decoration"></div>
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge animate-in">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              <span>Free Forever</span>
-            </div>
-            <h1 className="hero-title animate-in">
-              Connect with Friends<br />
-              <span className="gradient-text">Anywhere, Anytime</span>
-            </h1>
-            <p className="hero-subtitle animate-in">
-              Experience seamless messaging and HD video calls. Chat with friends, 
-              join global conversations, and stay connected with the people you love.
-            </p>
-            <div className="hero-buttons animate-in">
-              <button className="btn-primary-modern" onClick={onGetStarted}>
-                <span>Start Chatting Free</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
+            <div className="hero-text">
+              <div className="hero-badge animate-in">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
                 </svg>
-              </button>
-              <button className="btn-secondary-modern" onClick={() => scrollToSection('preview')}>
-                <span>See How It Works</span>
-              </button>
+                <span>Free Forever</span>
+              </div>
+              <h1 className="hero-title animate-in">
+                Connect with Friends<br />
+                <span className="gradient-text">Anywhere, Anytime</span>
+              </h1>
+              <p className="hero-subtitle animate-in">
+                Experience seamless messaging and HD video calls. Chat with friends, 
+                join global conversations, and stay connected with the people you love.
+              </p>
+              <div className="hero-buttons animate-in">
+                <button className="btn-primary-modern" onClick={onGetStarted}>
+                  <span>Start Chatting Free</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
+                <button className="btn-secondary-modern" onClick={() => scrollToSection('preview')}>
+                  <span>See How It Works</span>
+                </button>
+              </div>
+              <div className="hero-stats animate-in">
+                <div className="stat-mini">
+                  <div className="stat-mini-value">1000+</div>
+                  <div className="stat-mini-label">Active Users</div>
+                </div>
+                <div className="stat-mini">
+                  <div className="stat-mini-value">50K+</div>
+                  <div className="stat-mini-label">Messages Sent</div>
+                </div>
+                <div className="stat-mini">
+                  <div className="stat-mini-value">99.9%</div>
+                  <div className="stat-mini-label">Uptime</div>
+                </div>
+              </div>
             </div>
-            <div className="hero-stats animate-in">
-              <div className="stat-mini">
-                <div className="stat-mini-value">1000+</div>
-                <div className="stat-mini-label">Active Users</div>
-              </div>
-              <div className="stat-mini">
-                <div className="stat-mini-value">50K+</div>
-                <div className="stat-mini-label">Messages Sent</div>
-              </div>
-              <div className="stat-mini">
-                <div className="stat-mini-value">99.9%</div>
-                <div className="stat-mini-label">Uptime</div>
+            
+            <div className="hero-visual">
+              <div className="hero-image-container">
+                <div className="hero-image-placeholder">
+                  <div className="chat-bubble-demo">
+                    <div className="bubble-header">
+                      <div className="bubble-avatar">A</div>
+                      <div className="bubble-name">Alex</div>
+                    </div>
+                    <div className="bubble-text">Hey! Ready for our video call?</div>
+                  </div>
+                  <div className="chat-bubble-demo">
+                    <div className="bubble-header">
+                      <div className="bubble-avatar">S</div>
+                      <div className="bubble-name">Sarah</div>
+                    </div>
+                    <div className="bubble-text">Yes! Starting now...</div>
+                  </div>
+                  <div className="chat-bubble-demo">
+                    <div className="bubble-header">
+                      <div className="bubble-avatar">M</div>
+                      <div className="bubble-name">Mike</div>
+                    </div>
+                    <div className="bubble-text">Count me in!</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
