@@ -3069,13 +3069,13 @@ body.no-scroll {
   background: var(--bg-primary);
   border-color: var(--border-secondary);
   color: var(--text-primary);
-  transform: scale(1.05);
+  transform: rotate(90deg) scale(1.05);
 }
 
 .profile-close-btn svg {
-  width: 20px;
-  height: 20px;
-  stroke-width: 2;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
 }
 
 .profile-modal-content {
