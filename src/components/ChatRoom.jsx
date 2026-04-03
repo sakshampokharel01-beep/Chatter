@@ -13,6 +13,7 @@ import {
   setDoc,
   doc,
   updateDoc,
+  startAfter,
 } from 'firebase/firestore';
 import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '../firebase';
 import DirectMessages from './DirectMessages';
@@ -207,6 +208,8 @@ export default function ChatRoom({ user }) {
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
   const [loadingMsgs, setLoadingMsgs] = useState(true);
+  const [loadingOlderMsgs, setLoadingOlderMsgs] = useState(false); // Loading older messages
+  const [hasMoreMessages, setHasMoreMessages] = useState(true); // Whether there are more messages to load
   const [typingUsers, setTypingUsers] = useState(new Map()); // Map of userId -> userName
   const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
   const [editingText, setEditingText] = useState(''); // Track the edited text
@@ -221,6 +224,7 @@ export default function ChatRoom({ user }) {
   const containerRef = useRef(null);
   const lastSentRef = useRef(0);
   const typingTimeoutRef = useRef(null); // Ref for typing timeout
+  const oldestMessageRef = useRef(null); // Track oldest message for pagination
   
   // In-app notifications
   const { notifications, showNotification, hideNotification } = useInAppNotifications();
@@ -442,14 +446,28 @@ export default function ChatRoom({ user }) {
 
   /* ── Subscribe to Firestore messages ── */
   useEffect(() => {
+    setLoadingMsgs(true);
+    setHasMoreMessages(true);
+    oldestMessageRef.current = null;
+    
+    // Load only recent 50 messages initially
     const q = query(
       collection(db, 'messages'),
-      orderBy('createdAt', 'asc'),
-      limit(MESSAGES_LIMIT),
+      orderBy('createdAt', 'desc'),
+      limit(50),
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const msgs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).reverse();
+      
+      // Track oldest message for pagination
+      if (snapshot.docs.length > 0) {
+        oldestMessageRef.current = snapshot.docs[snapshot.docs.length - 1];
+      }
+      
+      // Check if there are more messages
+      setHasMoreMessages(snapshot.docs.length === 50);
+      
       setMessages(msgs);
       setLoadingMsgs(false);
     }, (err) => {
@@ -459,6 +477,51 @@ export default function ChatRoom({ user }) {
 
     return unsubscribe;
   }, []);
+  
+  /* ── Load older messages when scrolling up ── */
+  const loadOlderMessages = useCallback(async () => {
+    if (!oldestMessageRef.current || loadingOlderMsgs || !hasMoreMessages) return;
+    
+    setLoadingOlderMsgs(true);
+    
+    try {
+      const q = query(
+        collection(db, 'messages'),
+        orderBy('createdAt', 'desc'),
+        startAfter(oldestMessageRef.current),
+        limit(50)
+      );
+      
+      const snap = await getDocs(q);
+      const olderMsgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
+      
+      if (snap.docs.length > 0) {
+        oldestMessageRef.current = snap.docs[snap.docs.length - 1];
+        setMessages(prev => [...olderMsgs, ...prev]);
+      }
+      
+      setHasMoreMessages(snap.docs.length === 50);
+    } catch (err) {
+      console.error('Failed to load older messages:', err);
+    } finally {
+      setLoadingOlderMsgs(false);
+    }
+  }, [loadingOlderMsgs, hasMoreMessages]);
+  
+  /* ── Detect scroll to top and load older messages ── */
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const handleScroll = () => {
+      if (container.scrollTop < 100 && hasMoreMessages && !loadingOlderMsgs) {
+        loadOlderMessages();
+      }
+    };
+    
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [loadOlderMessages, hasMoreMessages, loadingOlderMsgs]);
 
   /* ── Auto-scroll to latest message ── */
   useEffect(() => {
@@ -760,27 +823,41 @@ export default function ChatRoom({ user }) {
                 <p>Be the first to say hello to the world.</p>
               </div>
             ) : (
-              messages.map((msg, idx) => {
-                const isOwn = msg.uid === user.uid;
-                const prev = messages[idx - 1];
-                const hideAvatar = !isOwn && prev?.uid === msg.uid;
-                return (
-                  <ChatMessage
-                    key={msg.id}
-                    message={msg}
-                    isOwn={isOwn}
-                    hideAvatar={hideAvatar}
-                    onDelete={adminUser || isOwn ? deleteMessage : null}
-                    onBlock={adminUser ? blockUser : null}
-                    onRemove={adminUser ? removeUser : null}
-                    onEdit={isOwn ? startEditMessage : null}
-                    onReply={startReply}
-                    messages={messages}
-                  />
-                );
-              })
+              <>
+                {/* Loading indicator for older messages */}
+                {loadingOlderMsgs && (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0' }}>
+                    <div className="loader" style={{ width: '20px', height: '20px' }} />
+                  </div>
+                )}
+                {/* Show "No more messages" if reached the beginning */}
+                {!hasMoreMessages && messages.length > 0 && (
+                  <div style={{ textAlign: 'center', padding: '12px 0', fontSize: '12px', color: '#8b8ba7' }}>
+                    Beginning of conversation
+                  </div>
+                )}
+                {messages.map((msg, idx) => {
+                  const isOwn = msg.uid === user.uid;
+                  const prev = messages[idx - 1];
+                  const hideAvatar = !isOwn && prev?.uid === msg.uid;
+                  return (
+                    <ChatMessage
+                      key={msg.id}
+                      message={msg}
+                      isOwn={isOwn}
+                      hideAvatar={hideAvatar}
+                      onDelete={adminUser || isOwn ? deleteMessage : null}
+                      onBlock={adminUser ? blockUser : null}
+                      onRemove={adminUser ? removeUser : null}
+                      onEdit={isOwn ? startEditMessage : null}
+                      onReply={startReply}
+                      messages={messages}
+                    />
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </>
             )}
-            <div ref={messagesEndRef} />
             
             {/* Typing indicators for global chat */}
             {typingUsers.size > 0 && (

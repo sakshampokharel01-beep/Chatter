@@ -13,6 +13,7 @@ import {
   deleteDoc,
   where,
   getDocs,
+  startAfter,
 } from 'firebase/firestore';
 import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
 import { formatLastSeen, isUserActuallyOnline } from '../utils/formatLastSeen';
@@ -205,6 +206,8 @@ export default function DirectMessages({ user, showNotification }) {
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState(false);
+  const [loadingOlderMsgs, setLoadingOlderMsgs] = useState(false); // Loading older messages
+  const [hasMoreMessages, setHasMoreMessages] = useState(true); // Whether there are more messages to load
   const [search, setSearch] = useState('');
   const [mobileView, setMobileView] = useState('list'); // 'list' | 'chat'
   const [activeTab, setActiveTab] = useState('friends'); // 'friends' | 'all' | 'requests'
@@ -218,9 +221,11 @@ export default function DirectMessages({ user, showNotification }) {
   const [replyingTo, setReplyingTo] = useState(null); // Track which message is being replied to
 
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null); // Ref for scroll detection
   const inputRef = useRef(null);
   const lastSentRef = useRef(0);
   const typingTimeoutRef = useRef(null); // Ref for typing timeout
+  const oldestMessageRef = useRef(null); // Track oldest message for pagination
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
 
@@ -358,17 +363,29 @@ export default function DirectMessages({ user, showNotification }) {
   useEffect(() => {
     if (!selectedUser) return;
     setLoadingMsg(true);
+    setHasMoreMessages(true);
+    oldestMessageRef.current = null;
+    
     const dmId = getDMId(user.uid, selectedUser.id);
+    // Load only recent 30 messages initially
     const q = query(
       collection(db, 'dms', dmId, 'messages'),
-      orderBy('createdAt', 'asc'),
-      limit(DM_LIMIT),
+      orderBy('createdAt', 'desc'),
+      limit(30),
     );
     
     let isFirstLoad = true;
     
     return onSnapshot(q, async (snap) => {
-      const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
+      
+      // Track oldest message for pagination
+      if (snap.docs.length > 0) {
+        oldestMessageRef.current = snap.docs[snap.docs.length - 1];
+      }
+      
+      // Check if there are more messages
+      setHasMoreMessages(snap.docs.length === 30);
       
       // Show notification for new messages (skip first load)
       if (!isFirstLoad && showNotification) {
@@ -441,6 +458,52 @@ export default function DirectMessages({ user, showNotification }) {
       setLoadingMsg(false);
     });
   }, [selectedUser, user.uid]);
+  
+  /* ── Load older messages when scrolling up ── */
+  const loadOlderMessages = useCallback(async () => {
+    if (!selectedUser || !oldestMessageRef.current || loadingOlderMsgs || !hasMoreMessages) return;
+    
+    setLoadingOlderMsgs(true);
+    const dmId = getDMId(user.uid, selectedUser.id);
+    
+    try {
+      const q = query(
+        collection(db, 'dms', dmId, 'messages'),
+        orderBy('createdAt', 'desc'),
+        startAfter(oldestMessageRef.current),
+        limit(30)
+      );
+      
+      const snap = await getDocs(q);
+      const olderMsgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
+      
+      if (snap.docs.length > 0) {
+        oldestMessageRef.current = snap.docs[snap.docs.length - 1];
+        setMessages(prev => [...olderMsgs, ...prev]);
+      }
+      
+      setHasMoreMessages(snap.docs.length === 30);
+    } catch (err) {
+      console.error('Failed to load older messages:', err);
+    } finally {
+      setLoadingOlderMsgs(false);
+    }
+  }, [selectedUser, user.uid, loadingOlderMsgs, hasMoreMessages]);
+  
+  /* ── Detect scroll to top and load older messages ── */
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    
+    const handleScroll = () => {
+      if (container.scrollTop < 100 && hasMoreMessages && !loadingOlderMsgs) {
+        loadOlderMessages();
+      }
+    };
+    
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [loadOlderMessages, hasMoreMessages, loadingOlderMsgs]);
   
   /* ── Mark messages as seen when window becomes visible ── */
   useEffect(() => {
@@ -1106,7 +1169,7 @@ export default function DirectMessages({ user, showNotification }) {
               </div>
             </div>
 
-            <div className="messages-container">
+            <div className="messages-container" ref={messagesContainerRef}>
               {loadingMsg ? (
                 <div className="welcome-msg"><div className="loader" /></div>
               ) : messages.length === 0 ? (
@@ -1121,26 +1184,40 @@ export default function DirectMessages({ user, showNotification }) {
                   <p>Say hello to {selectedUser.displayName}!</p>
                 </div>
               ) : (
-                messages.map((msg, idx) => {
-                  const isOwn = msg.uid === user.uid;
-                  const prev = messages[idx - 1];
-                  const hideAvatar = !isOwn && prev?.uid === msg.uid;
-                  return (
-                    <DmMessage 
-                      key={msg.id} 
-                      message={msg} 
-                      isOwn={isOwn} 
-                      hideAvatar={hideAvatar}
-                      friendId={selectedUser.id}
-                      onEdit={isOwn ? startEditDM : null}
-                      onDelete={isOwn ? deleteDM : null}
-                      onReply={startReplyDM}
-                      messages={messages}
-                    />
-                  );
-                })
+                <>
+                  {/* Loading indicator for older messages */}
+                  {loadingOlderMsgs && (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0' }}>
+                      <div className="loader" style={{ width: '20px', height: '20px' }} />
+                    </div>
+                  )}
+                  {/* Show "No more messages" if reached the beginning */}
+                  {!hasMoreMessages && messages.length > 0 && (
+                    <div style={{ textAlign: 'center', padding: '12px 0', fontSize: '12px', color: '#8b8ba7' }}>
+                      Beginning of conversation
+                    </div>
+                  )}
+                  {messages.map((msg, idx) => {
+                    const isOwn = msg.uid === user.uid;
+                    const prev = messages[idx - 1];
+                    const hideAvatar = !isOwn && prev?.uid === msg.uid;
+                    return (
+                      <DmMessage 
+                        key={msg.id} 
+                        message={msg} 
+                        isOwn={isOwn} 
+                        hideAvatar={hideAvatar}
+                        friendId={selectedUser.id}
+                        onEdit={isOwn ? startEditDM : null}
+                        onDelete={isOwn ? deleteDM : null}
+                        onReply={startReplyDM}
+                        messages={messages}
+                      />
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
+                </>
               )}
-              <div ref={messagesEndRef} />
               
               {/* Typing indicator */}
               {friendTyping && (
