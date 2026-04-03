@@ -692,9 +692,9 @@ export default function ChatRoom({ user }) {
               title={isGuest ? 'Sign in with Google to use Direct Messages' : 'Direct Messages'}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
               </svg>
-              <span>DMs</span>
+              <span>Private Messages</span>
               {isGuest && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginLeft:'4px'}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>}
             </button>
             {adminUser && (
