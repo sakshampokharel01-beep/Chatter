@@ -2956,7 +2956,8 @@ body.no-scroll {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2968,80 +2969,86 @@ body.no-scroll {
 .profile-modal {
   background: var(--bg-elevated);
   border: 1px solid var(--border-primary);
-  border-radius: 16px;
+  border-radius: 24px;
   width: 100%;
-  max-width: 500px;
+  max-width: 540px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 .profile-modal-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 24px;
+  padding: 28px 24px 24px;
   border-bottom: 1px solid var(--border-primary);
   position: relative;
 }
 
 .profile-modal-header h2 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .profile-close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
+  top: 20px;
+  right: 20px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
   cursor: pointer;
-  padding: 8px;
+  padding: 0;
   border-radius: 50%;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   z-index: 10;
 }
 
 .profile-close-btn:hover {
-  background: var(--bg-hover);
+  background: var(--bg-primary);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+  transform: scale(1.05);
 }
 
 .profile-close-btn svg {
-  width: 24px;
-  height: 24px;
-  stroke-width: 1.5;
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
 }
 
 .profile-modal-content {
-  padding: 24px;
+  padding: 32px 28px;
 }
 
 .profile-picture-section {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .profile-picture-preview {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid rgba(91, 141, 238, 0.3);
-  background: linear-gradient(135deg, #5b8dee 0%, #7b6ef6 100%);
+  border: 4px solid var(--border-primary);
+  background: linear-gradient(135deg, #0095f6 0%, #667eea 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 149, 246, 0.2);
 }
 
 .profile-picture-preview img {
