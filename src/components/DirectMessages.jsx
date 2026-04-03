@@ -1058,12 +1058,19 @@ export default function DirectMessages({ user, showNotification }) {
         )}
 
         <div className="dm-users-list">
-          {/* Loading state */}
+          {/* Skeleton Loading state */}
           {(loadingUsers || loadingFriends) && (
-            <div className="dm-loading">
-              <div className="loader" style={{ width: '24px', height: '24px' }} />
-              <span style={{ marginTop: '8px', fontSize: '13px', color: '#8b8ba7' }}>Loading...</span>
-            </div>
+            <>
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="dm-user-skeleton">
+                  <div className="skeleton-avatar"></div>
+                  <div className="skeleton-content">
+                    <div className="skeleton-name"></div>
+                    <div className="skeleton-status"></div>
+                  </div>
+                </div>
+              ))}
+            </>
           )}
           
           {/* Friends Tab */}
