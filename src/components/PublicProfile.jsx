@@ -94,7 +94,7 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
   if (loading) {
     return (
       <div className="modal-overlay" onClick={onClose}>
-        <div className="public-profile-modal" onClick={e => e.stopPropagation()}>
+        <div className="public-profile-modal-large" onClick={e => e.stopPropagation()}>
           <div className="profile-loading">
             <div className="loader" />
           </div>
@@ -106,7 +106,7 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
   if (!profileData) {
     return (
       <div className="modal-overlay" onClick={onClose}>
-        <div className="public-profile-modal" onClick={e => e.stopPropagation()}>
+        <div className="public-profile-modal-large" onClick={e => e.stopPropagation()}>
           <div className="profile-error">User not found</div>
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="public-profile-modal" onClick={e => e.stopPropagation()}>
+      <div className="public-profile-modal-large" onClick={e => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose} aria-label="Close">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -123,111 +123,96 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
           </svg>
         </button>
 
-        <div className="public-profile-content">
-          {/* Profile Header */}
-          <div className="public-profile-header">
-            <div className="public-profile-avatar-large">
-              {profileData.photoURL ? (
-                <img src={profileData.photoURL} alt={profileData.displayName} />
-              ) : (
-                <div className="avatar-placeholder-large">
-                  {(profileData.displayName || '?').charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-
-            <div className="public-profile-info">
-              <h2 className="public-profile-name">{profileData.displayName}</h2>
-              {profileData.email && (
-                <p className="public-profile-email">{profileData.email}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="public-profile-stats">
-            <div className="profile-stat">
-              <span className="stat-value">{friendCount}</span>
-              <span className="stat-label">Friends</span>
-            </div>
-            {mutualFriends.length > 0 && (
-              <div className="profile-stat">
-                <span className="stat-value">{mutualFriends.length}</span>
-                <span className="stat-label">Mutual</span>
+        <div className="public-profile-content-large">
+          {/* Top Section */}
+          <div className="profile-top-section">
+            <div className="profile-avatar-container">
+              <div className="public-profile-avatar-xl">
+                {profileData.photoURL ? (
+                  <img src={profileData.photoURL} alt={profileData.displayName} />
+                ) : (
+                  <div className="avatar-placeholder-xl">
+                    {(profileData.displayName || '?').charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
+            <div className="profile-info-section">
+              <div className="profile-header-row">
+                <h1 className="profile-username">{profileData.displayName}</h1>
+                <div className="profile-action-buttons">
+                  {isFriend ? (
+                    <>
+                      <button className="profile-btn-primary" onClick={() => onSendMessage(profileData)}>
+                        Message
+                      </button>
+                      <button className="profile-btn-secondary" onClick={() => onRemoveFriend(profileData)}>
+                        Unfriend
+                      </button>
+                    </>
+                  ) : hasPendingRequest ? (
+                    <button className="profile-btn-disabled" disabled>
+                      Requested
+                    </button>
+                  ) : (
+                    <button className="profile-btn-primary" onClick={() => onAddFriend(profileData)}>
+                      Add Friend
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="profile-stats-row">
+                <div className="profile-stat-item">
+                  <span className="stat-number">{friendCount}</span>
+                  <span className="stat-text">friends</span>
+                </div>
+                {mutualFriends.length > 0 && (
+                  <div className="profile-stat-item">
+                    <span className="stat-number">{mutualFriends.length}</span>
+                    <span className="stat-text">mutual</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="profile-details">
+                <div className="profile-fullname">{profileData.displayName}</div>
+                {profileData.bio && (
+                  <div className="profile-bio-text">{profileData.bio}</div>
+                )}
+                {profileData.email && (
+                  <div className="profile-email-text">{profileData.email}</div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Bio */}
-          {profileData.bio && (
-            <div className="public-profile-bio">
-              <h3>Bio</h3>
-              <p>{profileData.bio}</p>
-            </div>
-          )}
-
-          {/* Mutual Friends */}
+          {/* Mutual Friends Section */}
           {mutualFriends.length > 0 && (
-            <div className="public-profile-mutual">
-              <h3>Mutual Friends</h3>
-              <div className="mutual-friends-list">
+            <div className="profile-mutual-section">
+              <div className="mutual-header">
+                <h2>Mutual Friends</h2>
+                <span className="mutual-count">{mutualFriends.length}</span>
+              </div>
+              <div className="mutual-grid">
                 {mutualFriends.map(friend => (
-                  <div key={friend.id} className="mutual-friend-item">
-                    <div className="mutual-friend-avatar">
+                  <div key={friend.id} className="mutual-card">
+                    <div className="mutual-avatar">
                       {friend.photoURL ? (
                         <img src={friend.photoURL} alt={friend.displayName} />
                       ) : (
-                        <div className="avatar-placeholder-small">
+                        <div className="avatar-placeholder-mutual">
                           {(friend.displayName || '?').charAt(0).toUpperCase()}
                         </div>
                       )}
                     </div>
-                    <span className="mutual-friend-name">{friend.displayName}</span>
+                    <div className="mutual-name">{friend.displayName}</div>
                   </div>
                 ))}
               </div>
             </div>
           )}
-
-          {/* Action Buttons */}
-          <div className="public-profile-actions">
-            {isFriend ? (
-              <>
-                <button className="profile-action-btn primary" onClick={() => onSendMessage(profileData)}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
-                  Message
-                </button>
-                <button className="profile-action-btn secondary" onClick={() => onRemoveFriend(profileData)}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="8.5" cy="7" r="4"/>
-                    <line x1="23" y1="11" x2="17" y2="11"/>
-                  </svg>
-                  Unfriend
-                </button>
-              </>
-            ) : hasPendingRequest ? (
-              <button className="profile-action-btn disabled" disabled>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                Request Sent
-              </button>
-            ) : (
-              <button className="profile-action-btn primary" onClick={() => onAddFriend(profileData)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="8.5" cy="7" r="4"/>
-                  <line x1="20" y1="8" x2="20" y2="14"/>
-                  <line x1="23" y1="11" x2="17" y2="11"/>
-                </svg>
-                Add Friend
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </div>
