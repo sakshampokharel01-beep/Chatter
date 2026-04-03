@@ -30,11 +30,11 @@
   --bg-secondary: #fafafa;
   --bg-surface: #ffffff;
   --bg-elevated: #ffffff;
-  --bg-input: #fafafa;
+  --bg-input: #efefef;
   --bg-hover: rgba(0, 0, 0, 0.05);
   
-  --border-primary: rgba(0, 0, 0, 0.1);
-  --border-secondary: rgba(0, 0, 0, 0.05);
+  --border-primary: rgba(0, 0, 0, 0.15);
+  --border-secondary: rgba(0, 0, 0, 0.08);
   
   --text-primary: #000000;
   --text-secondary: #737373;
@@ -3830,10 +3830,10 @@ input:checked + .toggle-slider:before {
   top: calc(100% + 8px);
   right: 0;
   min-width: 280px;
-  background: linear-gradient(135deg, #1e1e2e 0%, #252538 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   animation: dropdownSlideIn 0.2s ease;
   overflow: hidden;
@@ -3855,7 +3855,8 @@ input:checked + .toggle-slider:before {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-secondary);
 }
 
 .user-dropdown-avatar {
@@ -3878,7 +3879,7 @@ input:checked + .toggle-slider:before {
 .user-dropdown-name {
   font-size: 15px;
   font-weight: 600;
-  color: #e8e8f0;
+  color: var(--text-primary);
   margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3887,7 +3888,7 @@ input:checked + .toggle-slider:before {
 
 .user-dropdown-email {
   font-size: 12px;
-  color: #7a7a8a;
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3895,7 +3896,7 @@ input:checked + .toggle-slider:before {
 
 .user-dropdown-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border-secondary);
   margin: 4px 0;
 }
 
@@ -3907,44 +3908,44 @@ input:checked + .toggle-slider:before {
   padding: 12px 16px;
   background: transparent;
   border: none;
-  color: #b8b8c8;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
 .user-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #e8e8f0;
+  background: var(--bg-hover);
 }
 
 .user-dropdown-item svg {
   flex-shrink: 0;
-  color: #7a7a8a;
+  color: var(--text-secondary);
   transition: color 0.2s;
 }
 
 .user-dropdown-item:hover svg {
-  color: #5b8dee;
+  color: var(--accent-primary);
 }
 
 .user-dropdown-item.logout {
-  color: #e05c6a;
+  color: var(--accent-red);
 }
 
 .user-dropdown-item.logout:hover {
   background: rgba(224, 92, 106, 0.1);
-  color: #e05c6a;
+  color: var(--accent-red);
 }
 
 .user-dropdown-item.logout svg {
-  color: #e05c6a;
+  color: var(--accent-red);
 }
 
 .user-dropdown-item.logout:hover svg {
-  color: #e05c6a;
+  color: var(--accent-red);
 }
 
 /* Mobile responsive */

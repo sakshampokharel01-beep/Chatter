@@ -218,6 +218,17 @@ export default function ChatRoom({ user }) {
   const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
   const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
   const [showUserMenu, setShowUserMenu] = useState(false); // Track user dropdown menu visibility
+  const [theme, setTheme] = useState(() => {
+    // Initialize theme from localStorage or default to 'dark'
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'dark';
+  });
+
+  // Apply theme on mount and when it changes
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -787,12 +798,11 @@ export default function ChatRoom({ user }) {
                 <button
                   className="user-dropdown-item theme-toggle-item"
                   onClick={() => {
-                    const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', newTheme);
-                    localStorage.setItem('theme', newTheme);
+                    const newTheme = theme === 'dark' ? 'light' : 'dark';
+                    setTheme(newTheme);
                   }}
                 >
-                  {document.documentElement.getAttribute('data-theme') === 'dark' ? (
+                  {theme === 'dark' ? (
                     <>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="12" cy="12" r="5"/>
