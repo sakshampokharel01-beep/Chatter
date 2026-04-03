@@ -2302,8 +2302,8 @@ body.no-scroll {
 .audio-call-btn,
 .video-call-btn {
   background: transparent;
-  border: none;
-  color: #ffffff;
+  border: 1.5px solid var(--border-primary);
+  color: var(--text-primary);
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
@@ -2318,7 +2318,10 @@ body.no-scroll {
 
 .audio-call-btn:hover,
 .video-call-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: scale(1.05);
 }
 
 .video-call-container {
