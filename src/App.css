@@ -386,7 +386,7 @@ body.no-scroll {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: #111318;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   position: relative;
   overflow: hidden;
 }
@@ -396,7 +396,7 @@ body.no-scroll {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(91, 141, 238, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 149, 246, 0.05) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: radial-gradient(ellipse 50% 60% at 50% 40%, black 20%, transparent 70%);
   -webkit-mask-image: radial-gradient(ellipse 50% 60% at 50% 40%, black 20%, transparent 70%);
@@ -408,42 +408,42 @@ body.no-scroll {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(60px);
-  opacity: 0.35;
+  filter: blur(80px);
+  opacity: 0.15;
 }
 .auth-orb--1 {
-  width: 220px; height: 220px;
-  background: #2a4a88;
-  top: -60px; right: -40px;
+  width: 300px; height: 300px;
+  background: #0095f6;
+  top: -100px; right: -80px;
   animation: drift 12s ease-in-out infinite;
 }
 .auth-orb--2 {
-  width: 180px; height: 180px;
-  background: #3a5888;
-  bottom: -50px; left: -30px;
+  width: 250px; height: 250px;
+  background: #667eea;
+  bottom: -80px; left: -60px;
   animation: drift 15s ease-in-out infinite reverse;
 }
 .auth-orb--3 {
-  width: 100px; height: 100px;
-  background: #5b8dee;
+  width: 150px; height: 150px;
+  background: #0095f6;
   top: 40%; left: 10%;
   animation: drift 10s ease-in-out infinite 2s;
-  opacity: 0.2;
+  opacity: 0.1;
 }
 
 .auth-card {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 410px;
-  background: rgba(26, 30, 39, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 20px;
   padding: 48px 40px 40px;
   text-align: center;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
   animation: fadeUp 0.4s ease both;
 }
 
@@ -468,7 +468,7 @@ body.no-scroll {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  border: 2px solid rgba(91, 141, 238, 0.2);
+  border: 2px solid rgba(0, 149, 246, 0.2);
   animation: pulse-ring 2.5s ease-out infinite;
 }
 
@@ -478,29 +478,29 @@ body.no-scroll {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #5b8dee;
-  opacity: 0.5;
+  background: #0095f6;
+  opacity: 0.6;
 }
 .auth-logo-dot--1 {
   animation: orbit 6s linear infinite;
 }
 .auth-logo-dot--2 {
   animation: orbit 8s linear infinite reverse;
-  background: #80a0d0;
+  background: #667eea;
   width: 4px; height: 4px;
-  opacity: 0.35;
+  opacity: 0.5;
 }
 
 .auth-title {
   font-size: 34px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: #e8ecf4;
+  color: #1a1a1a;
   margin-bottom: 8px;
 }
 
 .auth-subtitle {
-  color: #606878;
+  color: #6b7280;
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 32px;
@@ -570,24 +570,24 @@ body.no-scroll {
 .btn-google:active:not(:disabled) { transform: translateY(0); }
 
 .btn-guest {
-  background: transparent;
-  color: #8898b0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: white;
+  color: #6b7280;
+  border: 1.5px solid #d1d5db;
 }
 .btn-guest:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.18);
-  color: #aab8cc;
+  background: #f8f9fa;
+  border-color: #9ca3af;
+  color: #1a1a1a;
   transform: translateY(-1px);
 }
 
 .btn-phone {
-  background: rgba(80, 160, 120, 0.1);
-  color: #80c8a0;
-  border: 1px solid rgba(80, 160, 120, 0.25);
+  background: rgba(0, 149, 246, 0.1);
+  color: #0095f6;
+  border: 1.5px solid rgba(0, 149, 246, 0.3);
 }
 .btn-phone:hover:not(:disabled) {
-  background: rgba(80, 160, 120, 0.16);
+  background: rgba(0, 149, 246, 0.15);
   transform: translateY(-1px);
 }
 
@@ -609,7 +609,7 @@ body.no-scroll {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #2e3240;
+  color: #9ca3af;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -620,12 +620,12 @@ body.no-scroll {
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
+  background: #e5e7eb;
 }
 
 .auth-disclaimer {
   font-size: 12px;
-  color: #383e50;
+  color: #9ca3af;
   margin-top: 22px;
   line-height: 1.5;
 }
@@ -648,7 +648,7 @@ body.no-scroll {
 .email-label {
   font-size: 11.5px;
   font-weight: 600;
-  color: #606878;
+  color: #6b7280;
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
@@ -656,10 +656,10 @@ body.no-scroll {
 .email-input {
   width: 100%;
   padding: 11px 13px;
-  background: #13161e;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: #f8f9fa;
+  border: 1.5px solid #e5e7eb;
   border-radius: 10px;
-  color: #e2e6ed;
+  color: #1a1a1a;
   font-size: 14px;
   font-family: inherit;
   outline: none;
@@ -667,11 +667,11 @@ body.no-scroll {
 }
 
 .email-input:focus {
-  border-color: rgba(91, 141, 238, 0.5);
-  box-shadow: 0 0 0 3px rgba(91, 141, 238, 0.08);
+  border-color: #0095f6;
+  box-shadow: 0 0 0 3px rgba(0, 149, 246, 0.1);
 }
 
-.email-input::placeholder { color: #30364a; }
+.email-input::placeholder { color: #9ca3af; }
 
 .email-pass-wrap {
   position: relative;
@@ -688,19 +688,19 @@ body.no-scroll {
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #4a5060;
+  color: #6b7280;
   display: flex;
   align-items: center;
   padding: 4px;
   border-radius: 6px;
   transition: color 0.15s ease;
 }
-.pass-toggle:hover { color: #8898b0; }
+.pass-toggle:hover { color: #1a1a1a; }
 
 .btn-email-submit {
   width: 100%;
   padding: 12px;
-  background: #5b8dee;
+  background: #0095f6;
   color: #fff;
   border: none;
   border-radius: 11px;
@@ -717,7 +717,7 @@ body.no-scroll {
   margin-top: 4px;
 }
 .btn-email-submit:hover:not(:disabled) {
-  background: #4a7dde;
+  background: #0081d9;
   transform: translateY(-1px);
 }
 .btn-email-submit:active:not(:disabled) { transform: translateY(0); }
@@ -726,8 +726,8 @@ body.no-scroll {
 /* -- Auth tabs --------------------------------------------------- */
 .auth-tabs {
   display: flex;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #f8f9fa;
+  border: 1.5px solid #e5e7eb;
   border-radius: 11px;
   padding: 3px;
   margin-bottom: 20px;
@@ -740,7 +740,7 @@ body.no-scroll {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #505870;
+  color: #6b7280;
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
@@ -748,6 +748,12 @@ body.no-scroll {
   transition: background 0.15s ease, color 0.15s ease;
 }
 .auth-tab:disabled { cursor: not-allowed; opacity: 0.45; }
+
+.auth-tab.active {
+  background: white;
+  color: #0095f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
 .auth-tab.active {
   background: #5b8dee;
   color: #fff;
