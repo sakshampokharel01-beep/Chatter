@@ -226,6 +226,50 @@ export default function AuthScreen({ onBack }) {
       <div className="auth-orb auth-orb--2" />
       <div className="auth-orb auth-orb--3" />
 
+      {/* Left side phone mockup */}
+      <div className="auth-phone-mockup auth-phone-left">
+        <div className="phone-frame">
+          <img 
+            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=800&fit=crop&crop=faces" 
+            alt="Person using chat app"
+            className="phone-image"
+          />
+          <div className="phone-overlay">
+            <div className="phone-chat-bubble">
+              <div className="bubble-avatar">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=faces" alt="" />
+              </div>
+              <div className="bubble-content">
+                <div className="bubble-name">Sarah</div>
+                <div className="bubble-text">Hey! How are you?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side phone mockup */}
+      <div className="auth-phone-mockup auth-phone-right">
+        <div className="phone-frame">
+          <img 
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=800&fit=crop&crop=faces" 
+            alt="Person using chat app"
+            className="phone-image"
+          />
+          <div className="phone-overlay">
+            <div className="phone-chat-bubble">
+              <div className="bubble-avatar">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=faces" alt="" />
+              </div>
+              <div className="bubble-content">
+                <div className="bubble-name">Mike</div>
+                <div className="bubble-text">Let's video call!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="auth-card">
         {onBack && (
           <button className="back-to-landing" onClick={onBack} aria-label="Back to home">
