@@ -348,7 +348,7 @@ export default function DirectMessages({ user, showNotification }) {
   useEffect(() => {
     if (!selectedUser) return;
     setLoadingMsg(true);
-    const dmId = getDMId(user.uid, selectedUser.uid);
+    const dmId = getDMId(user.uid, selectedUser.id);
     const q = query(
       collection(db, 'dms', dmId, 'messages'),
       orderBy('createdAt', 'asc'),
@@ -791,7 +791,7 @@ export default function DirectMessages({ user, showNotification }) {
       }
       
       await addDoc(
-        collection(db, 'dms', getDMId(user.uid, selectedUser.uid), 'messages'),
+        collection(db, 'dms', getDMId(user.uid, selectedUser.id), 'messages'),
         messageData
       );
       
