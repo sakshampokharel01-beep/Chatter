@@ -121,7 +121,7 @@ body.no-scroll {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #111318;
+  background: var(--bg-primary);
 }
 
 .admin-panel-header {
@@ -129,7 +129,7 @@ body.no-scroll {
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  border-bottom: 1px solid #1e2330;
+  border-bottom: 1px solid var(--border-primary);
   flex-shrink: 0;
   flex-wrap: wrap;
 }
@@ -143,7 +143,7 @@ body.no-scroll {
 .admin-stat {
   font-size: 15px;
   font-weight: 600;
-  color: #c8cfe0;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -152,15 +152,15 @@ body.no-scroll {
 .admin-panel-title {
   font-size: 15px;
   font-weight: 600;
-  color: #c8cfe0;
+  color: var(--text-primary);
   margin: 0;
   display: flex;
   align-items: center;
   white-space: nowrap;
 }
 .admin-count {
-  background: #1e2330;
-  color: #5b8dee;
+  background: var(--bg-elevated);
+  color: var(--accent-primary);
   font-size: 11px;
   font-weight: 700;
   padding: 2px 7px;
@@ -170,23 +170,23 @@ body.no-scroll {
 .admin-search {
   flex: 1;
   min-width: 180px;
-  background: #1a1e27;
-  border: 1px solid #2a3040;
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
-  color: #c8cfe0;
+  color: var(--text-primary);
   font-size: 13px;
   padding: 7px 12px;
   outline: none;
   transition: border-color .2s;
 }
-.admin-search:focus { border-color: #5b8dee; }
-.admin-search::placeholder { color: #3a4055; }
+.admin-search:focus { border-color: var(--accent-primary); }
+.admin-search::placeholder { color: var(--text-secondary); opacity: 0.5; }
 .admin-loading, .admin-empty {
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 1;
-  color: #3a4055;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 .admin-user-list {
@@ -202,7 +202,7 @@ body.no-scroll {
   border-radius: 10px;
   transition: background .15s;
 }
-.admin-user-row:hover { background: #1a1e27; }
+.admin-user-row:hover { background: var(--bg-hover); }
 .admin-user-removed { opacity: .45; }
 .admin-user-avatar img,
 .admin-avatar-placeholder {
@@ -213,8 +213,8 @@ body.no-scroll {
   flex-shrink: 0;
 }
 .admin-avatar-placeholder {
-  background: #2a3040;
-  color: #5b8dee;
+  background: var(--bg-elevated);
+  color: var(--accent-primary);
   font-weight: 700;
   font-size: 14px;
   display: flex;
@@ -231,7 +231,7 @@ body.no-scroll {
 .admin-user-name {
   font-size: 13px;
   font-weight: 600;
-  color: #c8cfe0;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -239,22 +239,22 @@ body.no-scroll {
 }
 .admin-user-uid {
   font-size: 10px;
-  color: #3a4055;
+  color: var(--text-secondary);
   font-family: monospace;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .admin-tag {
-  background: #1e3a6e;
-  color: #5b8dee;
+  background: rgba(91, 141, 238, 0.15);
+  color: var(--accent-primary);
   font-size: 10px;
   font-weight: 700;
   padding: 1px 6px;
   border-radius: 4px;
 }
 .blocked-tag {
-  background: #3a1a1a;
+  background: rgba(224, 92, 106, 0.15);
   color: #e05c6a;
   font-size: 10px;
   font-weight: 700;
@@ -262,7 +262,7 @@ body.no-scroll {
   border-radius: 4px;
 }
 .removed-tag {
-  background: #2a1a1a;
+  background: rgba(128, 64, 64, 0.15);
   color: #804040;
   font-size: 10px;
   font-weight: 700;
@@ -287,25 +287,34 @@ body.no-scroll {
   transition: background .15s, color .15s;
 }
 .admin-action-btn.promote {
-  background: #1e2a3a;
-  color: #5b8dee;
+  background: rgba(91, 141, 238, 0.15);
+  color: var(--accent-primary);
 }
-.admin-action-btn.promote:hover { background: #1e3050; }
+.admin-action-btn.promote:hover { 
+  background: rgba(91, 141, 238, 0.25);
+}
 .admin-action-btn.block {
-  background: #2a1e1e;
+  background: rgba(224, 92, 106, 0.15);
   color: #e05c6a;
 }
-.admin-action-btn.block:hover { background: #3a1e1e; }
+.admin-action-btn.block:hover { 
+  background: rgba(224, 92, 106, 0.25);
+}
 .admin-action-btn.unblock {
-  background: #1a2a1e;
+  background: rgba(76, 175, 125, 0.15);
   color: #4caf7d;
 }
-.admin-action-btn.unblock:hover { background: #1e3a28; }
+.admin-action-btn.unblock:hover { 
+  background: rgba(76, 175, 125, 0.25);
+}
 .admin-action-btn.remove {
-  background: #1e1a1a;
+  background: rgba(128, 64, 64, 0.15);
   color: #804040;
 }
-.admin-action-btn.remove:hover { background: #2a1a1a; color: #e05c6a; }
+.admin-action-btn.remove:hover { 
+  background: rgba(224, 92, 106, 0.15);
+  color: #e05c6a;
+}
 
 /* -- Crafted footer ---------------------------------------------- */
 .crafted-footer {
