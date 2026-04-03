@@ -197,6 +197,8 @@ export default function DirectMessages({ user, showNotification }) {
   const [friends, setFriends] = useState(new Set());
   const [pendingRequests, setPendingRequests] = useState(new Map()); // uid -> request doc
   const [incomingRequests, setIncomingRequests] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true); // Add loading state
+  const [loadingFriends, setLoadingFriends] = useState(true); // Add loading state
   
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -242,6 +244,7 @@ export default function DirectMessages({ user, showNotification }) {
 
   /* ── Subscribe to registered users (exclude guests) ── */
   useEffect(() => {
+    setLoadingUsers(true);
     const q = collection(db, 'users');
     return onSnapshot(q, (snap) => {
       const allUsers = snap.docs
@@ -253,8 +256,10 @@ export default function DirectMessages({ user, showNotification }) {
       
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
       setUsers(allUsers);
+      setLoadingUsers(false);
     }, (err) => {
       console.error('Users snapshot error:', err);
+      setLoadingUsers(false);
     });
   }, [user.uid]);
 
@@ -329,6 +334,7 @@ export default function DirectMessages({ user, showNotification }) {
 
   /* ── Subscribe to friends list ── */
   useEffect(() => {
+    setLoadingFriends(true);
     const q = query(
       collection(db, 'friends'),
       where('users', 'array-contains', user.uid)
@@ -341,6 +347,10 @@ export default function DirectMessages({ user, showNotification }) {
         if (otherUser) friendSet.add(otherUser);
       });
       setFriends(friendSet);
+      setLoadingFriends(false);
+    }, (err) => {
+      console.error('Friends snapshot error:', err);
+      setLoadingFriends(false);
     });
   }, [user.uid]);
 
@@ -926,8 +936,16 @@ export default function DirectMessages({ user, showNotification }) {
         )}
 
         <div className="dm-users-list">
+          {/* Loading state */}
+          {(loadingUsers || loadingFriends) && (
+            <div className="dm-loading">
+              <div className="loader" style={{ width: '24px', height: '24px' }} />
+              <span style={{ marginTop: '8px', fontSize: '13px', color: '#8b8ba7' }}>Loading...</span>
+            </div>
+          )}
+          
           {/* Friends Tab */}
-          {activeTab === 'friends' && (
+          {activeTab === 'friends' && !loadingFriends && !loadingUsers && (
             friendsList.length === 0 ? (
               <div className="dm-empty">No friends yet.\nAdd friends from All Users tab!</div>
             ) : (
@@ -955,7 +973,7 @@ export default function DirectMessages({ user, showNotification }) {
           )}
 
           {/* All Users Tab */}
-          {activeTab === 'all' && (
+          {activeTab === 'all' && !loadingUsers && (
             allUsersList.length === 0 ? (
               <div className="dm-empty">No users found</div>
             ) : (
