@@ -2937,22 +2937,26 @@ body.no-scroll {
 .profile-modal-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 24px 24px 16px;
+  justify-content: center;
+  padding: 20px 24px;
   border-bottom: 1px solid var(--border-primary);
+  position: relative;
 }
 
 .profile-modal-header h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .profile-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
@@ -2960,14 +2964,19 @@ body.no-scroll {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+  z-index: 10;
 }
 
 .profile-close-btn:hover {
   background: var(--bg-hover);
-  color: var(--text-primary);
-  transform: rotate(90deg);
+}
+
+.profile-close-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.5;
 }
 
 .profile-modal-content {
