@@ -30,19 +30,28 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
       const userData = { id: user.id, ...user.data() };
       setProfileData(userData);
 
-      // Load friend count
+      // Load friend count - DEDUPLICATE to get actual unique friends
       const friendsQuery = query(
         collection(db, 'friends'),
         where('users', 'array-contains', userId)
       );
       const friendsSnap = await getDocs(friendsQuery);
-      setFriendCount(friendsSnap.size);
+      
+      // Get unique friend IDs (deduplicate)
+      const uniqueFriendIds = new Set();
+      friendsSnap.docs.forEach(doc => {
+        const users = doc.data().users;
+        const friendId = users.find(id => id !== userId);
+        if (friendId) {
+          uniqueFriendIds.add(friendId);
+        }
+      });
+      
+      // Set the ACTUAL unique friend count
+      setFriendCount(uniqueFriendIds.size);
 
       // Check if current user is friends with this user
-      const isFriendCheck = friendsSnap.docs.some(doc => {
-        const users = doc.data().users;
-        return users.includes(currentUserId);
-      });
+      const isFriendCheck = uniqueFriendIds.has(currentUserId);
       setIsFriend(isFriendCheck);
 
       // Load mutual friends
@@ -52,19 +61,16 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
           where('users', 'array-contains', currentUserId)
         );
         const currentUserFriendsSnap = await getDocs(currentUserFriendsQuery);
+        
+        // Get unique friend IDs for current user (deduplicate)
         const currentUserFriendIds = new Set();
         currentUserFriendsSnap.docs.forEach(doc => {
           const friendId = doc.data().users.find(id => id !== currentUserId);
           if (friendId) currentUserFriendIds.add(friendId);
         });
 
-        const targetUserFriendIds = new Set();
-        friendsSnap.docs.forEach(doc => {
-          const friendId = doc.data().users.find(id => id !== userId);
-          if (friendId) targetUserFriendIds.add(friendId);
-        });
-
-        const mutualIds = [...currentUserFriendIds].filter(id => targetUserFriendIds.has(id));
+        // Find mutual friends (intersection of both sets)
+        const mutualIds = [...uniqueFriendIds].filter(id => currentUserFriendIds.has(id));
         
         // Load mutual friend details
         const mutualFriendData = [];
