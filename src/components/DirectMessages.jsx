@@ -657,8 +657,22 @@ export default function DirectMessages({ user, showNotification }) {
 
   const handleSendMessageFromProfile = useCallback((userData) => {
     setViewingProfile(null);
-    openConversation(userData);
-  }, []);
+    // Directly open conversation - we already verified friendship in the profile
+    setSelectedUser(userData);
+    setMobileView('chat');
+    setMessages([]);
+    setLoadingMsg(true);
+    
+    const dmId = getDMId(user.uid, userData.id);
+    setDoc(doc(db, 'dms', dmId), {
+      participants: [user.uid, userData.id],
+      createdAt: serverTimestamp(),
+    }, { merge: true }).catch(() => {
+      // Silently fail - not critical
+    });
+    
+    setTimeout(() => inputRef.current?.focus(), 150);
+  }, [user.uid]);
 
   const handleAddFriendFromProfile = useCallback(async (userData) => {
     await sendFriendRequest(userData);
