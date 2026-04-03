@@ -974,10 +974,17 @@ body.no-scroll {
 .msg-edit-btn:hover { background: rgba(91, 141, 238, 0.1); }
 
 .msg-edited-label {
-  font-size: 10px;
-  color: #505870;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
   font-style: italic;
   margin-left: 4px;
+  font-weight: 400;
+}
+
+/* Edited label in received messages */
+.message-row.other .msg-edited-label {
+  color: var(--text-secondary);
+  opacity: 0.7;
 }
 
 .editing-indicator {
