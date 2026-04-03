@@ -1213,7 +1213,7 @@ body.no-scroll {
 
 .msg-sender {
   font-size: 11px;
-  color: #505870;
+  color: var(--text-secondary);
   font-weight: 600;
   padding: 0 6px;
   letter-spacing: 0.2px;
@@ -1230,22 +1230,31 @@ body.no-scroll {
   white-space: pre-wrap;
 }
 
+/* Own messages - Instagram blue */
 .message-row.own .msg-bubble {
-  background: #2a4a88;
-  color: #dce8f8;
+  background: var(--accent-primary);
+  color: #ffffff;
   border-bottom-right-radius: 5px;
 }
 
-.message-row.other .msg-bubble {
-  background: #1e2330;
-  color: #d0d8e8;
+/* Other messages - themed background */
+:root[data-theme="dark"] .message-row.other .msg-bubble {
+  background: #262626;
+  color: #ffffff;
   border-bottom-left-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="light"] .message-row.other .msg-bubble {
+  background: #efefef;
+  color: #000000;
+  border-bottom-left-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .msg-time {
   font-size: 10.5px;
-  color: #363c50;
+  color: var(--text-secondary);
   padding: 0 6px;
 }
 
