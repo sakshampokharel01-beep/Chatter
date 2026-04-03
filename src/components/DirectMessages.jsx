@@ -20,6 +20,7 @@ import { formatLastSeen, isUserActuallyOnline } from '../utils/formatLastSeen';
 import { areNotificationsEnabled } from '../utils/notifications';
 import { createMessageNotification, createCallNotification, createFriendRequestNotification } from '../hooks/useInAppNotifications.jsx';
 import VideoCall from './VideoCall';
+import PublicProfile from './PublicProfile';
 import { getSocket } from '../socket';
 
 const DM_LIMIT = 100;
@@ -219,6 +220,7 @@ export default function DirectMessages({ user, showNotification }) {
   const [editingMessageId, setEditingMessageId] = useState(null); // Track which message is being edited
   const [editingText, setEditingText] = useState(''); // Track the edited text
   const [replyingTo, setReplyingTo] = useState(null); // Track which message is being replied to
+  const [viewingProfile, setViewingProfile] = useState(null); // Track which user profile is being viewed
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null); // Ref for scroll detection
@@ -644,6 +646,49 @@ export default function DirectMessages({ user, showNotification }) {
   const rejectIncomingCall = useCallback(() => {
     setIncomingCall(null);
   }, []);
+
+  /* ── Profile actions ── */
+  const handleViewProfile = useCallback((userId) => {
+    const userToView = users.find(u => u.id === userId);
+    if (userToView) {
+      setViewingProfile(userToView);
+    }
+  }, [users]);
+
+  const handleSendMessageFromProfile = useCallback((userData) => {
+    setViewingProfile(null);
+    openConversation(userData);
+  }, []);
+
+  const handleAddFriendFromProfile = useCallback(async (userData) => {
+    await sendFriendRequest(userData);
+    setViewingProfile(null);
+  }, []);
+
+  const handleRemoveFriendFromProfile = useCallback(async (userData) => {
+    if (!window.confirm(`Remove ${userData.displayName} from friends?`)) return;
+    
+    try {
+      // Find and delete the friendship
+      const friendsQuery = query(
+        collection(db, 'friends'),
+        where('users', 'array-contains', user.uid)
+      );
+      const friendsSnap = await getDocs(friendsQuery);
+      const friendshipDoc = friendsSnap.docs.find(doc => 
+        doc.data().users.includes(userData.id)
+      );
+      
+      if (friendshipDoc) {
+        await deleteDoc(doc(db, 'friends', friendshipDoc.id));
+      }
+      
+      setViewingProfile(null);
+    } catch (err) {
+      console.error('Failed to remove friend:', err);
+      alert('Failed to remove friend');
+    }
+  }, [user.uid]);
 
   /* ── Send friend request ── */
   const sendFriendRequest = async (toUser) => {
@@ -1127,16 +1172,21 @@ export default function DirectMessages({ user, showNotification }) {
                   <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
-              <Avatar 
-                displayName={selectedUser.displayName} 
-                photoURL={selectedUser.photoURL} 
-                size={34}
-                isOnline={isUserActuallyOnline(selectedUser.lastSeen, selectedUser.online)}
-                showOnlineIndicator={true}
-              />
-              <div className="dm-chat-info">
-                <span className="dm-chat-name">{selectedUser.displayName}</span>
-                <span className="dm-chat-sub">{formatLastSeen(selectedUser.lastSeen, selectedUser.online)}</span>
+              <div 
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+                onClick={() => handleViewProfile(selectedUser.id)}
+              >
+                <Avatar 
+                  displayName={selectedUser.displayName} 
+                  photoURL={selectedUser.photoURL} 
+                  size={34}
+                  isOnline={isUserActuallyOnline(selectedUser.lastSeen, selectedUser.online)}
+                  showOnlineIndicator={true}
+                />
+                <div className="dm-chat-info">
+                  <span className="dm-chat-name">{selectedUser.displayName}</span>
+                  <span className="dm-chat-sub">{formatLastSeen(selectedUser.lastSeen, selectedUser.online)}</span>
+                </div>
               </div>
               <div className="call-buttons-group">
                 <button 
@@ -1348,6 +1398,18 @@ export default function DirectMessages({ user, showNotification }) {
           autoStart={true} // Always auto-start (either new call or accepting incoming)
           incomingPeerId={incomingCall?.peerId} // Pass the peer ID if accepting incoming call
           audioOnly={isAudioOnly} // Pass audio-only mode
+        />
+      )}
+
+      {/* Public Profile Modal */}
+      {viewingProfile && (
+        <PublicProfile
+          userId={viewingProfile.id}
+          currentUserId={user.uid}
+          onClose={() => setViewingProfile(null)}
+          onSendMessage={handleSendMessageFromProfile}
+          onAddFriend={handleAddFriendFromProfile}
+          onRemoveFriend={handleRemoveFriendFromProfile}
         />
       )}
     </div>
