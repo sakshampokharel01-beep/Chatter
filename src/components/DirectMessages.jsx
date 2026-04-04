@@ -98,35 +98,42 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
       <div className="msg-content">
         {!isOwn && !hideAvatar && <span className="msg-sender">{name}</span>}
         <div className="msg-bubble-wrap">
-          <div className="msg-bubble">
-            {repliedMessage && (
+          <div className={`msg-bubble ${(isImage && !message.text && !message.replyTo) ? 'image-only' : ''}`}>
+            {(repliedMessage || message.replyTo) && (
               <div 
                 className="msg-reply-preview" 
                 onClick={() => {
-                  const element = document.getElementById(`dm-msg-${repliedMessage.id}`);
-                  element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  element?.classList.add('msg-highlight');
-                  setTimeout(() => element?.classList.remove('msg-highlight'), 2000);
+                  const element = document.getElementById(`dm-msg-${message.replyTo}`);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.classList.add('msg-highlight');
+                    setTimeout(() => element.classList.remove('msg-highlight'), 2000);
+                  }
                 }}
               >
                 <div className="msg-reply-line"></div>
                 <div className="msg-reply-content">
-                  <div className="msg-reply-name">{repliedMessage.displayName || 'User'}</div>
-                  <div className="msg-reply-text">{repliedMessage.text || (repliedMessage.fileUrl ? '📎 File' : '')}</div>
+                  <div className="msg-reply-name">
+                    {repliedMessage ? (repliedMessage.displayName || 'User') : (message.replyToUser || 'User')}
+                  </div>
+                  <div className="msg-reply-text">
+                    {repliedMessage 
+                      ? (repliedMessage.text || (repliedMessage.fileUrl ? '📎 File' : '')) 
+                      : (message.replyToText || '📎 File')}
+                  </div>
                 </div>
               </div>
             )}
             
             {/* Voice Message */}
             {isVoice && (
-              <div className="voice-message">
-                <audio controls style={{ width: '100%', maxWidth: '300px' }}>
-                  <source src={message.fileUrl} type={message.fileType} />
-                  Your browser does not support audio playback.
-                </audio>
-                {message.voiceDuration && (
-                  <span className="voice-duration">{formatDuration(message.voiceDuration)}</span>
-                )}
+              <div className="voice-message messenger-audio">
+                <div className="audio-controls-minimal">
+                  <audio controls controlsList="nodownload noplaybackrate">
+                    <source src={message.fileUrl} type={message.fileType} />
+                    Your browser does not support audio playback.
+                  </audio>
+                </div>
               </div>
             )}
             
@@ -136,11 +143,10 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
                 <a href={message.fileUrl} target="_blank" rel="noopener noreferrer">
                   <img 
                     src={message.fileUrl} 
-                    alt={message.fileName} 
-                    style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '8px', display: 'block' }}
+                    alt={message.fileName || 'Image'} 
+                    className="messenger-image"
                   />
                 </a>
-                <span className="file-name">{message.fileName}</span>
               </div>
             )}
             
@@ -167,7 +173,7 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
             
             {message.edited && <span className="msg-edited-label"> (edited)</span>}
           </div>
-          {onReply && !isVoice && (
+          {onReply && (
             <button
               className="msg-reply-btn"
               onClick={() => onReply(message)}

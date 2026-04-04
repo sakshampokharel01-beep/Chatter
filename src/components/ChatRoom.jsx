@@ -93,20 +93,26 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, 
         )}
         <div className="msg-bubble-wrap">
           <div className="msg-bubble">
-            {repliedMessage && (
+            {(repliedMessage || message.replyTo) && (
               <div 
                 className="msg-reply-preview" 
                 onClick={() => {
-                  const element = document.getElementById(`msg-${repliedMessage.id}`);
-                  element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  element?.classList.add('msg-highlight');
-                  setTimeout(() => element?.classList.remove('msg-highlight'), 2000);
+                  const element = document.getElementById(`msg-${message.replyTo}`);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.classList.add('msg-highlight');
+                    setTimeout(() => element.classList.remove('msg-highlight'), 2000);
+                  }
                 }}
               >
                 <div className="msg-reply-line"></div>
                 <div className="msg-reply-content">
-                  <div className="msg-reply-name">{repliedMessage.displayName || 'User'}</div>
-                  <div className="msg-reply-text">{repliedMessage.text}</div>
+                  <div className="msg-reply-name">
+                    {repliedMessage ? (repliedMessage.displayName || 'User') : (message.replyToUser || 'User')}
+                  </div>
+                  <div className="msg-reply-text">
+                    {repliedMessage ? repliedMessage.text : (message.replyToText || '')}
+                  </div>
                 </div>
               </div>
             )}

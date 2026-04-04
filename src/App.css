@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    Chatter — Global Stylesheet
    Clean dark slate theme — natural, calm, minimal
    ============================================================ */
@@ -1291,6 +1291,40 @@ body.no-scroll {
   color: #000000;
   border-bottom-left-radius: 5px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Messenger Image Bubble Layout */
+.msg-bubble.image-only {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+}
+
+.messenger-image {
+  max-width: 300px;
+  max-height: 300px;
+  border-radius: 18px;
+  display: block;
+  object-fit: cover;
+}
+
+/* Messenger Audio Minimal Layout */
+.voice-message.messenger-audio {
+  display: flex;
+  align-items: center;
+}
+
+.audio-controls-minimal audio::-webkit-media-controls-enclosure {
+  background-color: transparent;
+  border-radius: 18px;
+}
+
+.audio-controls-minimal audio {
+  width: 250px;
+  height: 40px;
+  outline: none;
 }
 
 .msg-time {
@@ -2688,8 +2722,8 @@ body.no-scroll {
 }
 
 .control-btn {
-  padding: 16px 28px;
-  border-radius: 12px;
+  padding: 16px;
+  border-radius: 50%;
   border: 2px solid;
   cursor: pointer;
   font-size: 16px;
