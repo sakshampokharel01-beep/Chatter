@@ -1,5 +1,7 @@
 // api/serve-blob.js — Proxy to serve private Vercel Blob files to the browser
-// Browser can't directly access private blobs — this fetches them server-side
+// Instead of guessing the private domain, we use the SDK to locate the file
+// and issue a 307 redirect to the Vercel-provided signed downloadUrl.
+import { list } from '@vercel/blob';
 
 export default async function handler(request, response) {
   if (request.method !== 'GET') {
@@ -17,27 +19,24 @@ export default async function handler(request, response) {
   }
 
   try {
-    // Fetch the private blob server-side using the auth token
-    const blobUrl = `https://blob.vercel-storage.com/${pathname}`;
-    const blobResponse = await fetch(blobUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    // 1. Locate the exact blob using its pathname
+    const { blobs } = await list({
+      prefix: pathname,
+      limit: 1,
+      token,
     });
 
-    if (!blobResponse.ok) {
-      return response.status(blobResponse.status).json({ error: 'Failed to fetch blob' });
+    if (!blobs || blobs.length === 0) {
+      return response.status(404).json({ error: 'File not found' });
     }
 
-    // Forward content-type and cache headers
-    const contentType = blobResponse.headers.get('content-type') || 'application/octet-stream';
-    response.setHeader('Content-Type', contentType);
-    response.setHeader('Cache-Control', 'private, max-age=3600');
-    response.setHeader('Access-Control-Allow-Origin', '*');
+    const blob = blobs[0];
 
-    // Stream the blob body to the client
-    const arrayBuffer = await blobResponse.arrayBuffer();
-    return response.status(200).send(Buffer.from(arrayBuffer));
+    // 2. Redirect the browser to the short-lived signed URL provided by Vercel.
+    // This allows the browser to download/stream the private file directly from Vercel's CDN,
+    // which is much faster and saves serverless function bandwidth.
+    response.setHeader('Cache-Control', 'private, max-age=3600');
+    return response.redirect(307, blob.downloadUrl || blob.url);
   } catch (error) {
     console.error('serve-blob error:', error);
     return response.status(500).json({ error: error.message });
