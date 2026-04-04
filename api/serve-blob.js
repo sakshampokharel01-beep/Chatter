@@ -33,26 +33,44 @@ export default async function handler(request, response) {
     const blob = blobs[0];
 
     // 2. Fetch the blob server-side using the token since it's private
-    const blobResponse = await fetch(blob.url, {
+    const fetchOptions = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
+    };
 
-    if (!blobResponse.ok) {
+    // Forward range requests for audio/video seeking
+    if (request.headers.range) {
+      fetchOptions.headers.Range = request.headers.range;
+    }
+
+    const blobResponse = await fetch(blob.url, fetchOptions);
+
+    if (!blobResponse.ok && blobResponse.status !== 206) {
       const errText = await blobResponse.text();
       return response.status(blobResponse.status).json({ error: `Failed to fetch blob: ${errText}` });
     }
 
-    // 3. Forward the content type and cache headers
-    const contentType = blobResponse.headers.get('content-type') || 'application/octet-stream';
-    response.setHeader('Content-Type', contentType);
-    response.setHeader('Cache-Control', 'private, max-age=3600');
+    // 3. Forward the content headers needed for media streaming
+    const forwardHeaders = ['content-type', 'content-length', 'content-range', 'accept-ranges'];
+    forwardHeaders.forEach(hdr => {
+      const val = blobResponse.headers.get(hdr);
+      if (val) {
+        response.setHeader(hdr, val);
+      }
+    });
     
-    // We must handle range requests for audio/video seeking if needed,
-    // but for now, sending the full buffer works reliably.
+    // Fallback if content-type is missing
+    if (!response.getHeader('content-type')) {
+      response.setHeader('Content-Type', 'application/octet-stream');
+    }
+
+    // Pass the original status (200 or 206)
+    response.status(blobResponse.status);
+
+    // Read the array buffer and return
     const arrayBuffer = await blobResponse.arrayBuffer();
-    return response.status(200).send(Buffer.from(arrayBuffer));
+    return response.send(Buffer.from(arrayBuffer));
   } catch (error) {
     console.error('serve-blob error:', error);
     return response.status(500).json({ error: error.message });
