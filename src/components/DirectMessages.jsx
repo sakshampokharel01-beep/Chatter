@@ -19,6 +19,8 @@ import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
 import { formatLastSeen, isUserActuallyOnline } from '../utils/formatLastSeen';
 import { areNotificationsEnabled } from '../utils/notifications';
 import { createMessageNotification, createCallNotification, createFriendRequestNotification } from '../hooks/useInAppNotifications.jsx';
+import { uploadFile, formatFileSize, getFileIcon, isImageFile } from '../utils/fileUpload';
+import { VoiceRecorder, formatDuration } from '../utils/voiceRecorder';
 import VideoCall from './VideoCall';
 import PublicProfile from './PublicProfile';
 import { getSocket } from '../socket';
@@ -72,8 +74,8 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
   const isSeen = message.seenBy && message.seenBy.includes(friendId);
   const isDelivered = message.deliveredTo && message.deliveredTo.includes(friendId);
   
-  // Check if message can be edited (within 15 minutes)
-  const canEdit = isOwn && message.createdAt && onEdit && 
+  // Check if message can be edited (within 15 minutes) - only text messages
+  const canEdit = isOwn && message.createdAt && onEdit && !message.fileUrl &&
     (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 15 * 60 * 1000;
   
   // Check if message can be deleted by owner (within 1 hour)
@@ -82,6 +84,11 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
   
   // Find the replied message if this is a reply
   const repliedMessage = message.replyTo ? messages.find(m => m.id === message.replyTo) : null;
+  
+  // Check if this is a file/voice message
+  const hasFile = !!message.fileUrl;
+  const isVoice = message.isVoice || false;
+  const isImage = hasFile && !isVoice && isImageFile(message.fileType);
   
   return (
     <div className={`message-row ${isOwn ? 'own' : 'other'}${hideAvatar ? ' hide-avatar' : ''}`} id={`dm-msg-${message.id}`}>
@@ -105,14 +112,62 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
                 <div className="msg-reply-line"></div>
                 <div className="msg-reply-content">
                   <div className="msg-reply-name">{repliedMessage.displayName || 'User'}</div>
-                  <div className="msg-reply-text">{repliedMessage.text}</div>
+                  <div className="msg-reply-text">{repliedMessage.text || (repliedMessage.fileUrl ? '📎 File' : '')}</div>
                 </div>
               </div>
             )}
-            {message.text}
+            
+            {/* Voice Message */}
+            {isVoice && (
+              <div className="voice-message">
+                <audio controls style={{ width: '100%', maxWidth: '300px' }}>
+                  <source src={message.fileUrl} type={message.fileType} />
+                  Your browser does not support audio playback.
+                </audio>
+                {message.voiceDuration && (
+                  <span className="voice-duration">{formatDuration(message.voiceDuration)}</span>
+                )}
+              </div>
+            )}
+            
+            {/* Image File */}
+            {isImage && (
+              <div className="image-message">
+                <a href={message.fileUrl} target="_blank" rel="noopener noreferrer">
+                  <img 
+                    src={message.fileUrl} 
+                    alt={message.fileName} 
+                    style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '8px', display: 'block' }}
+                  />
+                </a>
+                <span className="file-name">{message.fileName}</span>
+              </div>
+            )}
+            
+            {/* Other File Types */}
+            {hasFile && !isVoice && !isImage && (
+              <div className="file-message">
+                <a href={message.fileUrl} target="_blank" rel="noopener noreferrer" className="file-link">
+                  <span className="file-icon">{getFileIcon(message.fileType)}</span>
+                  <div className="file-info">
+                    <span className="file-name">{message.fileName}</span>
+                    <span className="file-size">{formatFileSize(message.fileSize)}</span>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </a>
+              </div>
+            )}
+            
+            {/* Text Message */}
+            {message.text && <div>{message.text}</div>}
+            
             {message.edited && <span className="msg-edited-label"> (edited)</span>}
           </div>
-          {onReply && (
+          {onReply && !isVoice && (
             <button
               className="msg-reply-btn"
               onClick={() => onReply(message)}
@@ -221,6 +276,15 @@ export default function DirectMessages({ user, showNotification }) {
   const [editingText, setEditingText] = useState(''); // Track the edited text
   const [replyingTo, setReplyingTo] = useState(null); // Track which message is being replied to
   const [viewingProfile, setViewingProfile] = useState(null); // Track which user profile is being viewed
+  
+  // File upload and voice message states
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [voiceRecorder] = useState(() => new VoiceRecorder());
+  const fileInputRef = useRef(null);
+  const recordingIntervalRef = useRef(null);
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null); // Ref for scroll detection
@@ -991,6 +1055,161 @@ export default function DirectMessages({ user, showNotification }) {
     }
   };
 
+  /* ── Handle File Upload ── */
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedUser) return;
+    
+    setUploadingFile(true);
+    setUploadProgress(0);
+    
+    try {
+      const dmId = getDMId(user.uid, selectedUser.id);
+      const fileData = await uploadFile(
+        file,
+        dmId,
+        user.uid,
+        false,
+        (progress) => setUploadProgress(progress)
+      );
+      
+      // Send message with file attachment
+      const cu = auth.currentUser;
+      await addDoc(
+        collection(db, 'dms', dmId, 'messages'),
+        {
+          uid: user.uid,
+          displayName: (cu?.displayName || displayName).slice(0, 64),
+          photoURL: safePhotoURL(cu?.photoURL),
+          createdAt: serverTimestamp(),
+          deliveredTo: [],
+          seenBy: [],
+          edited: false,
+          fileUrl: fileData.url,
+          fileName: fileData.fileName,
+          fileType: fileData.fileType,
+          fileSize: fileData.fileSize,
+          storagePath: fileData.storagePath,
+          text: '', // Empty text for file messages
+        }
+      );
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      alert(error.message || 'Failed to upload file');
+    } finally {
+      setUploadingFile(false);
+      setUploadProgress(0);
+    }
+  };
+
+  /* ── Handle Voice Recording ── */
+  const startVoiceRecording = async () => {
+    try {
+      await voiceRecorder.start();
+      setIsRecording(true);
+      setRecordingDuration(0);
+      
+      // Start duration counter
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+      alert(error.message || 'Failed to access microphone');
+    }
+  };
+
+  const stopVoiceRecording = async () => {
+    try {
+      if (!selectedUser) return;
+      
+      const audioBlob = await voiceRecorder.stop();
+      
+      // Clear interval
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+      
+      setIsRecording(false);
+      setUploadingFile(true);
+      setUploadProgress(0);
+      
+      // Convert blob to file
+      const audioFile = new File(
+        [audioBlob],
+        `voice_${Date.now()}.webm`,
+        { type: audioBlob.type }
+      );
+      
+      // Upload voice message
+      const dmId = getDMId(user.uid, selectedUser.id);
+      const fileData = await uploadFile(
+        audioFile,
+        dmId,
+        user.uid,
+        true, // isVoice = true
+        (progress) => setUploadProgress(progress)
+      );
+      
+      // Send message with voice attachment
+      const cu = auth.currentUser;
+      await addDoc(
+        collection(db, 'dms', dmId, 'messages'),
+        {
+          uid: user.uid,
+          displayName: (cu?.displayName || displayName).slice(0, 64),
+          photoURL: safePhotoURL(cu?.photoURL),
+          createdAt: serverTimestamp(),
+          deliveredTo: [],
+          seenBy: [],
+          edited: false,
+          fileUrl: fileData.url,
+          fileName: fileData.fileName,
+          fileType: fileData.fileType,
+          fileSize: fileData.fileSize,
+          storagePath: fileData.storagePath,
+          isVoice: true,
+          voiceDuration: recordingDuration,
+          text: '', // Empty text for voice messages
+        }
+      );
+      
+      setRecordingDuration(0);
+    } catch (error) {
+      console.error('Voice recording error:', error);
+      alert(error.message || 'Failed to send voice message');
+    } finally {
+      setUploadingFile(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const cancelVoiceRecording = () => {
+    voiceRecorder.cancel();
+    if (recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+    }
+    setIsRecording(false);
+    setRecordingDuration(0);
+  };
+
+  /* ── Cleanup on unmount ── */
+  useEffect(() => {
+    return () => {
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+      if (voiceRecorder.isRecording()) {
+        voiceRecorder.cancel();
+      }
+    };
+  }, [voiceRecorder]);
+
   const filtered = users.filter(u =>
     !removed.has(u.id) &&
     !(u.email || '').toLowerCase().endsWith('@example.com') &&
@@ -1335,7 +1554,45 @@ export default function DirectMessages({ user, showNotification }) {
                   </button>
                 </div>
               )}
+              
+              {/* Upload Progress */}
+              {uploadingFile && (
+                <div className="upload-progress-bar">
+                  <div className="upload-progress-fill" style={{ width: `${uploadProgress}%` }}></div>
+                  <span className="upload-progress-text">{uploadProgress}%</span>
+                </div>
+              )}
+              
+              {/* Voice Recording Indicator */}
+              {isRecording && (
+                <div className="recording-indicator">
+                  <div className="recording-dot"></div>
+                  <span>Recording... {formatDuration(recordingDuration)}</span>
+                  <button onClick={cancelVoiceRecording} className="cancel-recording-btn">Cancel</button>
+                </div>
+              )}
+              
               <div className="input-wrapper">
+                {/* File Upload Button */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  style={{ display: 'none' }}
+                  onChange={handleFileSelect}
+                  accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                  disabled={uploadingFile || isRecording}
+                />
+                <button
+                  className="attach-file-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingFile || isRecording || editingMessageId}
+                  title="Attach file"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                  </svg>
+                </button>
+                
                 <textarea
                   ref={inputRef}
                   className="msg-input"
@@ -1344,19 +1601,46 @@ export default function DirectMessages({ user, showNotification }) {
                   value={inputText}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  disabled={sending}
+                  disabled={sending || uploadingFile || isRecording}
                 />
                 {charCount > 0 && (
                   <span className={charClass}>{charCount}/{MAX_CHARS}</span>
                 )}
-                <button
-                  className="btn-send"
-                  onClick={sendDM}
-                  disabled={!inputText.trim() || sending}
-                  title={editingMessageId ? "Save edit" : "Send message"}
-                >
-                  <SendIcon />
-                </button>
+                
+                {/* Voice Recording Button */}
+                {!inputText.trim() && !editingMessageId && (
+                  <button
+                    className={`voice-record-btn ${isRecording ? 'recording' : ''}`}
+                    onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+                    disabled={uploadingFile}
+                    title={isRecording ? "Stop recording" : "Record voice message"}
+                  >
+                    {isRecording ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="6" width="12" height="12" rx="2"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="23"/>
+                        <line x1="8" y1="23" x2="16" y2="23"/>
+                      </svg>
+                    )}
+                  </button>
+                )}
+                
+                {/* Send Button */}
+                {(inputText.trim() || editingMessageId) && (
+                  <button
+                    className="btn-send"
+                    onClick={sendDM}
+                    disabled={!inputText.trim() || sending || uploadingFile}
+                    title={editingMessageId ? "Save edit" : "Send message"}
+                  >
+                    <SendIcon />
+                  </button>
+                )}
               </div>
             </div>
           </>

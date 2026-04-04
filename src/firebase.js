@@ -10,6 +10,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 // App Check import removed — disabled due to reCAPTCHA network failures blocking all Firebase ops
 
 // ── Safe URL allow-list ──────────────────────────────────────
@@ -59,6 +60,7 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account', login_hint: '' });
