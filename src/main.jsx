@@ -7,12 +7,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>,
 )
-
-// Register service worker for caching
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('✅ Service Worker registered'))
-      .catch((err) => console.warn('⚠️ Service Worker registration failed:', err));
-  });
-}

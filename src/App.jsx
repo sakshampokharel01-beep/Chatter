@@ -1,23 +1,13 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db, registerUser, signOutUser } from './firebase';
 import { useUserPresence } from './hooks/useUserPresence';
-
-// Lazy load heavy components for better initial load
-const LandingPage = lazy(() => import('./components/LandingPage'));
-const AuthScreen = lazy(() => import('./components/AuthScreen'));
-const ChatRoom = lazy(() => import('./components/ChatRoom'));
-const EmailVerificationScreen = lazy(() => import('./components/EmailVerificationScreen'));
-
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="loading-screen">
-    <div className="loader" />
-    <p className="loading-text">Loading…</p>
-  </div>
-);
+import LandingPage from './components/LandingPage';
+import AuthScreen from './components/AuthScreen';
+import ChatRoom from './components/ChatRoom';
+import EmailVerificationScreen from './components/EmailVerificationScreen';
 
 function App() {
   // undefined = still loading, null = signed out, object = signed in
@@ -110,27 +100,17 @@ function App() {
 
   // Show email verification screen if needed
   if (user && needsVerification) {
-    return (
-      <Suspense fallback={<LoadingFallback />}>
-        <EmailVerificationScreen user={user} onVerified={handleVerified} />
-      </Suspense>
-    );
+    return <EmailVerificationScreen user={user} onVerified={handleVerified} />;
   }
 
   // Show landing page for first-time visitors
   if (showLanding && !user) {
-    return (
-      <Suspense fallback={<LoadingFallback />}>
-        <LandingPage onGetStarted={() => setShowLanding(false)} />
-      </Suspense>
-    );
+    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
   }
 
   return (
     <div className="app">
-      <Suspense fallback={<LoadingFallback />}>
-        {user ? <ChatRoom user={user} /> : <AuthScreen onBack={() => setShowLanding(true)} />}
-      </Suspense>
+      {user ? <ChatRoom user={user} /> : <AuthScreen onBack={() => setShowLanding(true)} />}
     </div>
   );
 }
