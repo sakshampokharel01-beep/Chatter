@@ -1792,3 +1792,57 @@
     font-size: 0.875rem;
   }
 }
+
+/* ================================================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ================================================================ */
+
+@media (max-width: 768px) {
+  /* Reduce backdrop blur on mobile */
+  .landing-header {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  
+  /* Disable complex animations */
+  .chat-bubble-1,
+  .chat-bubble-2,
+  .chat-bubble-3,
+  .gradient-circle-1,
+  .gradient-circle-2 {
+    animation: none !important;
+  }
+  
+  /* Simplify shadows */
+  .hero-text-card,
+  .hero-chat-card,
+  .feature-visual,
+  .cta-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  /* Optimize transitions */
+  * {
+    transition-duration: 0.15s !important;
+  }
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* GPU acceleration */
+.hero-section,
+.features-section,
+.showcase-section {
+  will-change: auto;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
