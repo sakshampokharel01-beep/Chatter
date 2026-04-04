@@ -1316,15 +1316,11 @@ body.no-scroll {
   align-items: center;
 }
 
-.audio-controls-minimal audio::-webkit-media-controls-enclosure {
-  background-color: transparent;
-  border-radius: 18px;
-}
-
 .audio-controls-minimal audio {
   width: 250px;
-  height: 40px;
+  max-width: 100%;
   outline: none;
+  border-radius: 20px;
 }
 
 .msg-time {
