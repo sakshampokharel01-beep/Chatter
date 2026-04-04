@@ -43,6 +43,7 @@ export default async function handler(request, response) {
       headers: {
         Authorization: `Bearer ${token}`,
         'x-content-type': contentType || 'application/octet-stream',
+        'x-access': 'private',   // match the private store configuration
         'Content-Length': String(body.length),
       },
       body,
@@ -58,7 +59,13 @@ export default async function handler(request, response) {
 
     const result = await blobResponse.json();
 
-    return response.status(200).json(result);
+    // For private stores, downloadUrl is a signed URL; url is the permanent path.
+    // Return both so the client can use whichever is appropriate.
+    return response.status(200).json({
+      url: result.downloadUrl || result.url, // prefer signed URL for private stores
+      downloadUrl: result.downloadUrl || result.url,
+      pathname: result.pathname,
+    });
   } catch (error) {
     console.error('Proxy upload error:', error);
     return response.status(500).json({ error: error.message });
