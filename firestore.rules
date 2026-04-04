@@ -151,8 +151,7 @@ service cloud.firestore {
           );
         allow delete: if isSignedIn() &&
           get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]) &&
-          resource.data.uid == request.auth.uid &&
-          request.time < resource.data.createdAt + duration.value(1, 'h');
+          (isAdmin() || (resource.data.uid == request.auth.uid && request.time < resource.data.createdAt + duration.value(1, 'h')));
       }
     }
 

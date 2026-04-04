@@ -69,7 +69,7 @@ function formatTime(ts) {
 }
 
 /* ── DM Message ───────────────────────────────────────────── */
-function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onReply, messages }) {
+function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onReply, messages, isAdmin }) {
   const name = message.displayName || 'User';
   const isSeen = message.seenBy && message.seenBy.includes(friendId);
   const isDelivered = message.deliveredTo && message.deliveredTo.includes(friendId);
@@ -78,9 +78,9 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
   const canEdit = isOwn && message.createdAt && onEdit && !message.fileUrl &&
     (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 15 * 60 * 1000;
   
-  // Check if message can be deleted by owner (within 1 hour)
-  const canDelete = isOwn && message.createdAt && onDelete &&
-    (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
+  // Check if message can be deleted by owner (within 1 hour) or by admin
+  const canDelete = isAdmin || (isOwn && message.createdAt && onDelete &&
+    (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000);
   
   // Find the replied message if this is a reply
   const repliedMessage = message.replyTo ? messages.find(m => m.id === message.replyTo) : null;
@@ -282,6 +282,7 @@ export default function DirectMessages({ user, showNotification }) {
   const [editingText, setEditingText] = useState(''); // Track the edited text
   const [replyingTo, setReplyingTo] = useState(null); // Track which message is being replied to
   const [viewingProfile, setViewingProfile] = useState(null); // Track which user profile is being viewed
+  const [adminUser, setAdminUser] = useState(false); // Track admin status
   
   // File upload and voice message states
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -861,10 +862,10 @@ export default function DirectMessages({ user, showNotification }) {
     const message = messages.find(m => m.id === messageId);
     if (!message) return;
     
-    // Check if user can delete (own message within 1 hour)
+    // Check if user can delete (own message within 1 hour, or admin)
     const isOwn = message.uid === user.uid;
-    const canDelete = isOwn && message.createdAt && 
-      (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000;
+    const canDelete = adminUser || (isOwn && message.createdAt && 
+      (Date.now() - (message.createdAt.toMillis ? message.createdAt.toMillis() : message.createdAt)) < 60 * 60 * 1000);
     
     if (!canDelete) {
       alert('You can only delete your own messages within 1 hour of sending');
@@ -886,7 +887,7 @@ export default function DirectMessages({ user, showNotification }) {
       console.error('Delete DM failed:', err);
       alert('Failed to delete message');
     }
-  }, [selectedUser, user.uid, messages, editingMessageId]);
+  }, [selectedUser, user.uid, messages, editingMessageId, adminUser]);
 
   /* ── Edit DM (own message within 15 minutes) ── */
   const startEditDM = useCallback((messageId, currentText) => {
@@ -1544,9 +1545,10 @@ export default function DirectMessages({ user, showNotification }) {
                         hideAvatar={hideAvatar}
                         friendId={selectedUser.id}
                         onEdit={isOwn ? startEditDM : null}
-                        onDelete={isOwn ? deleteDM : null}
+                        onDelete={(isOwn || adminUser) ? deleteDM : null}
                         onReply={startReplyDM}
                         messages={messages}
+                        isAdmin={adminUser}
                       />
                     );
                   })}
