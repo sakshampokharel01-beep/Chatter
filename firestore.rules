@@ -65,6 +65,7 @@ service cloud.firestore {
            request.resource.data.displayName is string &&
            request.resource.data.displayName.size() > 0 &&
            request.resource.data.displayName.size() <= 64 &&
+           (!request.resource.data.keys().hasAny(['photoURL']) || request.resource.data.photoURL is string) &&
            (!request.resource.data.keys().hasAny(['bio']) || request.resource.data.bio.size() <= 150))
         );
       allow delete: if isAdmin(); // Allow admins to delete user profiles
@@ -78,7 +79,8 @@ service cloud.firestore {
         request.resource.data.from == request.auth.uid &&
         request.resource.data.to != request.auth.uid &&
         request.resource.data.from is string &&
-        request.resource.data.to is string;
+        request.resource.data.to is string &&
+        exists(/databases/$(database)/documents/users/$(request.resource.data.to)); // Verify recipient exists
       allow delete: if isSignedIn() && 
         (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
       allow update: if false;
