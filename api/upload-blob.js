@@ -57,8 +57,9 @@ export default async function handler(request, response) {
     }
 
     return response.status(200).json({
-      url: blob.url,
-      downloadUrl: blob.downloadUrl || blob.url,
+      // Use our proxy URL so the browser can access the file without hitting the private blob directly
+      url: `/api/serve-blob?pathname=${encodeURIComponent(blob.pathname)}`,
+      downloadUrl: `/api/serve-blob?pathname=${encodeURIComponent(blob.pathname)}`,
       pathname: blob.pathname,
     });
   } catch (error) {
