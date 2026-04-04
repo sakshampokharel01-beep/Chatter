@@ -203,6 +203,9 @@ export default function LandingPage({ onGetStarted }) {
                       className="chat-user-photo"
                       loading="lazy"
                       decoding="async"
+                      srcSet="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=faces&q=70&auto=format 480w,
+                              https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces&q=80&auto=format 768w"
+                      sizes="(max-width: 480px) 50px, 80px"
                     />
                     <div className="chat-message-content">
                       <div className="chat-user-name">Alex Johnson</div>
@@ -216,6 +219,9 @@ export default function LandingPage({ onGetStarted }) {
                       className="chat-user-photo"
                       loading="lazy"
                       decoding="async"
+                      srcSet="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=faces&q=70&auto=format 480w,
+                              https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=faces&q=80&auto=format 768w"
+                      sizes="(max-width: 480px) 50px, 80px"
                     />
                     <div className="chat-message-content">
                       <div className="chat-user-name">Sarah Miller</div>
@@ -229,6 +235,9 @@ export default function LandingPage({ onGetStarted }) {
                       className="chat-user-photo"
                       loading="lazy"
                       decoding="async"
+                      srcSet="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=faces&q=70&auto=format 480w,
+                              https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=faces&q=80&auto=format 768w"
+                      sizes="(max-width: 480px) 50px, 80px"
                     />
                     <div className="chat-message-content">
                       <div className="chat-user-name">Mike Chen</div>

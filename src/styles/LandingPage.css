@@ -1846,3 +1846,94 @@
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
+
+
+/* ================================================================
+   MOBILE-ONLY PERFORMANCE OPTIMIZATIONS
+   Desktop remains unchanged
+   ================================================================ */
+
+@media (max-width: 768px) {
+  /* Reduce image sizes on mobile */
+  .chat-user-photo {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  /* Disable expensive animations on mobile */
+  .chat-bubble-1,
+  .chat-bubble-2,
+  .chat-bubble-3,
+  .gradient-circle-1,
+  .gradient-circle-2,
+  .hero-text-card,
+  .hero-chat-card {
+    animation: none !important;
+  }
+  
+  /* Simplify shadows on mobile */
+  .hero-text-card,
+  .hero-chat-card,
+  .feature-visual,
+  .cta-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Reduce backdrop blur on mobile */
+  .landing-header {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+  
+  /* Simplify gradients on mobile */
+  .hero-visual-container {
+    background: linear-gradient(135deg, rgba(0, 149, 246, 0.05) 0%, rgba(102, 126, 234, 0.05) 100%) !important;
+  }
+  
+  /* Reduce padding on mobile */
+  .hero-section {
+    padding: 2rem 0 !important;
+  }
+  
+  .features-section,
+  .showcase-section,
+  .cta-section {
+    padding: 2rem 0 !important;
+  }
+  
+  /* Optimize font loading on mobile */
+  body {
+    font-synthesis: none;
+    text-rendering: optimizeSpeed;
+  }
+  
+  /* Reduce transitions on mobile */
+  * {
+    transition-duration: 0.1s !important;
+  }
+  
+  /* Hide decorative elements on mobile */
+  .gradient-circle-1,
+  .gradient-circle-2 {
+    display: none !important;
+  }
+}
+
+/* Optimize for very small screens */
+@media (max-width: 480px) {
+  /* Further reduce image quality */
+  .chat-user-photo {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  /* Simplify layout */
+  .hero-content {
+    gap: 1rem !important;
+  }
+  
+  /* Reduce font sizes slightly */
+  .hero-title {
+    font-size: 2.5rem !important;
+  }
+}

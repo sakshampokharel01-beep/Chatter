@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#0095f6" />
     <title>Chatter — Global Chat</title>
     <meta name="description" content="Connect with people around the globe in real-time." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -10,6 +13,19 @@
     <!-- Preconnect for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Reduce font weights on mobile -->
+    <style>
+      @media (max-width: 768px) {
+        @font-face {
+          font-family: 'Inter';
+          font-style: normal;
+          font-weight: 400 700;
+          font-display: swap;
+          src: url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2) format('woff2');
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
