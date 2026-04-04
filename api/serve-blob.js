@@ -1,6 +1,6 @@
 // api/serve-blob.js — Proxy to serve private Vercel Blob files to the browser
-// Instead of guessing the private domain, we use the SDK to locate the file
-// and issue a 307 redirect to the Vercel-provided signed downloadUrl.
+// We find the exact URL via the SDK, then fetch it server-side using our token
+// and stream the bytes to the browser. This bypasses the 403 Forbidden.
 import { list } from '@vercel/blob';
 
 export default async function handler(request, response) {
@@ -19,7 +19,7 @@ export default async function handler(request, response) {
   }
 
   try {
-    // 1. Locate the exact blob using its pathname
+    // 1. Locate the exact blob using its pathname to get the correct absolute URL
     const { blobs } = await list({
       prefix: pathname,
       limit: 1,
@@ -32,11 +32,27 @@ export default async function handler(request, response) {
 
     const blob = blobs[0];
 
-    // 2. Redirect the browser to the short-lived signed URL provided by Vercel.
-    // This allows the browser to download/stream the private file directly from Vercel's CDN,
-    // which is much faster and saves serverless function bandwidth.
+    // 2. Fetch the blob server-side using the token since it's private
+    const blobResponse = await fetch(blob.url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!blobResponse.ok) {
+      const errText = await blobResponse.text();
+      return response.status(blobResponse.status).json({ error: `Failed to fetch blob: ${errText}` });
+    }
+
+    // 3. Forward the content type and cache headers
+    const contentType = blobResponse.headers.get('content-type') || 'application/octet-stream';
+    response.setHeader('Content-Type', contentType);
     response.setHeader('Cache-Control', 'private, max-age=3600');
-    return response.redirect(307, blob.downloadUrl || blob.url);
+    
+    // We must handle range requests for audio/video seeking if needed,
+    // but for now, sending the full buffer works reliably.
+    const arrayBuffer = await blobResponse.arrayBuffer();
+    return response.status(200).send(Buffer.from(arrayBuffer));
   } catch (error) {
     console.error('serve-blob error:', error);
     return response.status(500).json({ error: error.message });
