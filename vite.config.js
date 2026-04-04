@@ -18,18 +18,39 @@ export default defineConfig({
       }
     },
     // Optimize chunk size
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500,
     // Enable minification
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true, // Remove console.logs in production
         drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        passes: 2, // Multiple passes for better compression
+      },
+      mangle: {
+        safari10: true, // Fix Safari 10 issues
+      },
+      format: {
+        comments: false, // Remove all comments
       }
-    }
+    },
+    // CSS code splitting
+    cssCodeSplit: true,
+    // Source maps for debugging (disable in production for smaller size)
+    sourcemap: false,
+    // Optimize assets
+    assetsInlineLimit: 4096, // Inline assets smaller than 4kb
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'firebase/app', 'firebase/auth', 'firebase/firestore']
+    include: ['react', 'react-dom', 'firebase/app', 'firebase/auth', 'firebase/firestore'],
+    exclude: ['@firebase/app-check'] // Exclude unused Firebase modules
+  },
+  // Server configuration for development
+  server: {
+    hmr: {
+      overlay: false // Disable error overlay for better performance
+    }
   }
 })
