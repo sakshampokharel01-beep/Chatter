@@ -60,7 +60,7 @@ export const validateFile = (file, isVoice = false) => {
 };
 
 /**
- * Upload file to Vercel Blob using client upload
+ * Upload file to Vercel Blob using direct API call
  * @param {File} file - The file to upload
  * @param {string} dmId - The DM conversation ID
  * @param {string} userId - The user ID
@@ -75,11 +75,8 @@ export const uploadToVercelBlob = async (file, dmId, userId, isVoice = false, on
     
     const token = import.meta.env.VITE_BLOB_READ_WRITE_TOKEN;
     
-    console.log('Checking Vercel Blob token...');
-    console.log('Token exists:', !!token);
-    
     if (!token) {
-      throw new Error('Vercel Blob token not configured. Please add VITE_BLOB_READ_WRITE_TOKEN to your .env file and restart the dev server.');
+      throw new Error('Please add VITE_BLOB_READ_WRITE_TOKEN to .env and restart server');
     }
     
     // Generate unique filename
@@ -91,54 +88,45 @@ export const uploadToVercelBlob = async (file, dmId, userId, isVoice = false, on
     const folder = isVoice ? 'voice' : 'files';
     const pathname = `dms/${dmId}/${folder}/${userId}/${fileName}`;
     
-    console.log('Uploading to Vercel Blob:', pathname);
-    console.log('File size:', file.size, 'bytes');
-    console.log('File type:', file.type);
+    console.log('Uploading:', pathname);
     
-    // Simulate progress start
-    if (onProgress) {
-      onProgress(10);
+    if (onProgress) onProgress(20);
+    
+    // Direct upload to Vercel Blob API
+    const response = await fetch(
+      `https://blob.vercel-storage.com/${pathname}?filename=${encodeURIComponent(fileName)}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-content-type': file.type,
+        },
+        body: file,
+      }
+    );
+    
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Upload failed: ${response.status} - ${error}`);
     }
     
-    // Upload using client method
-    console.log('Starting client upload...');
-    const blob = await upload(pathname, file, {
-      access: 'public',
-      handleUploadUrl: '/api/upload', // This will be handled by Vercel automatically
-      clientPayload: JSON.stringify({ dmId, userId, isVoice }),
-    });
+    const result = await response.json();
     
-    console.log('Upload response:', blob);
+    if (onProgress) onProgress(100);
     
-    // Simulate progress complete
-    if (onProgress) {
-      onProgress(100);
-    }
-    
-    console.log('Upload successful:', blob.url);
+    console.log('Upload successful:', result.url);
     
     return {
-      url: blob.url,
+      url: result.url,
       fileName: file.name,
       fileType: file.type,
       fileSize: file.size,
       storagePath: pathname,
-      downloadUrl: blob.downloadUrl || blob.url,
+      downloadUrl: result.downloadUrl || result.url,
     };
   } catch (error) {
-    console.error('Vercel Blob upload error:', error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    
-    if (error.message.includes('token')) {
-      throw new Error('Storage not configured. Please add VITE_BLOB_READ_WRITE_TOKEN to .env and restart dev server.');
-    } else if (error.message.includes('quota')) {
-      throw new Error('Storage quota exceeded. Please upgrade your Vercel plan.');
-    } else if (error.message.includes('CORS') || error.message.includes('Access-Control')) {
-      throw new Error('CORS error. Please deploy to Vercel or use the API route method.');
-    } else {
-      throw new Error('Upload failed: ' + error.message);
-    }
+    console.error('Upload error:', error);
+    throw new Error('Upload failed: ' + error.message);
   }
 };
 
