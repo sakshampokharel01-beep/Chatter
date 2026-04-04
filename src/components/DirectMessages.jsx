@@ -1139,12 +1139,25 @@ export default function DirectMessages({ user, showNotification }) {
       setUploadingFile(true);
       setUploadProgress(0);
       
+      // Get the actual MIME type from the blob
+      const mimeType = audioBlob.type;
+      console.log('Voice recording MIME type:', mimeType);
+      
+      // Determine file extension based on MIME type
+      let extension = 'webm';
+      if (mimeType.includes('ogg')) extension = 'ogg';
+      else if (mimeType.includes('mp4')) extension = 'm4a';
+      else if (mimeType.includes('mpeg')) extension = 'mp3';
+      else if (mimeType.includes('wav')) extension = 'wav';
+      
       // Convert blob to file
       const audioFile = new File(
         [audioBlob],
-        `voice_${Date.now()}.webm`,
-        { type: audioBlob.type }
+        `voice_${Date.now()}.${extension}`,
+        { type: mimeType }
       );
+      
+      console.log('Uploading voice file:', audioFile.name, audioFile.type, audioFile.size);
       
       // Upload voice message
       const dmId = getDMId(user.uid, selectedUser.id);
@@ -1183,6 +1196,8 @@ export default function DirectMessages({ user, showNotification }) {
     } catch (error) {
       console.error('Voice recording error:', error);
       alert(error.message || 'Failed to send voice message');
+      setIsRecording(false);
+      setRecordingDuration(0);
     } finally {
       setUploadingFile(false);
       setUploadProgress(0);

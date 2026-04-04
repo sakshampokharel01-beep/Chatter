@@ -87,8 +87,8 @@ export class VoiceRecorder {
    */
   getSupportedMimeType() {
     const types = [
-      'audio/webm',
       'audio/webm;codecs=opus',
+      'audio/webm',
       'audio/ogg;codecs=opus',
       'audio/mp4',
       'audio/mpeg'
@@ -96,10 +96,12 @@ export class VoiceRecorder {
 
     for (const type of types) {
       if (MediaRecorder.isTypeSupported(type)) {
+        console.log('Using audio format:', type);
         return type;
       }
     }
 
+    console.log('Using fallback audio format: audio/webm');
     return 'audio/webm'; // Fallback
   }
 

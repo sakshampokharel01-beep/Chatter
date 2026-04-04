@@ -7,7 +7,16 @@ const MAX_VOICE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/mp4'];
+const ALLOWED_AUDIO_TYPES = [
+  'audio/mpeg', 
+  'audio/wav', 
+  'audio/ogg', 
+  'audio/webm', 
+  'audio/mp4',
+  'audio/webm;codecs=opus',
+  'audio/ogg;codecs=opus',
+  'audio/x-m4a'
+];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg'];
 const ALLOWED_DOCUMENT_TYPES = [
   'application/pdf',
@@ -37,8 +46,11 @@ export const validateFile = (file, isVoice = false) => {
   }
   
   if (isVoice) {
-    if (!ALLOWED_AUDIO_TYPES.includes(file.type)) {
-      throw new Error('Invalid audio format');
+    // For voice messages, check if it's any audio type
+    const isAudio = file.type.startsWith('audio/') || ALLOWED_AUDIO_TYPES.some(type => file.type.includes(type.split(';')[0]));
+    if (!isAudio) {
+      console.error('Invalid audio type:', file.type);
+      throw new Error(`Invalid audio format: ${file.type}. Please try again.`);
     }
   } else {
     if (!ALL_ALLOWED_TYPES.includes(file.type)) {
