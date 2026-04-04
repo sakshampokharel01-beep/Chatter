@@ -1310,18 +1310,7 @@ body.no-scroll {
   object-fit: cover;
 }
 
-/* Messenger Audio Minimal Layout */
-.voice-message.messenger-audio {
-  display: flex;
-  align-items: center;
-}
 
-.audio-controls-minimal audio {
-  width: 250px;
-  max-width: 100%;
-  outline: none;
-  border-radius: 20px;
-}
 
 .msg-time {
   font-size: 10.5px;

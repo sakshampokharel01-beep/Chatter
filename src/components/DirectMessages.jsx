@@ -127,13 +127,13 @@ function DmMessage({ message, isOwn, hideAvatar, friendId, onEdit, onDelete, onR
             
             {/* Voice Message */}
             {isVoice && (
-              <div className="voice-message messenger-audio">
-                <div className="audio-controls-minimal">
-                  <audio controls controlsList="nodownload noplaybackrate">
-                    <source src={message.fileUrl} type={message.fileType} />
-                    Your browser does not support audio playback.
-                  </audio>
-                </div>
+              <div className="voice-message">
+                <audio controls style={{ width: '100%', maxWidth: '300px' }} src={message.fileUrl}>
+                  Your browser does not support audio playback.
+                </audio>
+                {message.voiceDuration && (
+                  <span className="voice-duration">{formatDuration(message.voiceDuration)}</span>
+                )}
               </div>
             )}
             
