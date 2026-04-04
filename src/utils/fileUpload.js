@@ -85,6 +85,8 @@ export const uploadFile = (file, dmId, userId, isVoice = false, onProgress = nul
       const folder = isVoice ? 'voice' : 'files';
       const storageRef = ref(storage, `dms/${dmId}/${folder}/${userId}/${fileName}`);
       
+      console.log('Storage path:', `dms/${dmId}/${folder}/${userId}/${fileName}`);
+      
       // Start upload
       const uploadTask = uploadBytesResumable(storageRef, file);
       
@@ -93,6 +95,7 @@ export const uploadFile = (file, dmId, userId, isVoice = false, onProgress = nul
         (snapshot) => {
           // Progress callback
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Upload progress:', Math.round(progress) + '%');
           if (onProgress) {
             onProgress(Math.round(progress));
           }
@@ -100,12 +103,25 @@ export const uploadFile = (file, dmId, userId, isVoice = false, onProgress = nul
         (error) => {
           // Error callback
           console.error('Upload error:', error);
-          reject(new Error('Upload failed: ' + error.message));
+          console.error('Error code:', error.code);
+          console.error('Error message:', error.message);
+          
+          // Provide helpful error messages
+          if (error.code === 'storage/unauthorized') {
+            reject(new Error('Permission denied. Make sure Firebase Storage rules are deployed.'));
+          } else if (error.code === 'storage/canceled') {
+            reject(new Error('Upload canceled'));
+          } else if (error.code === 'storage/unknown') {
+            reject(new Error('Upload failed. Check if Firebase Storage is enabled.'));
+          } else {
+            reject(new Error('Upload failed: ' + error.message));
+          }
         },
         async () => {
           // Success callback
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            console.log('Upload complete, download URL:', downloadURL);
             resolve({
               url: downloadURL,
               fileName: file.name,
@@ -114,11 +130,13 @@ export const uploadFile = (file, dmId, userId, isVoice = false, onProgress = nul
               storagePath: `dms/${dmId}/${folder}/${userId}/${fileName}`
             });
           } catch (error) {
+            console.error('Failed to get download URL:', error);
             reject(new Error('Failed to get download URL: ' + error.message));
           }
         }
       );
     } catch (error) {
+      console.error('Upload setup error:', error);
       reject(error);
     }
   });

@@ -1142,6 +1142,7 @@ export default function DirectMessages({ user, showNotification }) {
       // Get the actual MIME type from the blob
       const mimeType = audioBlob.type;
       console.log('Voice recording MIME type:', mimeType);
+      console.log('Voice recording size:', audioBlob.size, 'bytes');
       
       // Determine file extension based on MIME type
       let extension = 'webm';
@@ -1161,41 +1162,64 @@ export default function DirectMessages({ user, showNotification }) {
       
       // Upload voice message
       const dmId = getDMId(user.uid, selectedUser.id);
-      const fileData = await uploadFile(
-        audioFile,
-        dmId,
-        user.uid,
-        true, // isVoice = true
-        (progress) => setUploadProgress(progress)
-      );
+      console.log('DM ID:', dmId);
       
-      // Send message with voice attachment
-      const cu = auth.currentUser;
-      await addDoc(
-        collection(db, 'dms', dmId, 'messages'),
-        {
-          uid: user.uid,
-          displayName: (cu?.displayName || displayName).slice(0, 64),
-          photoURL: safePhotoURL(cu?.photoURL),
-          createdAt: serverTimestamp(),
-          deliveredTo: [],
-          seenBy: [],
-          edited: false,
-          fileUrl: fileData.url,
-          fileName: fileData.fileName,
-          fileType: fileData.fileType,
-          fileSize: fileData.fileSize,
-          storagePath: fileData.storagePath,
-          isVoice: true,
-          voiceDuration: recordingDuration,
-          text: '', // Empty text for voice messages
+      try {
+        const fileData = await uploadFile(
+          audioFile,
+          dmId,
+          user.uid,
+          true, // isVoice = true
+          (progress) => {
+            console.log('Upload progress:', progress + '%');
+            setUploadProgress(progress);
+          }
+        );
+        
+        console.log('Upload successful, file data:', fileData);
+        
+        // Send message with voice attachment
+        const cu = auth.currentUser;
+        await addDoc(
+          collection(db, 'dms', dmId, 'messages'),
+          {
+            uid: user.uid,
+            displayName: (cu?.displayName || displayName).slice(0, 64),
+            photoURL: safePhotoURL(cu?.photoURL),
+            createdAt: serverTimestamp(),
+            deliveredTo: [],
+            seenBy: [],
+            edited: false,
+            fileUrl: fileData.url,
+            fileName: fileData.fileName,
+            fileType: fileData.fileType,
+            fileSize: fileData.fileSize,
+            storagePath: fileData.storagePath,
+            isVoice: true,
+            voiceDuration: recordingDuration,
+            text: '', // Empty text for voice messages
+          }
+        );
+        
+        console.log('Voice message sent successfully');
+        setRecordingDuration(0);
+      } catch (uploadError) {
+        console.error('Upload or send error:', uploadError);
+        console.error('Error code:', uploadError.code);
+        console.error('Error message:', uploadError.message);
+        
+        // Show more specific error messages
+        if (uploadError.code === 'storage/unauthorized') {
+          alert('Permission denied. Please make sure:\n1. Firebase Storage is enabled\n2. Storage rules are deployed\n3. You are friends with this person');
+        } else if (uploadError.message.includes('storage bucket')) {
+          alert('Firebase Storage is not configured. Please enable Storage in Firebase Console.');
+        } else {
+          alert('Failed to send voice message: ' + uploadError.message);
         }
-      );
-      
-      setRecordingDuration(0);
+        throw uploadError;
+      }
     } catch (error) {
       console.error('Voice recording error:', error);
-      alert(error.message || 'Failed to send voice message');
       setIsRecording(false);
       setRecordingDuration(0);
     } finally {
