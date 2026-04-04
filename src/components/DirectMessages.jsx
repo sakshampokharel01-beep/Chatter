@@ -19,7 +19,7 @@ import { db, auth, getDisplayName, getDMId, safePhotoURL } from '../firebase';
 import { formatLastSeen, isUserActuallyOnline } from '../utils/formatLastSeen';
 import { areNotificationsEnabled } from '../utils/notifications';
 import { createMessageNotification, createCallNotification, createFriendRequestNotification } from '../hooks/useInAppNotifications.jsx';
-import { uploadFile, formatFileSize, getFileIcon, isImageFile } from '../utils/fileUpload';
+import { uploadToVercelBlob, formatFileSize, getFileIcon, isImageFile } from '../utils/vercelBlobUpload';
 import { VoiceRecorder, formatDuration } from '../utils/voiceRecorder';
 import VideoCall from './VideoCall';
 import PublicProfile from './PublicProfile';
@@ -1065,7 +1065,7 @@ export default function DirectMessages({ user, showNotification }) {
     
     try {
       const dmId = getDMId(user.uid, selectedUser.id);
-      const fileData = await uploadFile(
+      const fileData = await uploadToVercelBlob(
         file,
         dmId,
         user.uid,
@@ -1165,7 +1165,7 @@ export default function DirectMessages({ user, showNotification }) {
       console.log('DM ID:', dmId);
       
       try {
-        const fileData = await uploadFile(
+        const fileData = await uploadToVercelBlob(
           audioFile,
           dmId,
           user.uid,
