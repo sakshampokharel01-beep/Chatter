@@ -75,8 +75,12 @@ export const uploadToVercelBlob = async (file, dmId, userId, isVoice = false, on
     
     const token = import.meta.env.VITE_BLOB_READ_WRITE_TOKEN;
     
+    console.log('Checking Vercel Blob token...');
+    console.log('Token exists:', !!token);
+    console.log('Token length:', token?.length);
+    
     if (!token) {
-      throw new Error('Vercel Blob token not configured. Please add VITE_BLOB_READ_WRITE_TOKEN to your .env file.');
+      throw new Error('Vercel Blob token not configured. Please add VITE_BLOB_READ_WRITE_TOKEN to your .env file and restart the dev server.');
     }
     
     // Generate unique filename
@@ -89,6 +93,8 @@ export const uploadToVercelBlob = async (file, dmId, userId, isVoice = false, on
     const filePath = `dms/${dmId}/${folder}/${userId}/${fileName}`;
     
     console.log('Uploading to Vercel Blob:', filePath);
+    console.log('File size:', file.size, 'bytes');
+    console.log('File type:', file.type);
     
     // Simulate progress start
     if (onProgress) {
@@ -96,10 +102,13 @@ export const uploadToVercelBlob = async (file, dmId, userId, isVoice = false, on
     }
     
     // Upload to Vercel Blob
+    console.log('Starting upload...');
     const blob = await put(filePath, file, {
       access: 'public',
       token: token,
     });
+    
+    console.log('Upload response:', blob);
     
     // Simulate progress complete
     if (onProgress) {
@@ -118,11 +127,16 @@ export const uploadToVercelBlob = async (file, dmId, userId, isVoice = false, on
     };
   } catch (error) {
     console.error('Vercel Blob upload error:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     
     if (error.message.includes('token')) {
-      throw new Error('Storage not configured. Please add Vercel Blob token to environment variables.');
+      throw new Error('Storage not configured. Please add VITE_BLOB_READ_WRITE_TOKEN to .env and restart dev server.');
     } else if (error.message.includes('quota')) {
       throw new Error('Storage quota exceeded. Please upgrade your Vercel plan.');
+    } else if (error.message.includes('network') || error.message.includes('fetch')) {
+      throw new Error('Network error. Please check your internet connection.');
     } else {
       throw new Error('Upload failed: ' + error.message);
     }
