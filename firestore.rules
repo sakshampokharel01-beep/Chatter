@@ -122,10 +122,17 @@ service cloud.firestore {
           get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]);
         allow create: if isSignedIn() && 
           get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]) &&
-          request.resource.data.text is string &&
-          request.resource.data.text.size() > 0 &&
-          request.resource.data.text.size() <= 500 &&
-          request.resource.data.uid == request.auth.uid;
+          request.resource.data.uid == request.auth.uid &&
+          (
+            // Text message: must have non-empty text
+            (request.resource.data.text is string &&
+             request.resource.data.text.size() > 0 &&
+             request.resource.data.text.size() <= 500)
+            ||
+            // File / voice message: has a fileUrl instead of text
+            (request.resource.data.keys().hasAny(['fileUrl']) &&
+             request.resource.data.fileUrl is string)
+          );
         allow update: if isSignedIn() &&
           get(/databases/$(database)/documents/dms/$(convId)).data.participants.hasAny([request.auth.uid]) &&
           (
