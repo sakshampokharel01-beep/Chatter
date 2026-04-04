@@ -4,7 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db, registerUser, signOutUser } from './firebase';
 import { useUserPresence } from './hooks/useUserPresence';
-import LandingPage from './components/LandingPage';
+import LandingPageMobile from './components/LandingPageMobile';
 import AuthScreen from './components/AuthScreen';
 import ChatRoom from './components/ChatRoom';
 import EmailVerificationScreen from './components/EmailVerificationScreen';
@@ -105,7 +105,7 @@ function App() {
 
   // Show landing page for first-time visitors
   if (showLanding && !user) {
-    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+    return <LandingPageMobile onGetStarted={() => setShowLanding(false)} />;
   }
 
   return (
