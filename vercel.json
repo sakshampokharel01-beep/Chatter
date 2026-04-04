@@ -9,7 +9,7 @@
       "destination": "https://chatapp-eb6e3.firebaseapp.com/__/firebase/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

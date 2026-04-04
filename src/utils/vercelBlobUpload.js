@@ -1,4 +1,4 @@
-import { upload } from '@vercel/blob/client';
+// File upload utility — routes through /api/upload-blob proxy to avoid CORS
 
 // File size limits
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -72,50 +72,47 @@ export const uploadToVercelBlob = async (file, dmId, userId, isVoice = false, on
   try {
     // Validate file
     validateFile(file, isVoice);
-    
-    const token = import.meta.env.VITE_BLOB_READ_WRITE_TOKEN;
-    
-    if (!token) {
-      throw new Error('Please add VITE_BLOB_READ_WRITE_TOKEN to .env and restart server');
-    }
-    
+
     // Generate unique filename
     const timestamp = Date.now();
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const fileName = `${timestamp}_${sanitizedName}`;
-    
+
     // Create file path
     const folder = isVoice ? 'voice' : 'files';
     const pathname = `dms/${dmId}/${folder}/${userId}/${fileName}`;
-    
-    console.log('Uploading:', pathname);
-    
+
+    console.log('Uploading via proxy:', pathname);
+
     if (onProgress) onProgress(20);
-    
-    // Direct upload to Vercel Blob API
-    const response = await fetch(
-      `https://blob.vercel-storage.com/${pathname}?filename=${encodeURIComponent(fileName)}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'x-content-type': file.type,
-        },
-        body: file,
-      }
-    );
-    
+
+    // Upload via our server-side proxy to avoid CORS
+    // Token is kept server-side in BLOB_READ_WRITE_TOKEN env var
+    const params = new URLSearchParams({
+      pathname,
+      filename: encodeURIComponent(fileName),
+      contentType: file.type,
+    });
+
+    const response = await fetch(`/api/upload-blob?${params.toString()}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
     if (!response.ok) {
       const error = await response.text();
       throw new Error(`Upload failed: ${response.status} - ${error}`);
     }
-    
+
     const result = await response.json();
-    
+
     if (onProgress) onProgress(100);
-    
+
     console.log('Upload successful:', result.url);
-    
+
     return {
       url: result.url,
       fileName: file.name,
