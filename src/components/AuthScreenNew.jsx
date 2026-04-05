@@ -137,7 +137,6 @@ export default function AuthScreenNew({ onBack }) {
                 <circle cx="24" cy="24" r="1.5" fill="#3b82f6"/>
                 <circle cx="29" cy="24" r="1.5" fill="#3b82f6"/>
               </svg>
-              <span className="logo-text">Chatter</span>
             </div>
             
             <h1 className="hero-title">Welcome back to Chatter</h1>
