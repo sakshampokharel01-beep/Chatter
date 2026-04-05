@@ -5465,3 +5465,134 @@ input:checked + .toggle-slider:before {
   min-height: 40px;
   max-height: 120px;
 }
+
+/* Dark theme for Auth Screen */
+[data-theme="dark"] .auth-screen {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+[data-theme="dark"] .auth-screen::before {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+[data-theme="dark"] .auth-card {
+  background: rgba(26, 26, 26, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .auth-title {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .auth-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .auth-tab {
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 2px solid transparent;
+}
+
+[data-theme="dark"] .auth-tab.active {
+  color: rgba(255, 255, 255, 0.95);
+  border-bottom-color: #3b82f6;
+}
+
+[data-theme="dark"] .email-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .email-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .email-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .email-input:focus {
+  border-color: #3b82f6;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .pass-toggle {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .pass-toggle:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .divider {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .divider::before,
+[data-theme="dark"] .divider::after {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .btn-guest {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .btn-guest:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .auth-disclaimer {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .crafted-footer {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .crafted-footer a {
+  color: #3b82f6;
+}
+
+[data-theme="dark"] .crafted-footer a:hover {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .error-msg {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .back-to-landing {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .back-to-landing:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .guest-name-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .guest-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .guest-name-hint {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .auth-orb {
+  opacity: 0.3;
+}

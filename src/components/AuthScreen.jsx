@@ -90,6 +90,12 @@ export default function AuthScreen({ onBack }) {
 
   const nameInputRef = useRef(null);
 
+  // Apply theme from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
   useEffect(() => {
     if (step === 'guestName') setTimeout(() => nameInputRef.current?.focus(), 50);
   }, [step]);
