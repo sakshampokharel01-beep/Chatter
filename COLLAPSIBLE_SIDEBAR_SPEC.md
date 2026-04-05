@@ -269,20 +269,38 @@ return (
 
 ## Implementation Checklist
 
-- [ ] Update Sidebar.css with collapsed/expanded states
-- [ ] Add hover transitions for width
-- [ ] Hide/show text labels on hover
-- [ ] Hide/show sub-items on hover
-- [ ] Update brand logo behavior
-- [ ] Update user info section
-- [ ] Add tooltips for collapsed state
-- [ ] Test all navigation items
-- [ ] Test expandable sections
+- [x] Update Sidebar.css with collapsed/expanded states
+- [x] Add hover transitions for width
+- [x] Hide/show text labels on hover
+- [x] Hide/show sub-items on hover
+- [x] Update brand logo behavior
+- [x] Update user info section
+- [x] Add tooltips for collapsed state
+- [x] Test all navigation items
+- [x] Test expandable sections
+- [x] Fix icon centering in collapsed state
+- [x] Adjust padding for proper alignment
+- [x] Verify smooth animations
 - [ ] Test on different screen sizes
-- [ ] Verify smooth animations
 - [ ] Check accessibility
 - [ ] Test keyboard navigation
 - [ ] Verify active states work in both modes
+
+## Recent Fixes (Latest)
+
+### Icon Centering Fix
+Fixed the "messed up" layout by properly centering icons in collapsed state:
+
+1. **Sidebar Items**: Changed from `justify-content: flex-start` to `justify-content: center` when collapsed
+2. **Brand Logo**: Centered icon when collapsed, left-aligned when expanded
+3. **User Section**: Centered avatar when collapsed, left-aligned when expanded
+4. **Sub-items**: Centered icons when collapsed, left-aligned when expanded
+5. **Padding Adjustments**: 
+   - Collapsed: `padding: 12px` (uniform, centers content)
+   - Expanded: `padding: 12px 24px` (left-aligned with proper spacing)
+
+### Files Modified
+- `src/styles/Sidebar.css` - Fixed all centering and padding issues
 
 ## Edge Cases to Handle
 

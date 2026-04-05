@@ -14,11 +14,12 @@
   top: 0;
   z-index: 100;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  overflow: visible; /* Allow tooltips to show */
 }
 
 .sidebar:hover {
   width: 260px; /* Expanded on hover - icons + text */
+  overflow: hidden; /* Prevent horizontal scroll when expanded */
 }
 
 .sidebar-content {
@@ -26,16 +27,37 @@
   flex-direction: column;
   height: 100%;
   padding: 20px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 4px;
 }
 
 /* Brand */
 .sidebar-brand {
   display: flex;
   align-items: center;
+  justify-content: center; /* Center icon when collapsed */
   gap: 12px;
-  padding: 12px 24px;
+  padding: 12px;
   margin-bottom: 24px;
   min-height: 56px; /* Maintain height when collapsed */
+}
+
+.sidebar:hover .sidebar-brand {
+  justify-content: flex-start; /* Left-align when expanded */
+  padding: 12px 24px;
 }
 
 .sidebar-brand svg {
@@ -88,8 +110,8 @@
 .sidebar-item {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: 12px 24px;
+  justify-content: center; /* Center when collapsed */
+  padding: 12px;
   border-radius: 12px;
   background: transparent;
   border: none;
@@ -102,6 +124,11 @@
   width: 100%;
   text-align: left;
   position: relative;
+}
+
+.sidebar:hover .sidebar-item {
+  justify-content: flex-start; /* Left-align when expanded */
+  padding: 12px 24px;
 }
 
 .sidebar-item-content {
@@ -176,13 +203,14 @@
   display: none; /* Hidden when sidebar is collapsed */
   flex-direction: column;
   gap: 2px;
-  padding-left: 16px;
+  padding-left: 0; /* Remove left padding when collapsed */
   margin-top: 2px;
   animation: slideDown 0.3s ease;
 }
 
 .sidebar:hover .sidebar-subitems {
   display: flex; /* Show when sidebar is expanded */
+  padding-left: 16px; /* Add left padding when expanded */
 }
 
 @keyframes slideDown {
@@ -199,8 +227,9 @@
 .sidebar-subitem {
   display: flex;
   align-items: center;
+  justify-content: center; /* Center when collapsed */
   gap: 12px;
-  padding: 10px 16px;
+  padding: 10px;
   border-radius: 10px;
   background: transparent;
   border: none;
@@ -212,6 +241,11 @@
   font-family: inherit;
   width: 100%;
   text-align: left;
+}
+
+.sidebar:hover .sidebar-subitem {
+  justify-content: flex-start; /* Left-align when expanded */
+  padding: 10px 16px;
 }
 
 .sidebar-subitem svg {
@@ -270,16 +304,33 @@
   padding-top: 16px;
 }
 
-/* User Info */
+/* User Info - Now clickable button */
 .sidebar-user {
   display: flex;
   align-items: center;
+  justify-content: center; /* Center avatar when collapsed */
   gap: 12px;
-  padding: 12px 24px;
+  padding: 12px;
   border-radius: 12px;
-  background: var(--bg-hover);
+  background: transparent; /* Transparent by default */
+  border: none;
   margin-bottom: 8px;
   min-height: 64px; /* Maintain height when collapsed */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.sidebar:hover .sidebar-user {
+  justify-content: flex-start; /* Left-align when expanded */
+  padding: 12px 24px;
+}
+
+.sidebar-user:hover {
+  background: var(--bg-hover);
 }
 
 .sidebar-user-avatar {
