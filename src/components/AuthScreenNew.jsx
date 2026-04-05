@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { signInWithGoogle, signInWithApple, signInAsGuest, signUpWithEmail, signInWithEmail } from '../firebase';
+import { signInWithGoogle, signInAsGuest, signUpWithEmail, signInWithEmail } from '../firebase';
 import '../styles/AuthScreenNew.css';
 
 function GoogleIcon() {
@@ -69,20 +69,6 @@ export default function AuthScreenNew({ onBack }) {
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') {
         setError(err.message || 'Google sign-in failed');
-      }
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const handleAppleSignIn = async () => {
-    setLoading('apple');
-    setError('');
-    try {
-      await signInWithApple();
-    } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setError(err.message || 'Apple sign-in failed');
       }
     } finally {
       setLoading(null);
@@ -282,13 +268,9 @@ export default function AuthScreenNew({ onBack }) {
               {loading === 'google' ? <div className="spinner"></div> : <GoogleIcon />}
               Google
             </button>
-            <button
-              className="social-btn"
-              onClick={handleAppleSignIn}
-              disabled={loading === 'apple'}
-            >
-              {loading === 'apple' ? <div className="spinner"></div> : <AppleIcon />}
-              Apple
+            <button className="social-btn" disabled>
+              <GitHubIcon />
+              GitHub
             </button>
           </div>
 
