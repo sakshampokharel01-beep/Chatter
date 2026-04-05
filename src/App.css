@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Chatter — Global Stylesheet
    Clean dark slate theme — natural, calm, minimal
    ============================================================ */
@@ -4332,52 +4332,71 @@ input:checked + .toggle-slider:before {
 /* Mobile responsive for modern header */
 @media (max-width: 768px) {
   .chat-header {
-    padding: 10px 12px;
+    padding: 12px 16px;
     gap: 8px;
     position: relative;
-    min-height: 56px;
+    min-height: 60px;
     overflow: visible;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
   }
 
   .header-left {
     flex-shrink: 1;
     min-width: 0;
+    overflow: hidden;
   }
 
   .header-center {
     flex: 1 1 auto;
     justify-content: center;
     min-width: 0;
+    overflow: hidden;
   }
 
   .header-right {
     flex-shrink: 0;
+    display: flex;
+    gap: 8px;
   }
 
   .header-brand {
-    gap: 6px;
+    gap: 8px;
+    overflow: hidden;
   }
 
   .header-title {
-    font-size: 16px;
-    display: none; /* Hide title on mobile to save space */
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .admin-badge {
-    display: none; /* Hide admin badge on mobile to save space */
+    font-size: 10px;
+    padding: 3px 8px;
   }
 
   .header-tabs-modern {
-    gap: 2px;
-    padding: 3px;
+    gap: 4px;
+    padding: 4px;
     background: rgba(255, 255, 255, 0.04);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .header-tabs-modern::-webkit-scrollbar {
+    display: none;
   }
 
   .tab-btn-modern {
-    padding: 8px 12px;
+    padding: 8px 14px;
     font-size: 13px;
     gap: 6px;
-    min-width: 44px; /* Ensure touch target size */
+    min-width: 44px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .tab-btn-modern span {
