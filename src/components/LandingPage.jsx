@@ -4,12 +4,23 @@ import '../styles/LandingPage.css';
 export default function LandingPage({ onGetStarted }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     // Check for saved theme preference or default to dark
     const savedTheme = localStorage.getItem('theme') || 'dark';
     setIsDarkMode(savedTheme === 'dark');
     document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
+  useEffect(() => {
+    // Handle scroll for glassmorphism header effect
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleTheme = () => {
@@ -110,7 +121,7 @@ export default function LandingPage({ onGetStarted }) {
   return (
     <div className="landing">
       {/* Header */}
-      <header className="landing-header">
+      <header className={`landing-header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="container">
           <div className="header-content">
             <div className="header-logo-section">
