@@ -5489,14 +5489,33 @@ input:checked + .toggle-slider:before {
   color: rgba(255, 255, 255, 0.6);
 }
 
+[data-theme="dark"] .auth-tabs {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
 [data-theme="dark"] .auth-tab {
-  color: rgba(255, 255, 255, 0.5);
-  border-bottom: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 [data-theme="dark"] .auth-tab.active {
-  color: rgba(255, 255, 255, 0.95);
-  border-bottom-color: #3b82f6;
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .auth-tab:not(.active):hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .btn-email-submit {
+  background: #3b82f6;
+  color: white;
+}
+
+[data-theme="dark"] .btn-email-submit:hover:not(:disabled) {
+  background: #2563eb;
 }
 
 [data-theme="dark"] .email-label {
@@ -5551,15 +5570,17 @@ input:checked + .toggle-slider:before {
 }
 
 [data-theme="dark"] .crafted-footer {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 [data-theme="dark"] .crafted-footer a {
-  color: #3b82f6;
+  color: #60a5fa;
+  font-weight: 600;
 }
 
 [data-theme="dark"] .crafted-footer a:hover {
-  color: #60a5fa;
+  color: #93c5fd;
+  text-decoration: underline;
 }
 
 [data-theme="dark"] .error-msg {
