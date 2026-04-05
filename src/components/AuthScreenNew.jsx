@@ -129,16 +129,6 @@ export default function AuthScreenNew({ onBack }) {
         {/* Left Hero Section */}
         <div className="auth-hero">
           <div className="hero-content">
-            <div className="logo-section">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <rect width="48" height="48" rx="12" fill="#3b82f6"/>
-                <path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="white" fillOpacity="0.95"/>
-                <circle cx="19" cy="24" r="1.5" fill="#3b82f6"/>
-                <circle cx="24" cy="24" r="1.5" fill="#3b82f6"/>
-                <circle cx="29" cy="24" r="1.5" fill="#3b82f6"/>
-              </svg>
-            </div>
-            
             <h1 className="hero-title">Welcome back to Chatter</h1>
             <p className="hero-subtitle">
               Connect with friends, join conversations, and stay in touch with people around the world.
