@@ -811,13 +811,13 @@
 }
 
 [data-theme="light"] .auth-glass-card {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(80px) saturate(180%);
   -webkit-backdrop-filter: blur(80px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08),
               0 20px 60px rgba(0, 0, 0, 0.03),
-              0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+              0 0 0 1px rgba(255, 255, 255, 0.6) inset;
 }
 
 [data-theme="light"] .shimmer-border {
@@ -847,7 +847,7 @@
 }
 
 [data-theme="light"] .form-group input {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.5);
   border: 1.5px solid rgba(99, 102, 241, 0.15);
   color: #1e293b;
   backdrop-filter: blur(20px);
@@ -858,7 +858,7 @@
 }
 
 [data-theme="light"] .form-group input:focus {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.7);
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
@@ -897,14 +897,14 @@
 }
 
 [data-theme="light"] .social-btn {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.5);
   border: 1.5px solid rgba(99, 102, 241, 0.15);
   color: #1e293b;
   backdrop-filter: blur(20px);
 }
 
 [data-theme="light"] .social-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.7);
   border-color: #6366f1;
 }
 
@@ -921,14 +921,14 @@
 }
 
 [data-theme="light"] .back-btn {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(99, 102, 241, 0.15);
   color: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(20px);
 }
 
 [data-theme="light"] .back-btn:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.6);
   color: #6366f1;
   border-color: #6366f1;
 }
