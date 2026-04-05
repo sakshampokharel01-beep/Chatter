@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/Sidebar.css';
 
 export default function Sidebar({ 
@@ -17,9 +17,43 @@ export default function Sidebar({
 }) {
   const [messagesExpanded, setMessagesExpanded] = useState(true);
   const [moreExpanded, setMoreExpanded] = useState(false);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const morePopupRef = useRef(null);
+  const moreButtonRef = useRef(null);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        moreExpanded &&
+        morePopupRef.current &&
+        moreButtonRef.current &&
+        !morePopupRef.current.contains(event.target) &&
+        !moreButtonRef.current.contains(event.target)
+      ) {
+        setMoreExpanded(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [moreExpanded]);
+
+  // Close popup when sidebar is no longer hovered
+  useEffect(() => {
+    if (!isSidebarHovered && moreExpanded) {
+      setMoreExpanded(false);
+    }
+  }, [isSidebarHovered, moreExpanded]);
 
   return (
-    <aside className="sidebar">
+    <aside 
+      className="sidebar"
+      onMouseEnter={() => setIsSidebarHovered(true)}
+      onMouseLeave={() => setIsSidebarHovered(false)}
+    >
       <div className="sidebar-content">
         {/* Logo/Brand */}
         <div className="sidebar-brand">
@@ -158,6 +192,7 @@ export default function Sidebar({
           {/* More Section (Expandable) */}
           <div className="sidebar-section">
             <button
+              ref={moreButtonRef}
               className={`sidebar-item expandable ${moreExpanded ? 'expanded' : ''}`}
               onClick={() => setMoreExpanded(!moreExpanded)}
               title="More Options"
@@ -185,7 +220,7 @@ export default function Sidebar({
 
             {/* More Popup Card */}
             {moreExpanded && (
-              <div className="more-popup-card">
+              <div className="more-popup-card" ref={morePopupRef}>
                 <button
                   className="more-popup-item"
                   onClick={() => {
