@@ -508,16 +508,6 @@ export default function LandingPage({ onGetStarted }) {
       <footer className="footer-modern">
         <div className="container">
           <div className="footer-content">
-            <div className="footer-brand">
-              <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="48" height="48" rx="12" fill="#0095f6"/>
-                <path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="white" fillOpacity="0.95"/>
-                <circle cx="19" cy="24" r="1.5" fill="#0095f6"/>
-                <circle cx="24" cy="24" r="1.5" fill="#0095f6"/>
-                <circle cx="29" cy="24" r="1.5" fill="#0095f6"/>
-              </svg>
-              <span>Chatter</span>
-            </div>
             <p className="footer-text">
               © {new Date().getFullYear()} Crafted by <a href="https://sakshampokharel.me" target="_blank" rel="noopener noreferrer">Saksham Pokharel</a>
             </p>
