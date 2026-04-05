@@ -124,8 +124,9 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="public-profile-modal-large" onClick={e => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose} aria-label="Close">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        {/* Modern Close Button */}
+        <button className="profile-modal-close-btn" onClick={onClose} aria-label="Close profile">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -143,28 +144,57 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
                     {(profileData.displayName || '?').charAt(0).toUpperCase()}
                   </div>
                 )}
+                {profileData.online && <div className="profile-online-badge"></div>}
               </div>
             </div>
 
             <div className="profile-info-section">
               <div className="profile-header-row">
-                <h1 className="profile-username">{profileData.displayName}</h1>
+                <div className="profile-username-wrapper">
+                  <h1 className="profile-username">{profileData.displayName}</h1>
+                  {profileData.isAdmin && (
+                    <span className="profile-verified-badge" title="Admin">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                      </svg>
+                    </span>
+                  )}
+                </div>
                 <div className="profile-action-buttons">
                   {isFriend ? (
                     <>
                       <button className="profile-btn-primary" onClick={() => onSendMessage(profileData)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
                         Message
                       </button>
                       <button className="profile-btn-secondary" onClick={() => onRemoveFriend(profileData)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                          <circle cx="8.5" cy="7" r="4"/>
+                          <line x1="18" y1="8" x2="23" y2="13"/>
+                          <line x1="23" y1="8" x2="18" y2="13"/>
+                        </svg>
                         Unfriend
                       </button>
                     </>
                   ) : hasPendingRequest ? (
                     <button className="profile-btn-disabled" disabled>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
                       Requested
                     </button>
                   ) : (
                     <button className="profile-btn-primary" onClick={() => onAddFriend(profileData)}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="20" y1="8" x2="20" y2="14"/>
+                        <line x1="23" y1="11" x2="17" y2="11"/>
+                      </svg>
                       Add Friend
                     </button>
                   )}
