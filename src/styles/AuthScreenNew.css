@@ -353,10 +353,12 @@
   -webkit-backdrop-filter: blur(80px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 24px;
-  padding: 3rem;
+  padding: 2.5rem 3rem;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
               0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   overflow: hidden;
+  max-width: 480px;
+  width: 100%;
 }
 
 /* Shimmer Border */
@@ -380,19 +382,19 @@
 }
 
 .card-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
 .card-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: white;
   margin-bottom: 0.5rem;
 }
 
 .card-subtitle {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -414,7 +416,7 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .form-group {
@@ -424,18 +426,18 @@
 }
 
 .form-group label {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: 0.75rem 1rem;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 16px;
   color: white;
   font-size: 0.9375rem;
   font-family: inherit;
@@ -484,7 +486,7 @@
 .form-footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: -0.5rem;
+  margin-top: -0.25rem;
 }
 
 .forgot-link {
@@ -506,10 +508,10 @@
 /* Submit Button */
 .submit-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 0.875rem 1rem;
   background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -556,9 +558,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin: 1.5rem 0;
+  margin: 1.25rem 0;
   color: rgba(255, 255, 255, 0.4);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .divider::before,
@@ -581,11 +583,11 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.875rem 1rem;
+  padding: 0.75rem 1rem;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 16px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.9375rem;
   font-weight: 500;
@@ -608,8 +610,8 @@
 /* Switch Mode */
 .switch-mode {
   text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.9375rem;
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -637,11 +639,11 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  border-radius: 16px;
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.875rem;
   font-weight: 500;
@@ -681,7 +683,7 @@
   }
 
   .auth-glass-card {
-    padding: 2rem 1.5rem;
+    padding: 1.75rem 1.25rem;
   }
 
   .hero-title {
