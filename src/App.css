@@ -5468,11 +5468,11 @@ input:checked + .toggle-slider:before {
 
 /* Dark theme for Auth Screen */
 [data-theme="dark"] .auth-screen {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  background: #0a0a0a;
 }
 
 [data-theme="dark"] .auth-screen::before {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
 }
 
 [data-theme="dark"] .auth-card {
@@ -5594,5 +5594,6 @@ input:checked + .toggle-slider:before {
 }
 
 [data-theme="dark"] .auth-orb {
-  opacity: 0.3;
+  opacity: 0.08;
+  filter: blur(100px);
 }
