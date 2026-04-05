@@ -86,6 +86,27 @@ export default function AuthScreenNew({ onBack }) {
 
   return (
     <div className="auth-new-screen">
+      {/* Animated Background */}
+      <div className="animated-bg">
+        <div className="mesh-gradient"></div>
+        <div className="gradient-orb gradient-orb-1"></div>
+        <div className="gradient-orb gradient-orb-2"></div>
+        <div className="gradient-orb gradient-orb-3"></div>
+        
+        {/* Floating Particles */}
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDuration: `${15 + Math.random() * 15}s`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Theme Toggle Button */}
       <button className="auth-theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
         {isDarkMode ? (
