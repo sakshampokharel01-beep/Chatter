@@ -2,14 +2,17 @@
 
 .auth-new-screen {
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   background: #080a0f;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  width: 100%;
 }
 
 /* Animated Background */
@@ -681,27 +684,62 @@
   }
 }
 
-@media (max-width: 640px) {
+/* Mobile Performance Optimizations */
+@media (max-width: 768px) {
+  /* Reduce expensive backdrop blur on mobile */
   .auth-new-screen {
     padding: 0.5rem;
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .auth-glass-card {
     padding: 1.5rem 1rem;
     max-width: 100%;
     margin: 0 auto;
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    will-change: auto;
+    transform: translateZ(0);
   }
 
   .auth-new-container {
     padding: 1rem 0;
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .auth-hero {
     display: none;
+  }
+
+  /* Disable expensive animations on mobile */
+  .gradient-orb,
+  .particle,
+  .mesh-gradient,
+  .orb,
+  .stars {
+    display: none !important;
+  }
+
+  .animated-bg {
+    display: none !important;
+  }
+
+  /* Simplify city skyline */
+  .city-skyline {
+    height: 150px;
+    opacity: 0.2;
+    will-change: auto;
+  }
+
+  .window {
+    animation: none !important;
   }
 
   .hero-title {
@@ -720,19 +758,16 @@
     grid-template-columns: 1fr;
   }
 
-  .city-skyline {
-    height: 200px;
-    opacity: 0.3;
-  }
-
   .form-group input {
     padding: 0.875rem 1rem;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
+    transform: translateZ(0);
   }
 
   .submit-btn {
     padding: 1rem;
     font-size: 1rem;
+    transform: translateZ(0);
   }
 
   .auth-theme-toggle {
@@ -740,6 +775,27 @@
     right: 1rem;
     width: 44px;
     height: 44px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Simplify shadows */
+  .auth-glass-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Disable shimmer animation */
+  .shimmer-border {
+    display: none;
+  }
+
+  /* Optimize rendering */
+  .auth-glass-card,
+  .form-group input,
+  .submit-btn,
+  .social-btn {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
