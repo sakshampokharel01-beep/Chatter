@@ -5,7 +5,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db, registerUser, signOutUser } from './firebase';
 import { useUserPresence } from './hooks/useUserPresence';
 import LandingPage from './components/LandingPage';
-import AuthScreen from './components/AuthScreen';
+import AuthScreenNew from './components/AuthScreenNew';
 import ChatRoom from './components/ChatRoom';
 import EmailVerificationScreen from './components/EmailVerificationScreen';
 
@@ -110,7 +110,7 @@ function App() {
 
   return (
     <div className="app">
-      {user ? <ChatRoom user={user} /> : <AuthScreen onBack={() => setShowLanding(true)} />}
+      {user ? <ChatRoom user={user} /> : <AuthScreenNew onBack={() => setShowLanding(true)} />}
     </div>
   );
 }
