@@ -222,6 +222,67 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  position: relative; /* For popup positioning */
+}
+
+/* More Popup Card - Instagram Style */
+.more-popup-card {
+  position: absolute;
+  bottom: 100%;
+  left: 12px;
+  margin-bottom: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  min-width: 240px;
+  padding: 8px;
+  z-index: 1000;
+  animation: popupSlideUp 0.2s ease both;
+}
+
+@keyframes popupSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.more-popup-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.more-popup-item svg {
+  flex-shrink: 0;
+  min-width: 20px;
+  min-height: 20px;
+  color: var(--text-primary);
+}
+
+.more-popup-item:hover {
+  background: var(--bg-hover);
+}
+
+.more-popup-item span {
+  white-space: nowrap;
 }
 
 /* Sub-items */

@@ -183,13 +183,15 @@ export default function Sidebar({
               </svg>
             </button>
 
-            {/* More Sub-items */}
+            {/* More Popup Card */}
             {moreExpanded && (
-              <div className="sidebar-subitems">
+              <div className="more-popup-card">
                 <button
-                  className="sidebar-subitem"
-                  onClick={onThemeToggle}
-                  title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                  className="more-popup-item"
+                  onClick={() => {
+                    onThemeToggle();
+                    setMoreExpanded(false);
+                  }}
                 >
                   {theme === 'dark' ? (
                     <>
@@ -204,22 +206,24 @@ export default function Sidebar({
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                       </svg>
-                      <span>Light Mode</span>
+                      <span>Switch to Light Mode</span>
                     </>
                   ) : (
                     <>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                       </svg>
-                      <span>Dark Mode</span>
+                      <span>Switch to Dark Mode</span>
                     </>
                   )}
                 </button>
 
                 <button
-                  className="sidebar-subitem"
-                  onClick={onDevicesClick}
-                  title="Manage Active Sessions"
+                  className="more-popup-item"
+                  onClick={() => {
+                    onDevicesClick();
+                    setMoreExpanded(false);
+                  }}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
