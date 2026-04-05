@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /admin
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://chatter-talk.vercel.app/sitemap.xml

@@ -121,11 +121,11 @@ export default function LandingPage({ onGetStarted }) {
   return (
     <div className="landing">
       {/* Header */}
-      <header className={`landing-header ${isScrolled ? 'scrolled' : ''}`}>
+      <header className={`landing-header ${isScrolled ? 'scrolled' : ''}`} role="banner">
         <div className="container">
           <div className="header-content">
             <div className="header-logo-section">
-              <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <rect width="48" height="48" rx="12" fill="#0095f6"/>
                 <path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="white" fillOpacity="0.95"/>
                 <circle cx="19" cy="24" r="1.5" fill="#0095f6"/>
@@ -138,7 +138,7 @@ export default function LandingPage({ onGetStarted }) {
             <button 
               className="menu-toggle" 
               onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Toggle menu"
+              aria-label="Toggle navigation menu"
               aria-expanded={menuOpen}
             >
               <span className={`hamburger ${menuOpen ? 'open' : ''}`}>
@@ -148,7 +148,7 @@ export default function LandingPage({ onGetStarted }) {
               </span>
             </button>
 
-            <nav className={`nav-menu ${menuOpen ? 'open' : ''}`}>
+            <nav className={`nav-menu ${menuOpen ? 'open' : ''}`} role="navigation" aria-label="Main navigation">
               <button className="nav-link" onClick={() => scrollToSection('hero')}>
                 Home
               </button>
