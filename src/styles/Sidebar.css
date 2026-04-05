@@ -13,13 +13,14 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.2s ease-in-out; /* Slower, smoother transition */
   overflow: visible; /* Allow tooltips to show */
 }
 
 .sidebar:hover {
   width: 260px; /* Expanded on hover - icons + text */
   overflow: hidden; /* Prevent horizontal scroll when expanded */
+  transition: width 0.15s ease-in-out; /* Faster on expand */
 }
 
 .sidebar-content {
@@ -75,12 +76,13 @@
   width: 0;
   overflow: hidden;
   white-space: nowrap;
-  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
+  transition: opacity 0.15s ease 0.05s, width 0.15s ease 0.05s;
 }
 
 .sidebar:hover .sidebar-brand-text {
   opacity: 1;
   width: auto;
+  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
 }
 
 /* Navigation */
@@ -178,12 +180,13 @@
   width: 0;
   overflow: hidden;
   white-space: nowrap;
-  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
+  transition: opacity 0.15s ease 0.05s, width 0.15s ease 0.05s;
 }
 
 .sidebar:hover .sidebar-item span {
   opacity: 1;
   width: auto;
+  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
 }
 
 .sidebar-item:hover {
@@ -201,7 +204,7 @@
 
 /* Expandable Items */
 .sidebar-item.expandable .expand-icon {
-  transition: transform 0.3s ease, opacity 0.2s ease 0.1s;
+  transition: transform 0.2s ease, opacity 0.15s ease 0.05s;
   color: var(--text-secondary);
   opacity: 0;
   width: 0;
@@ -211,6 +214,7 @@
 .sidebar:hover .sidebar-item.expandable .expand-icon {
   opacity: 1;
   width: 16px;
+  transition: transform 0.2s ease, opacity 0.2s ease 0.1s;
 }
 
 .sidebar-item.expandable.expanded .expand-icon {
@@ -348,12 +352,13 @@
   width: 0;
   overflow: hidden;
   white-space: nowrap;
-  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
+  transition: opacity 0.15s ease 0.05s, width 0.15s ease 0.05s;
 }
 
 .sidebar:hover .sidebar-subitem span {
   opacity: 1;
   width: auto;
+  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
 }
 
 .sidebar-subitem:hover:not(.disabled) {
