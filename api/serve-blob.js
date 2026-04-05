@@ -1,7 +1,7 @@
 // api/serve-blob.js — Proxy to serve private Vercel Blob files to the browser
-// We find the exact URL via the SDK, then fetch it server-side using our token
+// We construct the blob URL directly and fetch it server-side using our token
 // and stream the bytes to the browser. This bypasses the 403 Forbidden.
-import { list } from '@vercel/blob';
+import { head } from '@vercel/blob';
 
 export default async function handler(request, response) {
   if (request.method !== 'GET') {
@@ -19,18 +19,17 @@ export default async function handler(request, response) {
   }
 
   try {
-    // 1. Locate the exact blob using its pathname to get the correct absolute URL
-    const { blobs } = await list({
-      prefix: pathname,
-      limit: 1,
-      token,
-    });
-
-    if (!blobs || blobs.length === 0) {
-      return response.status(404).json({ error: 'File not found' });
+    console.log('Serving blob with pathname:', pathname);
+    
+    // 1. Get blob metadata using head() to verify it exists and get the URL
+    const blobInfo = await head(pathname, { token });
+    
+    if (!blobInfo || !blobInfo.url) {
+      console.log('Blob not found:', pathname);
+      return response.status(404).json({ error: 'File not found', pathname });
     }
 
-    const blob = blobs[0];
+    console.log('Found blob:', blobInfo.url);
 
     // 2. Fetch the blob server-side using the token since it's private
     const fetchOptions = {
@@ -44,10 +43,11 @@ export default async function handler(request, response) {
       fetchOptions.headers.Range = request.headers.range;
     }
 
-    const blobResponse = await fetch(blob.url, fetchOptions);
+    const blobResponse = await fetch(blobInfo.url, fetchOptions);
 
     if (!blobResponse.ok && blobResponse.status !== 206) {
       const errText = await blobResponse.text();
+      console.error('Failed to fetch blob:', errText);
       return response.status(blobResponse.status).json({ error: `Failed to fetch blob: ${errText}` });
     }
 
@@ -62,7 +62,7 @@ export default async function handler(request, response) {
     
     // Fallback if content-type is missing
     if (!response.getHeader('content-type')) {
-      response.setHeader('Content-Type', 'application/octet-stream');
+      response.setHeader('Content-Type', blobInfo.contentType || 'application/octet-stream');
     }
 
     // Pass the original status (200 or 206)
@@ -73,6 +73,6 @@ export default async function handler(request, response) {
     return response.send(Buffer.from(arrayBuffer));
   } catch (error) {
     console.error('serve-blob error:', error);
-    return response.status(500).json({ error: error.message });
+    return response.status(500).json({ error: error.message, pathname });
   }
 }

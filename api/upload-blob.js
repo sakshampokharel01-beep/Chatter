@@ -34,6 +34,8 @@ export default async function handler(request, response) {
 
     let blob;
 
+    console.log('Uploading blob with pathname:', pathname, 'contentType:', contentType);
+
     // Try public access first; fall back to private if the store requires it
     try {
       blob = await put(pathname, body, {
@@ -42,6 +44,7 @@ export default async function handler(request, response) {
         contentType: contentType || 'application/octet-stream',
         addRandomSuffix: false,
       });
+      console.log('Uploaded as public blob:', blob.pathname, blob.url);
     } catch (publicErr) {
       if (publicErr.message && publicErr.message.includes('private store')) {
         // Store is private — retry with private access
@@ -51,15 +54,19 @@ export default async function handler(request, response) {
           contentType: contentType || 'application/octet-stream',
           addRandomSuffix: false,
         });
+        console.log('Uploaded as private blob:', blob.pathname, blob.url);
       } else {
         throw publicErr;
       }
     }
 
+    const proxyUrl = `/api/serve-blob?pathname=${encodeURIComponent(blob.pathname)}`;
+    console.log('Returning proxy URL:', proxyUrl);
+
     return response.status(200).json({
       // Use our proxy URL so the browser can access the file without hitting the private blob directly
-      url: `/api/serve-blob?pathname=${encodeURIComponent(blob.pathname)}`,
-      downloadUrl: `/api/serve-blob?pathname=${encodeURIComponent(blob.pathname)}`,
+      url: proxyUrl,
+      downloadUrl: proxyUrl,
       pathname: blob.pathname,
     });
   } catch (error) {
