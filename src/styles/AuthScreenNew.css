@@ -705,57 +705,57 @@
 
 /* Light Theme Overrides */
 [data-theme="light"] .auth-new-screen {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 50%, #f5f3ff 100%);
 }
 
 [data-theme="light"] .gradient-orb-1 {
-  background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
 }
 
 [data-theme="light"] .gradient-orb-2 {
-  background: radial-gradient(circle, rgba(240, 147, 251, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
 }
 
 [data-theme="light"] .gradient-orb-3 {
-  background: radial-gradient(circle, rgba(118, 75, 162, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
 }
 
 [data-theme="light"] .particle {
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  background: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
 }
 
 [data-theme="light"] .mesh-gradient {
   background: 
-    radial-gradient(at 20% 30%, rgba(102, 126, 234, 0.25) 0px, transparent 50%),
-    radial-gradient(at 80% 70%, rgba(240, 147, 251, 0.25) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(118, 75, 162, 0.2) 0px, transparent 50%);
+    radial-gradient(at 20% 30%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(59, 130, 246, 0.06) 0px, transparent 50%);
 }
 
 [data-theme="light"] .auth-theme-toggle {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  color: #667eea;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  color: #6366f1;
   backdrop-filter: blur(12px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
 }
 
 [data-theme="light"] .auth-theme-toggle:hover {
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
 }
 
 [data-theme="light"] .city-skyline {
-  opacity: 0.15;
+  opacity: 0.12;
 }
 
 [data-theme="light"] .skyline-svg rect {
-  fill: #667eea !important;
+  fill: #6366f1 !important;
 }
 
 [data-theme="light"] .window {
-  fill: #f093fb !important;
-  opacity: 0.5 !important;
+  fill: #8b5cf6 !important;
+  opacity: 0.4 !important;
 }
 
 [data-theme="light"] .orb-1 {
@@ -778,59 +778,55 @@
 }
 
 [data-theme="light"] .hero-title {
-  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="light"] .hero-subtitle {
-  color: rgba(255, 255, 255, 0.95);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  color: rgba(30, 41, 59, 0.75);
 }
 
 [data-theme="light"] .user-stats {
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.15);
   backdrop-filter: blur(20px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
 }
 
 [data-theme="light"] .stats-number {
-  color: #ffffff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  color: #1e293b;
 }
 
 [data-theme="light"] .stats-label {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(30, 41, 59, 0.65);
 }
 
 [data-theme="light"] .auth-glass-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(80px) saturate(180%);
   -webkit-backdrop-filter: blur(80px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25),
-              0 8px 32px rgba(118, 75, 162, 0.15),
-              0 0 0 1px rgba(255, 255, 255, 1) inset;
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08),
+              0 20px 60px rgba(0, 0, 0, 0.05),
+              0 0 0 1px rgba(255, 255, 255, 0.9) inset;
 }
 
 [data-theme="light"] .shimmer-border {
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(102, 126, 234, 0.6) 50%, 
+    rgba(99, 102, 241, 0.4) 50%, 
     transparent 100%
   );
 }
 
 [data-theme="light"] .card-title {
-  color: #2d3748;
-  font-weight: 800;
+  color: #1e293b;
 }
 
 [data-theme="light"] .card-subtitle {
-  color: rgba(45, 55, 72, 0.7);
+  color: rgba(30, 41, 59, 0.65);
 }
 
 [data-theme="light"] .error-banner {
@@ -840,102 +836,94 @@
 }
 
 [data-theme="light"] .form-group label {
-  color: #2d3748;
-  font-weight: 600;
+  color: #1e293b;
 }
 
 [data-theme="light"] .form-group input {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1.5px solid rgba(102, 126, 234, 0.2);
-  color: #2d3748;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(99, 102, 241, 0.15);
+  color: #1e293b;
   backdrop-filter: blur(20px);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 [data-theme="light"] .form-group input::placeholder {
-  color: rgba(45, 55, 72, 0.5);
+  color: rgba(30, 41, 59, 0.45);
 }
 
 [data-theme="light"] .form-group input:focus {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15),
-              0 4px 12px rgba(102, 126, 234, 0.12);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 [data-theme="light"] .password-toggle {
-  color: rgba(45, 55, 72, 0.6);
+  color: rgba(30, 41, 59, 0.5);
 }
 
 [data-theme="light"] .password-toggle:hover {
-  color: #667eea;
+  color: #6366f1;
 }
 
 [data-theme="light"] .forgot-link {
-  color: #667eea;
-  font-weight: 600;
+  color: #6366f1;
 }
 
 [data-theme="light"] .forgot-link:hover {
-  color: #764ba2;
+  color: #4f46e5;
 }
 
 [data-theme="light"] .submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
 }
 
 [data-theme="light"] .submit-btn:hover:not(:disabled) {
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
 }
 
 [data-theme="light"] .divider {
-  color: rgba(45, 55, 72, 0.5);
+  color: rgba(30, 41, 59, 0.45);
 }
 
 [data-theme="light"] .divider::before,
 [data-theme="light"] .divider::after {
-  background: rgba(102, 126, 234, 0.2);
+  background: rgba(99, 102, 241, 0.15);
 }
 
 [data-theme="light"] .social-btn {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1.5px solid rgba(102, 126, 234, 0.2);
-  color: #2d3748;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(99, 102, 241, 0.15);
+  color: #1e293b;
   backdrop-filter: blur(20px);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 [data-theme="light"] .social-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #6366f1;
 }
 
 [data-theme="light"] .switch-mode {
-  color: rgba(45, 55, 72, 0.7);
+  color: rgba(30, 41, 59, 0.65);
 }
 
 [data-theme="light"] .switch-mode button {
-  color: #667eea;
-  font-weight: 700;
+  color: #6366f1;
 }
 
 [data-theme="light"] .switch-mode button:hover {
-  color: #764ba2;
+  color: #4f46e5;
 }
 
 [data-theme="light"] .back-btn {
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  color: rgba(45, 55, 72, 0.8);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  color: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(20px);
 }
 
 [data-theme="light"] .back-btn:hover {
-  background: rgba(255, 255, 255, 0.7);
-  color: #667eea;
-  border-color: #667eea;
+  background: rgba(255, 255, 255, 0.8);
+  color: #6366f1;
+  border-color: #6366f1;
 }
 
 @media (max-width: 640px) {
