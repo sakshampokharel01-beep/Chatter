@@ -242,7 +242,7 @@
   font-weight: 900;
   line-height: 1.15;
   letter-spacing: -0.05em;
-  color: #0a0a0a;
+  color: #1a1a1a !important;
   margin-bottom: 1.5rem;
   animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -2416,7 +2416,15 @@
 }
 
 [data-theme="light"] .video-call-mock {
-  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+[data-theme="light"] .video-participant {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .participant-name {
+  color: #1a1a1a;
 }
 
 [data-theme="light"] .video-participant {
