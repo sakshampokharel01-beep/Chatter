@@ -29,6 +29,9 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
 
       const userData = { id: user.id, ...user.data() };
       setProfileData(userData);
+      
+      // Debug: Log online status
+      console.log('Profile online status:', userData.online, 'for user:', userData.displayName);
 
       // Load friend count - DEDUPLICATE to get actual unique friends
       const friendsQuery = query(
@@ -144,7 +147,7 @@ export default function PublicProfile({ userId, currentUserId, onClose, onSendMe
                     {(profileData.displayName || '?').charAt(0).toUpperCase()}
                   </div>
                 )}
-                {profileData.online && <div className="profile-online-badge"></div>}
+                {profileData.online === true && <div className="profile-online-badge"></div>}
               </div>
             </div>
 
