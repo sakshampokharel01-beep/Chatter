@@ -1,0 +1,110 @@
+/* ================================================================
+   BOTTOM NAVIGATION - Mobile Only
+   ================================================================ */
+
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-primary);
+  z-index: 100;
+  padding: 0 8px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  padding: 8px 4px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.bottom-nav-item svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.bottom-nav-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.bottom-nav-item:active:not(.disabled) {
+  transform: scale(0.95);
+}
+
+.bottom-nav-item.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.bottom-nav-item.active svg {
+  color: var(--accent-primary);
+}
+
+.bottom-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: var(--accent-primary);
+  border-radius: 0 0 3px 3px;
+}
+
+.bottom-nav-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Show on mobile only */
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+  }
+
+  /* Add padding to content to prevent overlap with bottom nav */
+  .chat-room {
+    padding-bottom: 60px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .bottom-nav {
+    height: 56px;
+    padding: 0 4px;
+  }
+
+  .bottom-nav-item {
+    font-size: 10px;
+    gap: 2px;
+  }
+
+  .bottom-nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+}

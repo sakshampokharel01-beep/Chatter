@@ -5761,3 +5761,217 @@ input:checked + .toggle-slider:before {
   opacity: 0.08;
   filter: blur(100px);
 }
+
+
+/* ================================================================
+   SIDEBAR LAYOUT - Instagram Style
+   ================================================================ */
+
+.chat-room-wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.chat-room {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+/* Minimal Header */
+.chat-header-minimal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+
+.chat-header-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.admin-badge-minimal {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  background: rgba(91, 141, 238, 0.15);
+  color: #5b8dee;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Mobile Menu */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mobile-menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.mobile-menu-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.mobile-menu-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.mobile-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.mobile-menu-item svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-item:active {
+  transform: scale(0.98);
+}
+
+.mobile-menu-item:hover {
+  background: var(--bg-hover);
+}
+
+.mobile-menu-item:hover svg {
+  color: var(--accent-primary);
+}
+
+.mobile-menu-item.logout {
+  color: var(--accent-red);
+}
+
+.mobile-menu-item.logout svg {
+  color: var(--accent-red);
+}
+
+.mobile-menu-item.logout:hover {
+  background: rgba(224, 92, 106, 0.1);
+}
+
+.mobile-menu-divider {
+  height: 1px;
+  background: var(--border-secondary);
+  margin: 8px 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .chat-room-wrapper {
+    flex-direction: column;
+  }
+
+  .chat-room {
+    padding-bottom: 60px;
+  }
+
+  .chat-header-minimal {
+    padding: 16px 20px;
+  }
+
+  .chat-header-title {
+    font-size: 20px;
+  }
+
+  .mobile-menu-overlay {
+    display: block;
+  }
+}
+
+/* Hide old header on desktop when using sidebar */
+@media (min-width: 769px) {
+  .chat-header {
+    display: none !important;
+  }
+}

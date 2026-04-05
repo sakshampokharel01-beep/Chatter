@@ -58,11 +58,21 @@
 3. **Users** - Admin panel (only visible to admins)
 4. **Profile** - Edit profile
 5. **Notifications** - Notification settings
-6. **Theme** - Toggle dark/light mode
 
 ### Bottom Section
+- **More** (Expandable)
+  - Settings
+  - Your Activity (future feature)
+  - Saved Messages (future feature)
+  - Switch Appearance (Theme toggle)
+  - Active Sessions
+  - Report a Problem (future feature)
+  - Switch Accounts (future feature)
+  - Log Out
+
+### User Info (Very Bottom)
 - User avatar & name
-- Logout button
+- Online status indicator
 
 ## Benefits
 1. ✅ More screen space for content

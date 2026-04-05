@@ -15,13 +15,15 @@ import {
   updateDoc,
   startAfter,
 } from 'firebase/firestore';
-import { db, auth, signOutUser, getDisplayName, isAdmin, safePhotoURL } from '../firebase';
+import { db, auth, signOutUser, getDisplayName, safePhotoURL } from '../firebase';
 import DirectMessages from './DirectMessages';
 import AdminPanel from './AdminPanel';
 import UserProfile from './UserProfile';
 import DeviceManagement from './DeviceManagement';
 import NotificationSettings from './NotificationSettings';
 import InAppNotification from './InAppNotification';
+import Sidebar from './Sidebar';
+import BottomNav from './BottomNav';
 import { useInAppNotifications } from '../hooks/useInAppNotifications.jsx';
 import { getSocket } from '../socket';
 
@@ -223,7 +225,7 @@ export default function ChatRoom({ user }) {
   const [showProfile, setShowProfile] = useState(false); // Track profile modal visibility
   const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
   const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
-  const [showUserMenu, setShowUserMenu] = useState(false); // Track user dropdown menu visibility
+  const [showMobileMenu, setShowMobileMenu] = useState(false); // Track mobile menu visibility
   const [theme, setTheme] = useState(() => {
     // Initialize theme from localStorage or default to 'dark'
     const savedTheme = localStorage.getItem('theme');
@@ -249,24 +251,6 @@ export default function ChatRoom({ user }) {
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
   const [adminUser, setAdminUser] = useState(false);
-  const userMenuRef = useRef(null);
-
-  // Close user menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setShowUserMenu(false);
-      }
-    };
-
-    if (showUserMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showUserMenu]);
 
   // Cleanup session on sign out or browser close
   useEffect(() => {
@@ -665,195 +649,44 @@ export default function ChatRoom({ user }) {
 
   /* ── Render ── */
   return (
-    <div className="chat-room">
-      {/* ── Header ── */}
-      <header className="chat-header">
-        <div className="header-left">
-          <div className="header-brand">
-            <span className="header-logo" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="14" fill="#5b8dee"/><path d="M14 16h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H26l-5 4v-4h-7a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z" fill="#fff" fillOpacity=".92"/><circle cx="19" cy="24" r="1.5" fill="#5b8dee"/><circle cx="24" cy="24" r="1.5" fill="#5b8dee"/><circle cx="29" cy="24" r="1.5" fill="#5b8dee"/></svg>
+    <div className="chat-room-wrapper">
+      {/* Sidebar - Desktop */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        user={user}
+        displayName={displayName}
+        adminUser={adminUser}
+        isGuest={isGuest}
+        onProfileClick={() => setShowProfile(true)}
+        onNotificationsClick={() => setShowNotifications(true)}
+        onDevicesClick={() => setShowDevices(true)}
+        onThemeToggle={() => {
+          const newTheme = theme === 'dark' ? 'light' : 'dark';
+          setTheme(newTheme);
+        }}
+        onLogout={signOutUser}
+        theme={theme}
+      />
+
+      {/* Main Content Area */}
+      <div className="chat-room">
+        {/* Minimal Header - Just shows current view title */}
+        <header className="chat-header-minimal">
+          <h1 className="chat-header-title">
+            {activeTab === 'global' && 'Global Chat'}
+            {activeTab === 'dms' && 'Private Messages'}
+            {activeTab === 'admin' && 'User Management'}
+          </h1>
+          {adminUser && activeTab !== 'admin' && (
+            <span className="admin-badge-minimal">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Admin
             </span>
-            <span className="header-title">Chatter</span>
-            {adminUser && <span className="admin-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'-1px',marginRight:'3px'}}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin</span>}
-          </div>
-        </div>
-
-        <div className="header-center">
-          <div className="header-tabs-modern">
-            <button
-              className={`tab-btn-modern${activeTab === 'global' ? ' active' : ''}`}
-              onClick={() => setActiveTab('global')}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
-              <span>Global</span>
-            </button>
-            <button
-              className={`tab-btn-modern${activeTab === 'dms' ? ' active' : ''}`}
-              onClick={() => !isGuest && setActiveTab('dms')}
-              disabled={isGuest}
-              title={isGuest ? 'Sign in with Google to use Direct Messages' : 'Direct Messages'}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-              </svg>
-              <span>Private Messages</span>
-              {isGuest && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginLeft:'4px'}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>}
-            </button>
-            {adminUser && (
-              <button
-                className={`tab-btn-modern${activeTab === 'admin' ? ' active' : ''}`}
-                onClick={() => setActiveTab('admin')}
-                title="Admin Panel"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-                <span>Users</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="header-right">
-          <div className="header-user" ref={userMenuRef}>
-            <button 
-              className="user-profile-btn-modern"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              title="User Menu"
-            >
-              {user.photoURL ? (
-                <img src={user.photoURL} alt={displayName} className="user-avatar-modern" />
-              ) : (
-                <div className="user-avatar-placeholder-modern">
-                  {displayName.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </button>
-
-            {/* User Dropdown Menu */}
-            {showUserMenu && (
-              <div className="user-dropdown-menu">
-                <div className="user-dropdown-header">
-                  <div className="user-dropdown-avatar">
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt={displayName} />
-                    ) : (
-                      <div className="user-avatar-placeholder">
-                        {displayName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                  <div className="user-dropdown-info">
-                    <div className="user-dropdown-name">{displayName}</div>
-                    {user.email && <div className="user-dropdown-email">{user.email}</div>}
-                  </div>
-                </div>
-
-                <div className="user-dropdown-divider"></div>
-
-                <button
-                  className="user-dropdown-item"
-                  onClick={() => {
-                    setShowProfile(true);
-                    setShowUserMenu(false);
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                  Edit Profile
-                </button>
-
-                <button
-                  className="user-dropdown-item"
-                  onClick={() => {
-                    setShowNotifications(true);
-                    setShowUserMenu(false);
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                  Notifications
-                </button>
-
-                <button
-                  className="user-dropdown-item"
-                  onClick={() => {
-                    setShowDevices(true);
-                    setShowUserMenu(false);
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                    <line x1="8" y1="21" x2="16" y2="21"/>
-                    <line x1="12" y1="17" x2="12" y2="21"/>
-                  </svg>
-                  Active Sessions
-                </button>
-
-                <button
-                  className="user-dropdown-item theme-toggle-item"
-                  onClick={() => {
-                    const newTheme = theme === 'dark' ? 'light' : 'dark';
-                    setTheme(newTheme);
-                  }}
-                >
-                  {theme === 'dark' ? (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="5"/>
-                        <line x1="12" y1="1" x2="12" y2="3"/>
-                        <line x1="12" y1="21" x2="12" y2="23"/>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                        <line x1="1" y1="12" x2="3" y2="12"/>
-                        <line x1="21" y1="12" x2="23" y2="12"/>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                      </svg>
-                      Light Mode
-                    </>
-                  ) : (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                      </svg>
-                      Dark Mode
-                    </>
-                  )}
-                </button>
-
-                <div className="user-dropdown-divider"></div>
-
-                <button
-                  className="user-dropdown-item logout"
-                  onClick={() => {
-                    setShowUserMenu(false);
-                    signOutUser();
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <polyline points="16 17 21 12 16 7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
-                  </svg>
-                  Log Out
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+          )}
+        </header>
 
       {/* ── Global Chat ── */}
       {activeTab === 'global' && (
@@ -1015,6 +848,128 @@ export default function ChatRoom({ user }) {
           onClick={notification.onClick}
         />
       ))}
+      </div>
+
+      {/* Bottom Navigation - Mobile Only */}
+      <BottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        adminUser={adminUser}
+        isGuest={isGuest}
+        onMoreClick={() => setShowMobileMenu(true)}
+      />
+
+      {/* Mobile Menu Modal */}
+      {showMobileMenu && (
+        <div className="mobile-menu-overlay" onClick={() => setShowMobileMenu(false)}>
+          <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <h3>Menu</h3>
+              <button onClick={() => setShowMobileMenu(false)} className="mobile-menu-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+
+            <div className="mobile-menu-items">
+              <button
+                className="mobile-menu-item"
+                onClick={() => {
+                  setShowProfile(true);
+                  setShowMobileMenu(false);
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Profile</span>
+              </button>
+
+              <button
+                className="mobile-menu-item"
+                onClick={() => {
+                  setShowNotifications(true);
+                  setShowMobileMenu(false);
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span>Notifications</span>
+              </button>
+
+              <button
+                className="mobile-menu-item"
+                onClick={() => {
+                  const newTheme = theme === 'dark' ? 'light' : 'dark';
+                  setTheme(newTheme);
+                  setShowMobileMenu(false);
+                }}
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="5"/>
+                      <line x1="12" y1="1" x2="12" y2="3"/>
+                      <line x1="12" y1="21" x2="12" y2="23"/>
+                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                      <line x1="1" y1="12" x2="3" y2="12"/>
+                      <line x1="21" y1="12" x2="23" y2="12"/>
+                      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <span>Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    <span>Dark Mode</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                className="mobile-menu-item"
+                onClick={() => {
+                  setShowDevices(true);
+                  setShowMobileMenu(false);
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                <span>Active Sessions</span>
+              </button>
+
+              <div className="mobile-menu-divider"></div>
+
+              <button
+                className="mobile-menu-item logout"
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  signOutUser();
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                <span>Log Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
