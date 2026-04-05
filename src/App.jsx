@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -9,12 +10,13 @@ import AuthScreenNew from './components/AuthScreenNew';
 import ChatRoom from './components/ChatRoom';
 import EmailVerificationScreen from './components/EmailVerificationScreen';
 
-function App() {
+function AppContent() {
   // undefined = still loading, null = signed out, object = signed in
   const [user, setUser] = useState(undefined);
   const [removed, setRemoved] = useState(false);
-  const [showLanding, setShowLanding] = useState(true);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Track user online/offline status
   useUserPresence(user);
@@ -36,14 +38,17 @@ function App() {
         } else {
           setNeedsVerification(false);
           registerUser(currentUser);
-          setShowLanding(false);
+          // Navigate to chat if on landing or login page
+          if (location.pathname === '/' || location.pathname === '/login') {
+            navigate('/chat');
+          }
         }
       } else {
         setNeedsVerification(false);
       }
     });
     return unsubscribe;
-  }, []);
+  }, [navigate, location.pathname]);
 
   // Real-time listener: if admin deletes this user, force sign-out immediately
   useEffect(() => {
@@ -77,7 +82,7 @@ function App() {
     if (user.emailVerified) {
       setNeedsVerification(false);
       registerUser(user);
-      setShowLanding(false);
+      navigate('/chat');
     }
   };
 
@@ -103,15 +108,33 @@ function App() {
     return <EmailVerificationScreen user={user} onVerified={handleVerified} />;
   }
 
-  // Show landing page for first-time visitors
-  if (showLanding && !user) {
-    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
-  }
-
   return (
-    <div className="app">
-      {user ? <ChatRoom user={user} /> : <AuthScreenNew onBack={() => setShowLanding(true)} />}
-    </div>
+    <Routes>
+      <Route path="/" element={<LandingPage onGetStarted={() => navigate('/login')} />} />
+      <Route 
+        path="/login" 
+        element={
+          user ? <Navigate to="/chat" replace /> : <AuthScreenNew onBack={() => navigate('/')} />
+        } 
+      />
+      <Route 
+        path="/chat" 
+        element={
+          user ? <ChatRoom user={user} /> : <Navigate to="/login" replace />
+        } 
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <AppContent />
+      </div>
+    </BrowserRouter>
   );
 }
 
