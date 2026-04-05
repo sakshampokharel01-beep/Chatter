@@ -1,9 +1,9 @@
 /* ================================================================
-   SIDEBAR - Instagram Style
+   SIDEBAR - Instagram Style (Collapsible)
    ================================================================ */
 
 .sidebar {
-  width: 260px;
+  width: 72px; /* Collapsed by default - icons only */
   height: 100vh;
   background: var(--bg-primary);
   border-right: 1px solid var(--border-primary);
@@ -13,6 +13,12 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.sidebar:hover {
+  width: 260px; /* Expanded on hover - icons + text */
 }
 
 .sidebar-content {
@@ -29,6 +35,13 @@
   gap: 12px;
   padding: 12px 24px;
   margin-bottom: 24px;
+  min-height: 56px; /* Maintain height when collapsed */
+}
+
+.sidebar-brand svg {
+  flex-shrink: 0;
+  min-width: 32px;
+  min-height: 32px;
 }
 
 .sidebar-brand-text {
@@ -36,6 +49,16 @@
   font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--text-primary);
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
+}
+
+.sidebar:hover .sidebar-brand-text {
+  opacity: 1;
+  width: auto;
 }
 
 /* Navigation */
@@ -65,8 +88,8 @@
 .sidebar-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
+  justify-content: flex-start;
+  padding: 12px 24px;
   border-radius: 12px;
   background: transparent;
   border: none;
@@ -78,6 +101,7 @@
   font-family: inherit;
   width: 100%;
   text-align: left;
+  position: relative;
 }
 
 .sidebar-item-content {
@@ -85,12 +109,28 @@
   align-items: center;
   gap: 16px;
   flex: 1;
+  min-width: 0;
 }
 
 .sidebar-item svg {
   flex-shrink: 0;
+  min-width: 24px;
+  min-height: 24px;
   color: var(--text-primary);
   transition: all 0.2s ease;
+}
+
+.sidebar-item span {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
+}
+
+.sidebar:hover .sidebar-item span {
+  opacity: 1;
+  width: auto;
 }
 
 .sidebar-item:hover {
@@ -108,8 +148,16 @@
 
 /* Expandable Items */
 .sidebar-item.expandable .expand-icon {
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.2s ease 0.1s;
   color: var(--text-secondary);
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar:hover .sidebar-item.expandable .expand-icon {
+  opacity: 1;
+  width: 16px;
 }
 
 .sidebar-item.expandable.expanded .expand-icon {
@@ -125,12 +173,16 @@
 
 /* Sub-items */
 .sidebar-subitems {
-  display: flex;
+  display: none; /* Hidden when sidebar is collapsed */
   flex-direction: column;
   gap: 2px;
   padding-left: 16px;
   margin-top: 2px;
   animation: slideDown 0.3s ease;
+}
+
+.sidebar:hover .sidebar-subitems {
+  display: flex; /* Show when sidebar is expanded */
 }
 
 @keyframes slideDown {
@@ -164,8 +216,23 @@
 
 .sidebar-subitem svg {
   flex-shrink: 0;
+  min-width: 20px;
+  min-height: 20px;
   color: var(--text-secondary);
   transition: all 0.2s ease;
+}
+
+.sidebar-subitem span {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
+}
+
+.sidebar:hover .sidebar-subitem span {
+  opacity: 1;
+  width: auto;
 }
 
 .sidebar-subitem:hover:not(.disabled) {
@@ -208,10 +275,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 12px 24px;
   border-radius: 12px;
   background: var(--bg-hover);
   margin-bottom: 8px;
+  min-height: 64px; /* Maintain height when collapsed */
 }
 
 .sidebar-user-avatar {
@@ -240,6 +308,15 @@
 .sidebar-user-info {
   flex: 1;
   min-width: 0;
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
+}
+
+.sidebar:hover .sidebar-user-info {
+  opacity: 1;
+  width: auto;
 }
 
 .sidebar-user-name {
@@ -293,6 +370,33 @@
 
 .sidebar-item.logout:hover {
   background: rgba(224, 92, 106, 0.1);
+}
+
+/* Tooltips for collapsed state */
+.sidebar-item::before,
+.sidebar-subitem::before {
+  content: attr(title);
+  position: absolute;
+  left: 72px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar:not(:hover) .sidebar-item:hover::before,
+.sidebar:not(:hover) .sidebar-subitem:hover::before {
+  opacity: 1;
+  transition-delay: 0.5s;
 }
 
 /* Mobile - Hide sidebar, show bottom nav instead */

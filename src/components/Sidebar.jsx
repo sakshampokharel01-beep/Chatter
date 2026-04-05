@@ -40,6 +40,7 @@ export default function Sidebar({
             <button
               className={`sidebar-item expandable ${messagesExpanded ? 'expanded' : ''}`}
               onClick={() => setMessagesExpanded(!messagesExpanded)}
+              title="Messages"
             >
               <div className="sidebar-item-content">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -66,6 +67,7 @@ export default function Sidebar({
                 <button
                   className={`sidebar-subitem ${activeTab === 'global' ? 'active' : ''}`}
                   onClick={() => setActiveTab('global')}
+                  title="Global Chat"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"/>
@@ -101,6 +103,7 @@ export default function Sidebar({
             <button
               className={`sidebar-item ${activeTab === 'admin' ? 'active' : ''}`}
               onClick={() => setActiveTab('admin')}
+              title="User Management"
             >
               <div className="sidebar-item-content">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -118,6 +121,7 @@ export default function Sidebar({
           <button
             className="sidebar-item"
             onClick={onProfileClick}
+            title="Edit Profile"
           >
             <div className="sidebar-item-content">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -132,6 +136,7 @@ export default function Sidebar({
           <button
             className="sidebar-item"
             onClick={onNotificationsClick}
+            title="Notification Settings"
           >
             <div className="sidebar-item-content">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -150,6 +155,7 @@ export default function Sidebar({
             <button
               className={`sidebar-item expandable ${moreExpanded ? 'expanded' : ''}`}
               onClick={() => setMoreExpanded(!moreExpanded)}
+              title="More Options"
             >
               <div className="sidebar-item-content">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -178,6 +184,7 @@ export default function Sidebar({
                 <button
                   className="sidebar-subitem"
                   onClick={onThemeToggle}
+                  title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                 >
                   {theme === 'dark' ? (
                     <>
@@ -207,6 +214,7 @@ export default function Sidebar({
                 <button
                   className="sidebar-subitem"
                   onClick={onDevicesClick}
+                  title="Manage Active Sessions"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
@@ -220,7 +228,7 @@ export default function Sidebar({
           </div>
 
           {/* User Info */}
-          <div className="sidebar-user">
+          <div className="sidebar-user" title={displayName}>
             <div className="sidebar-user-avatar">
               {user.photoURL ? (
                 <img src={user.photoURL} alt={displayName} />
@@ -243,6 +251,7 @@ export default function Sidebar({
           <button
             className="sidebar-item logout"
             onClick={onLogout}
+            title="Log Out"
           >
             <div className="sidebar-item-content">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
