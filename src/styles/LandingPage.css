@@ -802,8 +802,8 @@
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  border-radius: 0;
   padding: 3rem 2rem;
   min-height: 320px;
 }
@@ -823,7 +823,62 @@
   font-size: 2.5rem;
   font-weight: 600;
   margin: 0 auto 1rem;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.participant-avatar span {
+  color: white;
+}
+
+.participant-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.participant-status {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  color: #00d95f;
+}
+
+.video-controls-mock {
+  display: flex;
+  gap: 1rem;
+}
+
+.control-mock {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.control-mock:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.control-mock svg {
+  width: 20px;
+  height: 20px;
+}
+
+.control-mock.danger {
+  background: #ff3b30;
+}
+
+.control-mock.danger:hover {
+  background: #e02d21;
 }
 
 .participant-avatar span {
@@ -2349,4 +2404,30 @@
 
 [data-theme="light"] .chat-user-photo {
   border: 3px solid rgba(0, 149, 246, 0.2);
+}
+
+/* Video call mock theme overrides */
+[data-theme="dark"] .video-call-mock {
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+}
+
+[data-theme="light"] .video-call-mock {
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+}
+
+[data-theme="light"] .video-participant {
+  color: white;
+}
+
+[data-theme="light"] .participant-name {
+  color: white;
+}
+
+[data-theme="light"] .control-mock {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+[data-theme="light"] .control-mock:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
