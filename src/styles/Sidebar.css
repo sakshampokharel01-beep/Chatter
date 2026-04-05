@@ -147,6 +147,32 @@
   transition: all 0.2s ease;
 }
 
+/* Avatar in sidebar item (for Profile button) */
+.sidebar-item-avatar {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.sidebar-item-avatar img,
+.sidebar-item-avatar-placeholder {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar-item-avatar-placeholder {
+  background: var(--bg-elevated);
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-primary);
+}
+
 .sidebar-item span {
   opacity: 0;
   width: 0;
@@ -302,112 +328,6 @@
   margin-top: auto;
   border-top: 1px solid var(--border-secondary);
   padding-top: 16px;
-}
-
-/* User Info - Now clickable button */
-.sidebar-user {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* Center avatar when collapsed */
-  gap: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  background: transparent; /* Transparent by default */
-  border: none;
-  margin-bottom: 8px;
-  min-height: 64px; /* Maintain height when collapsed */
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-  width: 100%;
-  text-align: left;
-  color: var(--text-primary);
-}
-
-.sidebar:hover .sidebar-user {
-  justify-content: flex-start; /* Left-align when expanded */
-  padding: 12px 24px;
-}
-
-.sidebar-user:hover {
-  background: var(--bg-hover);
-}
-
-.sidebar-user-avatar {
-  flex-shrink: 0;
-}
-
-.sidebar-user-avatar img,
-.sidebar-user-avatar-placeholder {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.sidebar-user-avatar-placeholder {
-  background: var(--bg-elevated);
-  color: var(--accent-primary);
-  font-weight: 700;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--border-primary);
-}
-
-.sidebar-user-info {
-  flex: 1;
-  min-width: 0;
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-  transition: opacity 0.2s ease 0.1s, width 0.2s ease 0.1s;
-}
-
-.sidebar:hover .sidebar-user-info {
-  opacity: 1;
-  width: auto;
-}
-
-.sidebar-user-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sidebar-user-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-secondary);
-}
-
-.status-dot.online {
-  background: var(--accent-green);
-  box-shadow: 0 0 8px rgba(0, 217, 95, 0.4);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
 }
 
 /* Logout Button */

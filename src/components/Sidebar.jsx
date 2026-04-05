@@ -117,6 +117,26 @@ export default function Sidebar({
             </button>
           )}
 
+          {/* Profile - with user avatar */}
+          <button
+            className="sidebar-item"
+            onClick={onProfileClick}
+            title="Edit Profile"
+          >
+            <div className="sidebar-item-content">
+              <div className="sidebar-item-avatar">
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt={displayName} />
+                ) : (
+                  <div className="sidebar-item-avatar-placeholder">
+                    {displayName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <span>Profile</span>
+            </div>
+          </button>
+
           {/* Notifications */}
           <button
             className="sidebar-item"
@@ -211,30 +231,6 @@ export default function Sidebar({
               </div>
             )}
           </div>
-
-          {/* User Info - Clickable Profile */}
-          <button
-            className="sidebar-user"
-            onClick={onProfileClick}
-            title={displayName}
-          >
-            <div className="sidebar-user-avatar">
-              {user.photoURL ? (
-                <img src={user.photoURL} alt={displayName} />
-              ) : (
-                <div className="sidebar-user-avatar-placeholder">
-                  {displayName.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-            <div className="sidebar-user-info">
-              <div className="sidebar-user-name">{displayName}</div>
-              <div className="sidebar-user-status">
-                <span className="status-dot online"></span>
-                <span>Online</span>
-              </div>
-            </div>
-          </button>
 
           {/* Logout Button */}
           <button
