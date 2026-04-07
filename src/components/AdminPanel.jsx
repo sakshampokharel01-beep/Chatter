@@ -13,11 +13,20 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
   const [loading, setLoading]   = useState(true);
   const [filterTab, setFilterTab] = useState('all'); // all, admins, blocked
 
-  // Load all registered users
+  // Load all registered users with real-time online status
   useEffect(() => {
     const q = collection(db, 'users');
     return onSnapshot(q, snap => {
-      const allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const allUsers = snap.docs.map(d => {
+        const data = d.data();
+        return { 
+          id: d.id, 
+          ...data,
+          // Only show online if explicitly set to true and lastSeen is recent (within 5 minutes)
+          isOnline: data.online === true && data.lastSeen && 
+                    (Date.now() - data.lastSeen.toMillis() < 5 * 60 * 1000)
+        };
+      });
       allUsers.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
       setUsers(allUsers);
       setLoading(false);
@@ -285,7 +294,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
                       ? <img src={u.photoURL} alt={u.displayName} />
                       : <div className="user-avatar-placeholder-large">{(u.displayName || '?').charAt(0).toUpperCase()}</div>
                     }
-                    {u.online === true && <span className="online-indicator"></span>}
+                    {u.isOnline && <span className="online-indicator"></span>}
                   </div>
                   <div className="user-card-info">
                     <h3 className="user-card-name">
