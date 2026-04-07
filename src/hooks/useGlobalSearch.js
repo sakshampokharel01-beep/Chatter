@@ -45,8 +45,7 @@ export function useGlobalSearch(searchQuery, userId, friendIds = new Set()) {
       const messagesSnap = await getDocs(
         query(
           collection(db, 'messages'),
-          orderBy('createdAt', 'desc'),
-          limit(50) // Get more to filter client-side
+          limit(100) // Get more to filter and sort client-side
         )
       );
       console.log('Messages fetched:', messagesSnap.docs.length);
@@ -69,14 +68,18 @@ export function useGlobalSearch(searchQuery, userId, friendIds = new Set()) {
             const dmSnap = await getDocs(
               query(
                 collection(db, 'dms', dmId, 'messages'),
-                orderBy('createdAt', 'desc'),
-                limit(20)
+                limit(50) // Get more to filter and sort client-side
               )
             );
             console.log(`DMs with ${friendId}:`, dmSnap.docs.length);
             return dmSnap.docs
               .map(doc => ({ id: doc.id, ...doc.data(), dmId, friendId }))
-              .filter(msg => msg.text && msg.text.toLowerCase().includes(normalizedQuery));
+              .filter(msg => msg.text && msg.text.toLowerCase().includes(normalizedQuery))
+              .sort((a, b) => {
+                const aTime = a.createdAt?.toMillis?.() || 0;
+                const bTime = b.createdAt?.toMillis?.() || 0;
+                return bTime - aTime;
+              });
           } catch (err) {
             console.warn(`Failed to search DMs with ${friendId}:`, err);
             return [];
@@ -85,9 +88,19 @@ export function useGlobalSearch(searchQuery, userId, friendIds = new Set()) {
       );
 
       // Filter and format results
-      const messageResults = messagesSnap.docs
-        .map(doc => ({ id: doc.id, ...doc.data(), type: 'message' }))
-        .filter(msg => msg.text && msg.text.toLowerCase().includes(normalizedQuery));
+      const allMessages = messagesSnap.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data(), 
+        type: 'message' 
+      }));
+      
+      const messageResults = allMessages
+        .filter(msg => msg.text && msg.text.toLowerCase().includes(normalizedQuery))
+        .sort((a, b) => {
+          const aTime = a.createdAt?.toMillis?.() || 0;
+          const bTime = b.createdAt?.toMillis?.() || 0;
+          return bTime - aTime;
+        });
       
       console.log('Filtered message results:', messageResults.length);
 

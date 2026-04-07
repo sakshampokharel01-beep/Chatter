@@ -29,7 +29,7 @@ import SavedMessages from './SavedMessages';
 import Groups from './Groups';
 import GroupChat from './GroupChat';
 import { useInAppNotifications } from '../hooks/useInAppNotifications.jsx';
-import { useSavedMessages } from '../hooks/useSavedMessages_debug';
+import { useSavedMessages } from '../hooks/useSavedMessages';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;

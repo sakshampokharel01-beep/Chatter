@@ -36,11 +36,11 @@ export function useSavedMessages(userId) {
     console.log('useSavedMessages: Setting up listener for userId:', userId);
     setLoading(true);
     
+    // Simple query without orderBy to avoid index requirement
     const q = query(
       collection(db, 'savedMessages'),
       where('userId', '==', userId),
-      orderBy('savedAt', 'desc'),
-      limit(30)
+      limit(50)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -55,8 +55,15 @@ export function useSavedMessages(userId) {
         };
       });
       
+      // Sort client-side by savedAt
+      messages.sort((a, b) => {
+        const aTime = a.savedAt?.toMillis?.() || 0;
+        const bTime = b.savedAt?.toMillis?.() || 0;
+        return bTime - aTime;
+      });
+      
       setSavedMessages(messages);
-      setHasMore(snapshot.docs.length === 30);
+      setHasMore(snapshot.docs.length === 50);
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
       setLoading(false);
     }, (err) => {
@@ -69,32 +76,12 @@ export function useSavedMessages(userId) {
     return unsubscribe;
   }, [userId]);
 
-  // Load more saved messages (pagination)
+  // Load more saved messages (pagination) - disabled for now since we removed orderBy
   const loadMore = useCallback(async () => {
-    if (!userId || !lastDoc || !hasMore) return;
-
-    try {
-      const q = query(
-        collection(db, 'savedMessages'),
-        where('userId', '==', userId),
-        orderBy('savedAt', 'desc'),
-        startAfter(lastDoc),
-        limit(30)
-      );
-
-      const snapshot = await getDocs(q);
-      const moreMessages = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      setSavedMessages(prev => [...prev, ...moreMessages]);
-      setHasMore(snapshot.docs.length === 30);
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-    } catch (err) {
-      console.error('Failed to load more saved messages:', err);
-    }
-  }, [userId, lastDoc, hasMore]);
+    console.log('loadMore: Pagination disabled in simplified version');
+    // Pagination requires orderBy which needs composite index
+    // For now, we load all messages in one go (up to 50)
+  }, []);
 
   // Check if a message is saved
   const isSaved = useCallback(async (messageId) => {

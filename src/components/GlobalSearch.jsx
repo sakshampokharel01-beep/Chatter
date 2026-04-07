@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useGlobalSearch } from '../hooks/useGlobalSearch_debug';
+import { useGlobalSearch } from '../hooks/useGlobalSearch';
 import '../styles/GlobalSearch.css';
 
 function formatTime(timestamp) {
