@@ -56,18 +56,43 @@ export default function GroupChat({ user, groupId, onBack }) {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showAddMembers, setShowAddMembers] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
+  const [members, setMembers] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
   const [friends, setFriends] = useState([]);
   const [loadingFriends, setLoadingFriends] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Load group details
+  // Load group details and members
   useEffect(() => {
     const loadGroup = async () => {
       try {
         const groupDoc = await getDoc(doc(db, 'groups', groupId));
         if (groupDoc.exists()) {
-          setGroup({ id: groupDoc.id, ...groupDoc.data() });
+          const groupData = { id: groupDoc.id, ...groupDoc.data() };
+          setGroup(groupData);
+          
+          // Load member details
+          if (groupData.members && groupData.members.length > 0) {
+            setLoadingMembers(true);
+            const membersList = [];
+            for (const memberId of groupData.members) {
+              try {
+                const userDoc = await getDoc(doc(db, 'users', memberId));
+                if (userDoc.exists()) {
+                  membersList.push({
+                    id: memberId,
+                    ...userDoc.data()
+                  });
+                }
+              } catch (err) {
+                console.error(`Failed to load member ${memberId}:`, err);
+              }
+            }
+            setMembers(membersList);
+            setLoadingMembers(false);
+          }
         }
       } catch (err) {
         console.error('Failed to load group:', err);
@@ -148,6 +173,12 @@ export default function GroupChat({ user, groupId, onBack }) {
       setFriends(prev => prev.map(f => 
         f.id === friendId ? { ...f, isInGroup: true } : f
       ));
+      
+      // Add to members list
+      const userDoc = await getDoc(doc(db, 'users', friendId));
+      if (userDoc.exists()) {
+        setMembers(prev => [...prev, { id: friendId, ...userDoc.data() }]);
+      }
     } catch (err) {
       console.error('Failed to add member:', err);
       alert('Failed to add member: ' + err.message);
@@ -219,6 +250,18 @@ export default function GroupChat({ user, groupId, onBack }) {
           </span>
         </div>
         <button 
+          className="group-chat-members-btn"
+          onClick={() => setShowMembers(!showMembers)}
+          title="View members"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </button>
+        <button 
           className="group-chat-add-btn"
           onClick={() => {
             setShowAddMembers(true);
@@ -235,45 +278,87 @@ export default function GroupChat({ user, groupId, onBack }) {
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="group-chat-messages">
-        {loading ? (
-          <div className="group-chat-loading">
-            <div className="loader" />
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="group-chat-empty">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <p>No messages yet. Start the conversation!</p>
-          </div>
-        ) : (
-          <>
-            {messages.map((msg) => {
-              const isOwn = msg.uid === user.uid;
-              return (
-                <div key={msg.id} className={`message-row ${isOwn ? 'own' : 'other'}`}>
-                  <div className="msg-avatar">
-                    <Avatar displayName={msg.displayName} photoURL={msg.photoURL} size={30} />
-                  </div>
-                  <div className="msg-content">
-                    {!isOwn && (
-                      <span className="msg-sender">{msg.displayName}</span>
-                    )}
-                    <div className="msg-bubble-wrap">
-                      <div className="msg-bubble">
-                        {msg.text}
-                        {msg.edited && <span className="msg-edited-label"> (edited)</span>}
-                      </div>
+      <div className="group-chat-content">
+        {/* Messages */}
+        <div className="group-chat-messages">
+          {loading ? (
+            <div className="group-chat-loading">
+              <div className="loader" />
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="group-chat-empty">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <p>No messages yet. Start the conversation!</p>
+            </div>
+          ) : (
+            <>
+              {messages.map((msg) => {
+                const isOwn = msg.uid === user.uid;
+                return (
+                  <div key={msg.id} className={`message-row ${isOwn ? 'own' : 'other'}`}>
+                    <div className="msg-avatar">
+                      <Avatar displayName={msg.displayName} photoURL={msg.photoURL} size={30} />
                     </div>
-                    <span className="msg-time">{formatTime(msg.createdAt)}</span>
+                    <div className="msg-content">
+                      {!isOwn && (
+                        <span className="msg-sender">{msg.displayName}</span>
+                      )}
+                      <div className="msg-bubble-wrap">
+                        <div className="msg-bubble">
+                          {msg.text}
+                          {msg.edited && <span className="msg-edited-label"> (edited)</span>}
+                        </div>
+                      </div>
+                      <span className="msg-time">{formatTime(msg.createdAt)}</span>
+                    </div>
                   </div>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </div>
+
+        {/* Members Sidebar */}
+        {showMembers && (
+          <div className="group-members-sidebar">
+            <div className="group-members-header">
+              <h3>Members — {members.length}</h3>
+            </div>
+            <div className="group-members-list">
+              {loadingMembers ? (
+                <div className="group-members-loading">
+                  <div className="loader" />
                 </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </>
+              ) : members.length === 0 ? (
+                <div className="group-members-empty">
+                  <p>No members</p>
+                </div>
+              ) : (
+                members.map(member => (
+                  <div key={member.id} className="group-member-item">
+                    <div className="group-member-avatar">
+                      {member.photoURL ? (
+                        <img src={member.photoURL} alt={member.displayName} />
+                      ) : (
+                        <div className="group-member-avatar-placeholder">
+                          {(member.displayName || '?').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="group-member-info">
+                      <div className="group-member-name">{member.displayName}</div>
+                      {member.id === group.createdBy && (
+                        <span className="group-member-badge">Owner</span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         )}
       </div>
 

@@ -336,3 +336,162 @@
   background: var(--primary-hover);
   transform: translateY(-1px);
 }
+
+
+/* Group Chat Content - Flex container for messages and members */
+.group-chat-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Adjust messages container when members sidebar is shown */
+.group-chat-content .group-chat-messages {
+  flex: 1;
+}
+
+/* Members Button */
+.group-chat-members-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.group-chat-members-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+/* Members Sidebar */
+.group-members-sidebar {
+  width: 240px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.group-members-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.group-members-header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.group-members-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.group-members-loading,
+.group-members-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.group-member-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.group-member-item:hover {
+  background: var(--hover-bg);
+}
+
+.group-member-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.group-member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.group-member-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.group-member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.group-member-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.group-member-badge {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 2px 6px;
+  background: var(--primary-color);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .group-members-sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 100;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .group-chat-members-btn {
+    display: flex;
+  }
+}
