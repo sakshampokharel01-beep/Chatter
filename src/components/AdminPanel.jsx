@@ -143,8 +143,8 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
 
   const stats = {
     total: users.filter(u => !removed.has(u.id) && !(u.email || '').toLowerCase().endsWith('@example.com')).length,
-    admins: Array.from(admins).filter(id => !removed.has(id)).length,
-    blocked: Array.from(blocked).filter(id => !removed.has(id)).length,
+    admins: users.filter(u => admins.has(u.id) && !removed.has(u.id) && !(u.email || '').toLowerCase().endsWith('@example.com')).length,
+    blocked: users.filter(u => blocked.has(u.id) && !removed.has(u.id) && !(u.email || '').toLowerCase().endsWith('@example.com')).length,
     messages: msgCount
   };
 
@@ -285,7 +285,7 @@ export default function AdminPanel({ adminUid, isSuperAdmin }) {
                       ? <img src={u.photoURL} alt={u.displayName} />
                       : <div className="user-avatar-placeholder-large">{(u.displayName || '?').charAt(0).toUpperCase()}</div>
                     }
-                    {u.online && <span className="online-indicator"></span>}
+                    {u.online === true && <span className="online-indicator"></span>}
                   </div>
                   <div className="user-card-info">
                     <h3 className="user-card-name">
