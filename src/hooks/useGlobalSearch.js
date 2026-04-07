@@ -55,7 +55,7 @@ export function useGlobalSearch(searchQuery, userId, friendIds = new Set()) {
         query(
           collection(db, 'users'),
           where('isAnonymous', '==', false),
-          limit(20)
+          limit(200) // Fetch more users for better search results
         )
       );
       console.log('Users fetched:', usersSnap.docs.length);
@@ -106,11 +106,17 @@ export function useGlobalSearch(searchQuery, userId, friendIds = new Set()) {
 
       const userResults = usersSnap.docs
         .map(doc => ({ id: doc.id, ...doc.data(), type: 'user' }))
-        .filter(user => 
-          user.id !== userId && // Exclude current user
-          user.displayName && 
-          user.displayName.toLowerCase().includes(normalizedQuery)
-        );
+        .filter(user => {
+          if (user.id === userId) return false; // Exclude current user
+          if (!user.displayName) return false;
+          
+          const displayNameLower = user.displayName.toLowerCase();
+          const emailLower = (user.email || '').toLowerCase();
+          
+          // Match against display name or email
+          return displayNameLower.includes(normalizedQuery) || 
+                 emailLower.includes(normalizedQuery);
+        });
       
       console.log('Filtered user results:', userResults.length);
 
@@ -119,7 +125,7 @@ export function useGlobalSearch(searchQuery, userId, friendIds = new Set()) {
 
       const searchResults = {
         messages: messageResults.slice(0, 20),
-        users: userResults.slice(0, 10),
+        users: userResults.slice(0, 20), // Show more user results
         dms: dmResultsFlat
       };
 
