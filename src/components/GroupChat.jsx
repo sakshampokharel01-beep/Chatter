@@ -10,7 +10,10 @@ import {
   deleteDoc,
   doc,
   updateDoc,
-  getDoc
+  getDoc,
+  getDocs,
+  where,
+  arrayUnion
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import '../styles/GroupChat.css';
@@ -52,6 +55,9 @@ export default function GroupChat({ user, groupId, onBack }) {
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showAddMembers, setShowAddMembers] = useState(false);
+  const [friends, setFriends] = useState([]);
+  const [loadingFriends, setLoadingFriends] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -95,6 +101,58 @@ export default function GroupChat({ user, groupId, onBack }) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Load friends list
+  const loadFriends = async () => {
+    setLoadingFriends(true);
+    try {
+      const q = query(
+        collection(db, 'friends'),
+        where('users', 'array-contains', user.uid)
+      );
+      const snapshot = await getDocs(q);
+      
+      const friendsList = [];
+      for (const friendDoc of snapshot.docs) {
+        const data = friendDoc.data();
+        const friendId = data.users.find(uid => uid !== user.uid);
+        
+        // Get friend's user data
+        const userDoc = await getDoc(doc(db, 'users', friendId));
+        if (userDoc.exists()) {
+          friendsList.push({
+            id: friendId,
+            ...userDoc.data(),
+            isInGroup: group?.members?.includes(friendId)
+          });
+        }
+      }
+      
+      setFriends(friendsList);
+    } catch (err) {
+      console.error('Failed to load friends:', err);
+    } finally {
+      setLoadingFriends(false);
+    }
+  };
+
+  // Add member to group
+  const addMember = async (friendId) => {
+    try {
+      await updateDoc(doc(db, 'groups', groupId), {
+        members: arrayUnion(friendId),
+        memberCount: (group?.memberCount || 0) + 1
+      });
+      
+      // Update local friends list
+      setFriends(prev => prev.map(f => 
+        f.id === friendId ? { ...f, isInGroup: true } : f
+      ));
+    } catch (err) {
+      console.error('Failed to add member:', err);
+      alert('Failed to add member: ' + err.message);
+    }
+  };
 
   const sendMessage = async () => {
     const text = inputText.trim();
@@ -160,6 +218,21 @@ export default function GroupChat({ user, groupId, onBack }) {
             {group.memberCount} {group.memberCount === 1 ? 'member' : 'members'}
           </span>
         </div>
+        <button 
+          className="group-chat-add-btn"
+          onClick={() => {
+            setShowAddMembers(true);
+            loadFriends();
+          }}
+          title="Add members"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+        </button>
       </div>
 
       {/* Messages */}
@@ -228,6 +301,64 @@ export default function GroupChat({ user, groupId, onBack }) {
           </svg>
         </button>
       </div>
+
+      {/* Add Members Modal */}
+      {showAddMembers && (
+        <div className="group-modal-overlay" onClick={() => setShowAddMembers(false)}>
+          <div className="group-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="group-modal-header">
+              <h3>Add Members</h3>
+              <button onClick={() => setShowAddMembers(false)} aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+            <div className="group-modal-content">
+              {loadingFriends ? (
+                <div className="group-modal-loading">
+                  <div className="loader" />
+                  <p>Loading friends...</p>
+                </div>
+              ) : friends.length === 0 ? (
+                <div className="group-modal-empty">
+                  <p>No friends to add</p>
+                </div>
+              ) : (
+                <div className="friends-list">
+                  {friends.map(friend => (
+                    <div key={friend.id} className="friend-item">
+                      <div className="friend-avatar">
+                        {friend.photoURL ? (
+                          <img src={friend.photoURL} alt={friend.displayName} />
+                        ) : (
+                          <div className="friend-avatar-placeholder">
+                            {(friend.displayName || '?').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="friend-info">
+                        <div className="friend-name">{friend.displayName}</div>
+                      </div>
+                      {friend.isInGroup ? (
+                        <span className="friend-status">Already in group</span>
+                      ) : (
+                        <button
+                          className="friend-add-btn"
+                          onClick={() => addMember(friend.id)}
+                        >
+                          Add
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
