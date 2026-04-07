@@ -196,5 +196,53 @@ service cloud.firestore {
         request.resource.data.userId == resource.data.userId &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['note']);
     }
+
+    // 10. GROUPS & CHANNELS
+    match /groups/{groupId} {
+      function isMember() {
+        return request.auth.uid in resource.data.members;
+      }
+      function isAdmin() {
+        return request.auth.uid in resource.data.admins;
+      }
+
+      allow read: if isSignedIn() && (resource.data.isPublic || isMember());
+      allow create: if isSignedIn() &&
+        request.resource.data.creator == request.auth.uid &&
+        request.resource.data.members.hasAll([request.auth.uid]) &&
+        request.resource.data.admins.hasAll([request.auth.uid]) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 100;
+      allow update: if isSignedIn() && isMember() &&
+        (
+          // Members can update lastActivity
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastActivity', 'messageCount']))
+          ||
+          // Admins can update group details
+          (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'description', 'isPublic']))
+          ||
+          // Members can join/leave
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberCount']))
+        );
+      allow delete: if isSignedIn() && isAdmin();
+
+      match /messages/{msgId} {
+        allow read: if isSignedIn() && get(/databases/$(database)/documents/groups/$(groupId)).data.members.hasAny([request.auth.uid]);
+        allow create: if isSignedIn() &&
+          get(/databases/$(database)/documents/groups/$(groupId)).data.members.hasAny([request.auth.uid]) &&
+          request.resource.data.uid == request.auth.uid &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 &&
+          request.resource.data.text.size() <= 500;
+        allow delete: if isSignedIn() &&
+          (get(/databases/$(database)/documents/groups/$(groupId)).data.admins.hasAny([request.auth.uid]) ||
+           (resource.data.uid == request.auth.uid && request.time < resource.data.createdAt + duration.value(1, 'h')));
+        allow update: if isSignedIn() &&
+          resource.data.uid == request.auth.uid &&
+          request.time < resource.data.createdAt + duration.value(15, 'm') &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'edited', 'editedAt']);
+      }
+    }
   }
 }
