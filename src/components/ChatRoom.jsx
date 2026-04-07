@@ -27,7 +27,7 @@ import BottomNav from './BottomNav';
 import GlobalSearch from './GlobalSearch';
 import SavedMessages from './SavedMessages';
 import { useInAppNotifications } from '../hooks/useInAppNotifications.jsx';
-import { useSavedMessages } from '../hooks/useSavedMessages';
+import { useSavedMessages } from '../hooks/useSavedMessages_debug';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;

@@ -3,48 +3,43 @@ import {
   collection, 
   query, 
   where, 
-  orderBy, 
   limit, 
   onSnapshot,
   addDoc,
   deleteDoc,
   getDocs,
   serverTimestamp,
-  doc,
-  startAfter
+  doc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
 /**
- * Custom hook for managing saved messages (bookmarks)
- * @param {string} userId - Current user ID
- * @returns {Object} - { savedMessages, loading, toggleSaveMessage, isSaved, loadMore, hasMore }
+ * DEBUG VERSION - Without orderBy to test if index is the issue
  */
 export function useSavedMessages(userId) {
   const [savedMessages, setSavedMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
-  const [lastDoc, setLastDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
 
-  // Subscribe to saved messages
+  // Subscribe to saved messages - WITHOUT orderBy
   useEffect(() => {
     if (!userId) {
       console.log('useSavedMessages: No userId provided');
       return;
     }
 
-    console.log('useSavedMessages: Setting up listener for userId:', userId);
+    console.log('useSavedMessages DEBUG: Setting up listener for userId:', userId);
     setLoading(true);
     
+    // Simple query without orderBy to avoid index requirement
     const q = query(
       collection(db, 'savedMessages'),
       where('userId', '==', userId),
-      orderBy('savedAt', 'desc'),
-      limit(30)
+      limit(50)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      console.log('useSavedMessages: Snapshot received, docs count:', snapshot.docs.length);
+      console.log('useSavedMessages DEBUG: Snapshot received, docs count:', snapshot.docs.length);
       
       const messages = snapshot.docs.map(doc => {
         const data = doc.data();
@@ -55,9 +50,15 @@ export function useSavedMessages(userId) {
         };
       });
       
+      // Sort client-side by savedAt
+      messages.sort((a, b) => {
+        const aTime = a.savedAt?.toMillis?.() || 0;
+        const bTime = b.savedAt?.toMillis?.() || 0;
+        return bTime - aTime;
+      });
+      
       setSavedMessages(messages);
-      setHasMore(snapshot.docs.length === 30);
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+      setHasMore(false);
       setLoading(false);
     }, (err) => {
       console.error('Saved messages snapshot error:', err);
@@ -69,32 +70,9 @@ export function useSavedMessages(userId) {
     return unsubscribe;
   }, [userId]);
 
-  // Load more saved messages (pagination)
-  const loadMore = useCallback(async () => {
-    if (!userId || !lastDoc || !hasMore) return;
-
-    try {
-      const q = query(
-        collection(db, 'savedMessages'),
-        where('userId', '==', userId),
-        orderBy('savedAt', 'desc'),
-        startAfter(lastDoc),
-        limit(30)
-      );
-
-      const snapshot = await getDocs(q);
-      const moreMessages = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      setSavedMessages(prev => [...prev, ...moreMessages]);
-      setHasMore(snapshot.docs.length === 30);
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-    } catch (err) {
-      console.error('Failed to load more saved messages:', err);
-    }
-  }, [userId, lastDoc, hasMore]);
+  const loadMore = useCallback(() => {
+    console.log('loadMore called but disabled in debug version');
+  }, []);
 
   // Check if a message is saved
   const isSaved = useCallback(async (messageId) => {
@@ -118,7 +96,7 @@ export function useSavedMessages(userId) {
 
   // Toggle save/unsave message
   const toggleSaveMessage = useCallback(async (message, conversationType, conversationId) => {
-    console.log('toggleSaveMessage called with:', { message, conversationType, conversationId, userId });
+    console.log('toggleSaveMessage DEBUG called with:', { message, conversationType, conversationId, userId });
     
     if (!userId || !message || !message.id) {
       console.error('Invalid parameters:', { userId, message });
