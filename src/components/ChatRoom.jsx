@@ -26,6 +26,7 @@ import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import GlobalSearch from './GlobalSearch';
 import SavedMessages from './SavedMessages';
+import Groups from './Groups';
 import { useInAppNotifications } from '../hooks/useInAppNotifications.jsx';
 import { useSavedMessages } from '../hooks/useSavedMessages_debug';
 import { getSocket } from '../socket';
@@ -736,6 +737,7 @@ export default function ChatRoom({ user }) {
         onDevicesClick={() => setShowDevices(true)}
         onSearchClick={() => setShowSearch(true)}
         onSavedClick={() => setActiveTab('saved')}
+        onGroupsClick={() => setActiveTab('groups')}
         onThemeToggle={() => {
           const newTheme = theme === 'dark' ? 'light' : 'dark';
           setTheme(newTheme);
@@ -753,6 +755,7 @@ export default function ChatRoom({ user }) {
             {activeTab === 'dms' && 'Private Messages'}
             {activeTab === 'admin' && 'User Management'}
             {activeTab === 'saved' && 'Saved Messages'}
+            {activeTab === 'groups' && 'Groups & Channels'}
           </h1>
           {adminUser && activeTab !== 'admin' && (
             <span className="admin-badge-minimal">
@@ -928,6 +931,18 @@ export default function ChatRoom({ user }) {
               setActiveTab('dms');
               // DM navigation will be handled by DirectMessages component
             }
+          }}
+          onBack={() => setActiveTab('global')}
+        />
+      )}
+
+      {/* ── Groups & Channels ── */}
+      {activeTab === 'groups' && (
+        <Groups
+          user={user}
+          onGroupSelect={(groupId) => {
+            // TODO: Navigate to group chat
+            console.log('Selected group:', groupId);
           }}
           onBack={() => setActiveTab('global')}
         />
