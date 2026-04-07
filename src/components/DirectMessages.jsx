@@ -1293,6 +1293,12 @@ export default function DirectMessages({ user, showNotification }) {
             Friends ({friendsList.length})
           </button>
           <button
+            className={`dm-tab${activeTab === 'all' ? ' active' : ''}`}
+            onClick={() => setActiveTab('all')}
+          >
+            All Users
+          </button>
+          <button
             className={`dm-tab${activeTab === 'requests' ? ' active' : ''}`}
             onClick={() => setActiveTab('requests')}
           >
@@ -1335,7 +1341,7 @@ export default function DirectMessages({ user, showNotification }) {
           {/* Friends Tab */}
           {activeTab === 'friends' && !loadingFriends && !loadingUsers && (
             friendsList.length === 0 ? (
-              <div className="dm-empty">No friends yet. Search for users in the search bar to add friends!</div>
+              <div className="dm-empty">No friends yet. Add friends from All Users tab!</div>
             ) : (
               friendsList.map(u => (
                 <button
@@ -1357,6 +1363,45 @@ export default function DirectMessages({ user, showNotification }) {
                   {selectedUser?.id === u.id && <span className="dm-selected-dot" />}
                 </button>
               ))
+            )
+          )}
+
+          {/* All Users Tab */}
+          {activeTab === 'all' && !loadingUsers && (
+            allUsersList.length === 0 ? (
+              <div className="dm-empty">No users found</div>
+            ) : (
+              allUsersList.map(u => {
+                const isFriend = friends.has(u.id);
+                const hasPending = pendingRequests.has(u.id);
+                
+                return (
+                  <div key={u.id} className="dm-user-item-wrapper">
+                    <div className="dm-user-item">
+                      <Avatar displayName={u.displayName} photoURL={u.photoURL} size={38} />
+                      <div className="dm-user-info">
+                        <span className="dm-user-name">{u.displayName}</span>
+                        {isFriend && <span className="friend-badge">Friend</span>}
+                        {hasPending && <span className="pending-badge">Pending</span>}
+                      </div>
+                      {!isFriend && !hasPending && (
+                        <button
+                          className="add-friend-btn"
+                          onClick={() => sendFriendRequest(u)}
+                          title="Send friend request"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="8.5" cy="7" r="4"/>
+                            <line x1="20" y1="8" x2="20" y2="14"/>
+                            <line x1="23" y1="11" x2="17" y2="11"/>
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
             )
           )}
 
