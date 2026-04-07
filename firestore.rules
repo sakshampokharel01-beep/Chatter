@@ -180,5 +180,21 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastActive']);
       allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
+
+    // 9. SAVED MESSAGES (Bookmarks)
+    match /savedMessages/{docId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && 
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.messageId is string &&
+        request.resource.data.conversationType in ['global', 'dm'] &&
+        request.resource.data.messageText is string &&
+        request.resource.data.messageText.size() <= 500;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && 
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['note']);
+    }
   }
 }

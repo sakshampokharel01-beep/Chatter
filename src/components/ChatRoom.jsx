@@ -24,7 +24,10 @@ import NotificationSettings from './NotificationSettings';
 import InAppNotification from './InAppNotification';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
+import GlobalSearch from './GlobalSearch';
+import SavedMessages from './SavedMessages';
 import { useInAppNotifications } from '../hooks/useInAppNotifications.jsx';
+import { useSavedMessages } from '../hooks/useSavedMessages';
 import { getSocket } from '../socket';
 
 const MAX_CHARS = 500;
@@ -66,7 +69,7 @@ function Avatar({ displayName, photoURL, size = 30 }) {
 }
 
 /* ── Single Chat Message ──────────────────────────────────── */
-function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, onEdit, onReply, messages }) {
+function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, onEdit, onReply, onSave, messages }) {
   const name = message.displayName || (message.isAnonymous ? 'Guest' : 'User');
   
   // Check if message can be edited (within 15 minutes)
@@ -131,6 +134,18 @@ function ChatMessage({ message, isOwn, hideAvatar, onDelete, onBlock, onRemove, 
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 14 4 9 9 4"/>
                 <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+              </svg>
+            </button>
+          )}
+          {onSave && (
+            <button
+              className="msg-save-btn"
+              onClick={() => onSave(message)}
+              title="Save message"
+              aria-label="Save message"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
               </svg>
             </button>
           )}
@@ -226,6 +241,7 @@ export default function ChatRoom({ user }) {
   const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
   const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Track mobile menu visibility
+  const [showSearch, setShowSearch] = useState(false); // Track global search modal visibility
   const [theme, setTheme] = useState(() => {
     // Initialize theme from localStorage or default to 'dark'
     const savedTheme = localStorage.getItem('theme');
@@ -247,10 +263,14 @@ export default function ChatRoom({ user }) {
   
   // In-app notifications
   const { notifications, showNotification, hideNotification } = useInAppNotifications();
+  
+  // Saved messages hook
+  const { toggleSaveMessage } = useSavedMessages(user.uid);
 
   const displayName = getDisplayName(user);
   const isGuest = user.isAnonymous;
   const [adminUser, setAdminUser] = useState(false);
+  const [friends, setFriends] = useState(new Set()); // Track friend IDs for search
 
   // Cleanup session on sign out or browser close
   useEffect(() => {
@@ -288,6 +308,25 @@ export default function ChatRoom({ user }) {
       setAdminUser(snap.docs.some(d => d.id === user.uid));
     }, (err) => {
       console.error('Admin status snapshot error:', err);
+    });
+  }, [user.uid]);
+
+  // Subscribe to friends list for search
+  useEffect(() => {
+    const q = query(
+      collection(db, 'friends'),
+      where('users', 'array-contains', user.uid)
+    );
+    return onSnapshot(q, (snap) => {
+      const friendSet = new Set();
+      snap.docs.forEach(d => {
+        const data = d.data();
+        const otherUser = data.users.find(uid => uid !== user.uid);
+        if (otherUser) friendSet.add(otherUser);
+      });
+      setFriends(friendSet);
+    }, (err) => {
+      console.error('Friends snapshot error:', err);
     });
   }, [user.uid]);
 
@@ -383,6 +422,40 @@ export default function ChatRoom({ user }) {
   const cancelReply = useCallback(() => {
     setReplyingTo(null);
   }, []);
+
+  /* ── Save/Unsave a message ── */
+  const handleSaveMessage = useCallback(async (message) => {
+    try {
+      const isSaved = await toggleSaveMessage(message, 'global', 'global');
+      // Show toast notification
+      if (isSaved) {
+        showNotification({
+          id: `save-${message.id}`,
+          type: 'success',
+          title: 'Message saved',
+          message: 'Message added to Saved Messages',
+          duration: 2000
+        });
+      } else {
+        showNotification({
+          id: `unsave-${message.id}`,
+          type: 'info',
+          title: 'Message removed',
+          message: 'Message removed from Saved Messages',
+          duration: 2000
+        });
+      }
+    } catch (err) {
+      console.error('Failed to save message:', err);
+      showNotification({
+        id: `save-error-${message.id}`,
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to save message',
+        duration: 3000
+      });
+    }
+  }, [toggleSaveMessage, showNotification]);
 
   const saveEdit = useCallback(async () => {
     if (!editingMessageId || !editingText.trim()) return;
@@ -661,6 +734,8 @@ export default function ChatRoom({ user }) {
         onProfileClick={() => setShowProfile(true)}
         onNotificationsClick={() => setShowNotifications(true)}
         onDevicesClick={() => setShowDevices(true)}
+        onSearchClick={() => setShowSearch(true)}
+        onSavedClick={() => setActiveTab('saved')}
         onThemeToggle={() => {
           const newTheme = theme === 'dark' ? 'light' : 'dark';
           setTheme(newTheme);
@@ -677,6 +752,7 @@ export default function ChatRoom({ user }) {
             {activeTab === 'global' && 'Global Chat'}
             {activeTab === 'dms' && 'Private Messages'}
             {activeTab === 'admin' && 'User Management'}
+            {activeTab === 'saved' && 'Saved Messages'}
           </h1>
           {adminUser && activeTab !== 'admin' && (
             <span className="admin-badge-minimal">
@@ -733,6 +809,7 @@ export default function ChatRoom({ user }) {
                       onRemove={adminUser ? removeUser : null}
                       onEdit={isOwn ? startEditMessage : null}
                       onReply={startReply}
+                      onSave={handleSaveMessage}
                       messages={messages}
                     />
                   );
@@ -829,6 +906,64 @@ export default function ChatRoom({ user }) {
 
       {/* ── Admin Panel ── */}
       {activeTab === 'admin' && adminUser && <AdminPanel adminUid={user.uid} isSuperAdmin={adminUser} />}
+
+      {/* ── Saved Messages ── */}
+      {activeTab === 'saved' && (
+        <SavedMessages
+          user={user}
+          onMessageClick={(result) => {
+            // Navigate to the original message
+            if (result.conversationType === 'global') {
+              setActiveTab('global');
+              // Scroll to message after a short delay
+              setTimeout(() => {
+                const element = document.getElementById(`msg-${result.messageId}`);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  element.classList.add('msg-highlight');
+                  setTimeout(() => element.classList.remove('msg-highlight'), 2000);
+                }
+              }, 300);
+            } else if (result.conversationType === 'dm') {
+              setActiveTab('dms');
+              // DM navigation will be handled by DirectMessages component
+            }
+          }}
+          onBack={() => setActiveTab('global')}
+        />
+      )}
+
+      {/* ── Global Search Modal ── */}
+      {showSearch && (
+        <GlobalSearch
+          user={user}
+          friendIds={friends}
+          onClose={() => setShowSearch(false)}
+          onResultClick={(result) => {
+            if (result.type === 'message') {
+              setActiveTab('global');
+              setShowSearch(false);
+              // Scroll to message after a short delay
+              setTimeout(() => {
+                const element = document.getElementById(`msg-${result.id}`);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  element.classList.add('msg-highlight');
+                  setTimeout(() => element.classList.remove('msg-highlight'), 2000);
+                }
+              }, 300);
+            } else if (result.type === 'user') {
+              // Navigate to user profile or DMs
+              setActiveTab('dms');
+              setShowSearch(false);
+            } else if (result.type === 'dm') {
+              setActiveTab('dms');
+              setShowSearch(false);
+              // DM navigation will be handled by DirectMessages component
+            }
+          }}
+        />
+      )}
 
       {/* ── User Profile Modal ── */}
       {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} />}

@@ -4654,6 +4654,33 @@ input:checked + .toggle-slider:before {
   transform: scale(1.1);
 }
 
+/* Save button on messages */
+.msg-save-btn {
+  opacity: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-left: 4px;
+}
+
+.msg-bubble-wrap:hover .msg-save-btn {
+  opacity: 1;
+}
+
+.msg-save-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffd700;
+  transform: scale(1.1);
+}
+
 /* Reply preview in message bubble */
 .msg-reply-preview {
   background: rgba(0, 0, 0, 0.15);
