@@ -27,6 +27,7 @@ import BottomNav from './BottomNav';
 import GlobalSearch from './GlobalSearch';
 import SavedMessages from './SavedMessages';
 import Groups from './Groups';
+import GroupChat from './GroupChat';
 import { useInAppNotifications } from '../hooks/useInAppNotifications.jsx';
 import { useSavedMessages } from '../hooks/useSavedMessages_debug';
 import { getSocket } from '../socket';
@@ -243,6 +244,7 @@ export default function ChatRoom({ user }) {
   const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Track mobile menu visibility
   const [showSearch, setShowSearch] = useState(false); // Track global search modal visibility
+  const [selectedGroupId, setSelectedGroupId] = useState(null); // Track selected group for chat
   const [theme, setTheme] = useState(() => {
     // Initialize theme from localStorage or default to 'dark'
     const savedTheme = localStorage.getItem('theme');
@@ -937,14 +939,22 @@ export default function ChatRoom({ user }) {
       )}
 
       {/* ── Groups & Channels ── */}
-      {activeTab === 'groups' && (
+      {activeTab === 'groups' && !selectedGroupId && (
         <Groups
           user={user}
           onGroupSelect={(groupId) => {
-            // TODO: Navigate to group chat
-            console.log('Selected group:', groupId);
+            setSelectedGroupId(groupId);
           }}
           onBack={() => setActiveTab('global')}
+        />
+      )}
+
+      {/* ── Group Chat ── */}
+      {activeTab === 'groups' && selectedGroupId && (
+        <GroupChat
+          user={user}
+          groupId={selectedGroupId}
+          onBack={() => setSelectedGroupId(null)}
         />
       )}
 
