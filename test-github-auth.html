@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test GitHub Auth</title>
+  <style>
+    body {
+      font-family: system-ui;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: white;
+    }
+    button {
+      padding: 12px 24px;
+      background: #24292e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 0;
+      width: 100%;
+    }
+    button:hover {
+      background: #1b1f23;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #2a2a2a;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .error {
+      color: #ff6b6b;
+    }
+    .success {
+      color: #51cf66;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    p {
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔧 GitHub Auth Diagnostic Test</h1>
+  <p>This page tests if your Firebase GitHub authentication is configured correctly.</p>
+  
+  <button onclick="testGithubAuth()">Test GitHub Sign-In</button>
+  <button onclick="checkConfig()">Check Firebase Config</button>
+  <button onclick="checkAuthorizedDomains()">Check Domain Authorization</button>
+  
+  <div id="result" class="result">Click a button to start testing...</div>
+
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, GithubAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDc8Y2VRz_qF5xVfZQX3fR7XJ4xU1Qd6gQ",
+      authDomain: "chatapp-eb6e3.firebaseapp.com",
+      projectId: "chatapp-eb6e3",
+      storageBucket: "chatapp-eb6e3.firebasestorage.app",
+      messagingSenderId: "878337054932",
+      appId: "1:878337054932:web:47c0f7b9f9c8e0b7b8c8e0",
+      measurementId: "G-XXXXXXXXXX"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GithubAuthProvider();
+
+    // Make functions global
+    window.testGithubAuth = async function() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result';
+      resultDiv.textContent = '⏳ Testing GitHub authentication...\n\n';
+
+      try {
+        resultDiv.textContent += '📱 Opening GitHub popup...\n';
+        const result = await signInWithPopup(auth, provider);
+        
+        resultDiv.className = 'result success';
+        resultDiv.textContent += '\n✅ SUCCESS! GitHub authentication works!\n\n';
+        resultDiv.textContent += `User: ${result.user.displayName || 'No name'}\n`;
+        resultDiv.textContent += `Email: ${result.user.email || 'No email'}\n`;
+        resultDiv.textContent += `UID: ${result.user.uid}\n`;
+        resultDiv.textContent += `Photo: ${result.user.photoURL ? 'Yes' : 'No'}\n`;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent += `\n❌ ERROR: ${error.code}\n\n`;
+        resultDiv.textContent += `Message: ${error.message}\n\n`;
+        
+        // Provide specific solutions
+        if (error.code === 'auth/operation-not-allowed') {
+          resultDiv.textContent += '💡 SOLUTION:\n';
+          resultDiv.textContent += '1. Go to Firebase Console\n';
+          resultDiv.textContent += '2. Authentication → Sign-in method\n';
+          resultDiv.textContent += '3. Enable GitHub provider\n';
+          resultDiv.textContent += '4. Add your GitHub Client ID and Secret\n';
+        } else if (error.code === 'auth/unauthorized-domain') {
+          resultDiv.textContent += '💡 SOLUTION:\n';
+          resultDiv.textContent += '1. Go to Firebase Console\n';
+          resultDiv.textContent += '2. Authentication → Settings → Authorized domains\n';
+          resultDiv.textContent += '3. Add your domain\n';
+        } else if (error.code === 'auth/popup-blocked') {
+          resultDiv.textContent += '💡 SOLUTION:\n';
+          resultDiv.textContent += 'Allow popups for this site in your browser settings.\n';
+        } else if (error.code === 'auth/popup-closed-by-user') {
+          resultDiv.textContent += '💡 You closed the popup. Try again!\n';
+        }
+      }
+    };
+
+    window.checkConfig = function() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result';
+      resultDiv.textContent = '🔍 Checking Firebase Configuration...\n\n';
+      
+      resultDiv.textContent += `✅ Firebase App: ${app ? 'Initialized' : 'Not initialized'}\n`;
+      resultDiv.textContent += `✅ Auth: ${auth ? 'Ready' : 'Not ready'}\n`;
+      resultDiv.textContent += `✅ GitHub Provider: ${provider ? 'Created' : 'Failed'}\n`;
+      resultDiv.textContent += `\n📋 Config:\n`;
+      resultDiv.textContent += `Project ID: ${firebaseConfig.projectId}\n`;
+      resultDiv.textContent += `Auth Domain: ${firebaseConfig.authDomain}\n`;
+      resultDiv.textContent += `\n✅ Everything looks good! Try the GitHub sign-in test.`;
+    };
+
+    window.checkAuthorizedDomains = function() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result';
+      resultDiv.textContent = '🌐 Checking Domain Authorization...\n\n';
+      
+      const currentDomain = window.location.hostname;
+      resultDiv.textContent += `Current domain: ${currentDomain}\n`;
+      resultDiv.textContent += `Current URL: ${window.location.href}\n\n`;
+      
+      resultDiv.textContent += '📝 Required Authorized Domains in Firebase:\n';
+      resultDiv.textContent += '  • localhost (for local testing)\n';
+      resultDiv.textContent += '  • chatapp-eb6e3.firebaseapp.com\n';
+      resultDiv.textContent += '  • chatter-talk.vercel.app\n\n';
+      
+      resultDiv.textContent += '🔗 To check/add domains:\n';
+      resultDiv.textContent += '1. Go to Firebase Console\n';
+      resultDiv.textContent += '2. Authentication → Settings\n';
+      resultDiv.textContent += '3. Scroll to "Authorized domains"\n';
+      resultDiv.textContent += '4. Add missing domains\n';
+    };
+
+    // Auto-check config on load
+    setTimeout(() => {
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = '✅ Test page loaded successfully!\n\n';
+      resultDiv.textContent += 'Firebase is initialized and ready.\n';
+      resultDiv.textContent += 'Click "Test GitHub Sign-In" to test authentication.\n';
+    }, 500);
+  </script>
+</body>
+</html>

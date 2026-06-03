@@ -104,6 +104,17 @@ export default function AuthScreen({ onBack }) {
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
+  // Safety: Reset loading state if it gets stuck (shouldn't happen, but prevents UI lockup)
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Loading state was stuck, resetting...');
+        setLoading(null);
+      }, 30000); // 30 second timeout
+      return () => clearTimeout(timeout);
+    }
+  }, [loading]);
+
   useEffect(() => {
     if (step === 'guestName') setTimeout(() => nameInputRef.current?.focus(), 50);
   }, [step]);
@@ -195,6 +206,11 @@ export default function AuthScreen({ onBack }) {
   };
 
   const busy = !!loading;
+
+  // DEBUG: Log button state
+  useEffect(() => {
+    console.log('🔍 Auth Debug:', { loading, busy, step, mode });
+  }, [loading, busy, step, mode]);
 
   // ── Step: guest name ─────────────────────────────────────
   if (step === 'guestName') {
