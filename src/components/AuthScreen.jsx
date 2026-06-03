@@ -419,7 +419,7 @@ export default function AuthScreen({ onBack }) {
         <div className="divider" aria-hidden="true"><span>or</span></div>
 
         <div className="auth-buttons">
-          <button className="btn-google" onClick={handleGoogleSignIn} disabled={busy}>
+          <button className="btn-google" onClick={handleGoogleSignIn}>
             {loading === 'google' ? <div className="btn-spinner" aria-hidden="true" /> : <GoogleIcon />}
             {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
           </button>
@@ -430,7 +430,7 @@ export default function AuthScreen({ onBack }) {
           </button>
 
           {!isSignUp && (
-            <button className="btn-guest" onClick={() => { setStep('guestName'); setError(''); }} disabled={busy}>
+            <button className="btn-guest" onClick={() => { setStep('guestName'); setError(''); }}>
               <UserIcon />
               Join as Guest
             </button>
