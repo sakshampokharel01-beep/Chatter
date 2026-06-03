@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   GoogleAuthProvider,
+  GithubAuthProvider,
   signInWithPopup,
   signInAnonymously,
   signOut,
@@ -65,6 +66,9 @@ export const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account', login_hint: '' });
 
+const githubProvider = new GithubAuthProvider();
+githubProvider.setCustomParameters({ prompt: 'select_account' });
+
 // ── Sign up with email + password ──────────────────────────
 export const signUpWithEmail = async (name, email, password) => {
   const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -89,6 +93,9 @@ export const signInWithEmail = (email, password) =>
 // Always uses popup — redirect was silently failing because
 // getRedirectResult() was never awaited after the page returned.
 export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+
+// ── Sign in with GitHub ──────────────────────────────────────
+export const signInWithGithub = () => signInWithPopup(auth, githubProvider);
 
 // ── Sign in as Anonymous guest ───────────────────────────────
 // Accepts a user-chosen name. Falls back to a random Guest# name.
