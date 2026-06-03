@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { signInWithGoogle, signInAsGuest, signUpWithEmail, signInWithEmail } from '../firebase';
+import { signInWithGoogle, signInWithGithub, signInAsGuest, signUpWithEmail, signInWithEmail } from '../firebase';
 import '../styles/AuthScreenNew.css';
 
 function GoogleIcon() {
@@ -78,6 +78,20 @@ export default function AuthScreenNew({ onBack }) {
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') {
         setError(err.message || 'Google sign-in failed');
+      }
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleGithubSignIn = async () => {
+    setLoading('github');
+    setError('');
+    try {
+      await signInWithGithub();
+    } catch (err) {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError(err.message || 'GitHub sign-in failed');
       }
     } finally {
       setLoading(null);
@@ -319,8 +333,12 @@ export default function AuthScreenNew({ onBack }) {
               {loading === 'google' ? <div className="spinner"></div> : <GoogleIcon />}
               Google
             </button>
-            <button className="social-btn" disabled>
-              <GitHubIcon />
+            <button 
+              className="social-btn"
+              onClick={handleGithubSignIn}
+              disabled={loading === 'github'}
+            >
+              {loading === 'github' ? <div className="spinner"></div> : <GitHubIcon />}
               GitHub
             </button>
           </div>
