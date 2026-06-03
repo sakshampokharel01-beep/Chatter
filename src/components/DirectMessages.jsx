@@ -377,7 +377,8 @@ export default function DirectMessages({ user, showNotification }) {
   useEffect(() => {
     const q = query(
       collection(db, 'friendRequests'),
-      where('to', '==', user.uid)
+      where('to', '==', user.uid),
+      where('status', '==', 'pending') // Only show pending requests
     );
     
     let isFirstLoad = true;
@@ -811,9 +812,12 @@ export default function DirectMessages({ user, showNotification }) {
   /* ── Reject friend request ── */
   const rejectFriendRequest = async (requestId) => {
     try {
+      // Delete the request document completely
       await deleteDoc(doc(db, 'friendRequests', requestId));
+      console.log('Friend request rejected and deleted:', requestId);
     } catch (err) {
       console.error('Failed to reject friend request:', err);
+      alert('Failed to reject friend request: ' + err.message);
     }
   };
 
