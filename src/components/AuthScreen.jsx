@@ -424,7 +424,18 @@ export default function AuthScreen({ onBack }) {
             {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
           </button>
 
-          <button className="btn-github" onClick={handleGithubSignIn}>
+          <button 
+            className="btn-github" 
+            onClick={handleGithubSignIn}
+            style={{
+              opacity: 1,
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              background: '#24292e',
+              color: 'white'
+            }}
+            type="button"
+          >
             {loading === 'github' ? <div className="btn-spinner" aria-hidden="true" /> : <GithubIcon />}
             {isSignUp ? 'Sign up with GitHub' : 'Sign in with GitHub'}
           </button>

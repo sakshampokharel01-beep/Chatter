@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Button Test</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial;
+            padding: 50px;
+        }
+        .test-button {
+            padding: 15px 30px;
+            background: #24292e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .test-button:hover {
+            background: #1b1f23;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Button Test</h1>
+    
+    <button class="test-button" onclick="alert('Button works!')">
+        Test Button (Should Work)
+    </button>
+    
+    <button class="test-button" onclick="testGitHub()">
+        Test GitHub Auth
+    </button>
+    
+    <div id="result" style="margin-top: 20px; padding: 20px; background: #2a2a2a; border-radius: 10px;"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, GithubAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbcnJwmpzTUM4dJpN40yc8pQbPTBVgk40",
+            authDomain: "chatapp-eb6e3.firebaseapp.com",
+            projectId: "chatapp-eb6e3",
+            storageBucket: "chatapp-eb6e3.firebasestorage.app",
+            messagingSenderId: "537792063979",
+            appId: "1:537792063979:web:6b69cc5e4e018d38de91ae"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GithubAuthProvider();
+
+        window.testGitHub = async function() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Testing GitHub authentication...</p>';
+            
+            try {
+                const userCredential = await signInWithPopup(auth, provider);
+                result.innerHTML = `
+                    <p style="color: #51cf66;">✅ SUCCESS!</p>
+                    <p>Name: ${userCredential.user.displayName}</p>
+                    <p>Email: ${userCredential.user.email}</p>
+                    <p>UID: ${userCredential.user.uid}</p>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <p style="color: #ff6b6b;">❌ ERROR</p>
+                    <p>Code: ${error.code}</p>
+                    <p>Message: ${error.message}</p>
+                    <br>
+                    <p><strong>What this means:</strong></p>
+                    <p>${getErrorSolution(error.code)}</p>
+                `;
+            }
+        };
+
+        function getErrorSolution(code) {
+            const solutions = {
+                'auth/operation-not-allowed': 'GitHub is not enabled in Firebase Console. Go to Authentication → Sign-in method → Enable GitHub.',
+                'auth/unauthorized-domain': 'Domain not authorized. Add localhost to Firebase Console → Authentication → Settings → Authorized domains.',
+                'auth/popup-blocked': 'Browser blocked the popup. Allow popups for this site.',
+                'auth/popup-closed-by-user': 'You closed the popup. Try again and complete the authorization.',
+                'auth/invalid-oauth-client-id': 'GitHub Client ID is wrong in Firebase. Check your GitHub OAuth App Client ID.',
+                'auth/account-exists-with-different-credential': 'This email is already used with a different sign-in method (Google/Email).'
+            };
+            return solutions[code] || 'Unknown error. Check Firebase and GitHub configuration.';
+        }
+    </script>
+</body>
+</html>
