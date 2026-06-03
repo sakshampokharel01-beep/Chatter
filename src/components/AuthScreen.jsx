@@ -424,7 +424,7 @@ export default function AuthScreen({ onBack }) {
             {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
           </button>
 
-          <button className="btn-github" onClick={handleGithubSignIn} disabled={busy}>
+          <button className="btn-github" onClick={handleGithubSignIn}>
             {loading === 'github' ? <div className="btn-spinner" aria-hidden="true" /> : <GithubIcon />}
             {isSignUp ? 'Sign up with GitHub' : 'Sign in with GitHub'}
           </button>
