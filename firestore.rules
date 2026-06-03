@@ -40,9 +40,11 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isSignedIn();
       allow create: if isOwner(uid) &&
+        request.resource.data.uid == uid &&
         request.resource.data.displayName is string &&
         request.resource.data.displayName.size() > 0 &&
         request.resource.data.displayName.size() <= 64 &&
+        request.resource.data.online is bool &&
         // Prevent removed users from creating new profiles
         !exists(/databases/$(database)/documents/deletedUsers/$(uid));
       allow update: if isOwner(uid) &&
