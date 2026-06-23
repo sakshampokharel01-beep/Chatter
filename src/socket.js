@@ -1,4 +1,4 @@
-import { io } from 'socket.io-client';
+ import { io } from 'socket.io-client';
 
 let socket = null;
 let currentUserId = null;
@@ -40,7 +40,7 @@ export const getSocket = (userId, userName) => {
       // Socket disconnected
     });
 
-    socket.on('connect_error', (error) => {
+    socket.on('connect_error', () => {
       // Silently fail - video calls and typing indicators will not work
       // This is expected when the Socket.IO server is sleeping (Render free tier)
     });
