@@ -24,7 +24,6 @@ import NotificationSettings from './NotificationSettings';
 import InAppNotification from './InAppNotification';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
-import GlobalSearch from './GlobalSearch';
 import SavedMessages from './SavedMessages';
 import Groups from './Groups';
 import GroupChat from './GroupChat';
@@ -243,7 +242,6 @@ export default function ChatRoom({ user }) {
   const [showDevices, setShowDevices] = useState(false); // Track device management modal visibility
   const [showNotifications, setShowNotifications] = useState(false); // Track notification settings modal visibility
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Track mobile menu visibility
-  const [showSearch, setShowSearch] = useState(false); // Track global search modal visibility
   const [selectedGroupId, setSelectedGroupId] = useState(null); // Track selected group for chat
   const [theme, setTheme] = useState(() => {
     // Initialize theme from localStorage or default to 'dark'
@@ -737,7 +735,6 @@ export default function ChatRoom({ user }) {
         onProfileClick={() => setShowProfile(true)}
         onNotificationsClick={() => setShowNotifications(true)}
         onDevicesClick={() => setShowDevices(true)}
-        onSearchClick={() => setShowSearch(true)}
         onSavedClick={() => setActiveTab('saved')}
         onGroupsClick={() => setActiveTab('groups')}
         onThemeToggle={() => {
@@ -959,37 +956,6 @@ export default function ChatRoom({ user }) {
       )}
 
       {/* ── Global Search Modal ── */}
-      {showSearch && (
-        <GlobalSearch
-          user={user}
-          friendIds={friends}
-          onClose={() => setShowSearch(false)}
-          onResultClick={(result) => {
-            if (result.type === 'message') {
-              setActiveTab('global');
-              setShowSearch(false);
-              // Scroll to message after a short delay
-              setTimeout(() => {
-                const element = document.getElementById(`msg-${result.id}`);
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  element.classList.add('msg-highlight');
-                  setTimeout(() => element.classList.remove('msg-highlight'), 2000);
-                }
-              }, 300);
-            } else if (result.type === 'user') {
-              // Navigate to user profile or DMs
-              setActiveTab('dms');
-              setShowSearch(false);
-            } else if (result.type === 'dm') {
-              setActiveTab('dms');
-              setShowSearch(false);
-              // DM navigation will be handled by DirectMessages component
-            }
-          }}
-        />
-      )}
-
       {/* ── User Profile Modal ── */}
       {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} />}
 
