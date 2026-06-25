@@ -27,21 +27,11 @@ function AppContent() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser ?? null);
       if (currentUser) {
-        // Check if email verification is needed
-        // Skip verification check for anonymous users and Google sign-in
-        const isEmailPasswordUser = currentUser.providerData.some(
-          provider => provider.providerId === 'password'
-        );
-        
-        if (isEmailPasswordUser && !currentUser.emailVerified) {
-          setNeedsVerification(true);
-        } else {
-          setNeedsVerification(false);
-          registerUser(currentUser);
-          // Navigate to chat if on landing or login page
-          if (location.pathname === '/' || location.pathname === '/login') {
-            navigate('/chat');
-          }
+        setNeedsVerification(false);
+        registerUser(currentUser);
+        // Navigate to chat if on landing or login page
+        if (location.pathname === '/' || location.pathname === '/login') {
+          navigate('/chat');
         }
       } else {
         setNeedsVerification(false);

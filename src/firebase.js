@@ -14,8 +14,7 @@ import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/fir
 import { getStorage } from 'firebase/storage';
 // App Check import removed — disabled due to reCAPTCHA network failures blocking all Firebase ops
 
-// ── Safe URL allow-list ──────────────────────────────────────
-// Only allow https:// photo URLs to prevent javascript: injection
+// Safe URL validation to prevent XSS
 export const safePhotoURL = (url) => {
   if (!url) return null;
   try {
@@ -26,16 +25,6 @@ export const safePhotoURL = (url) => {
   }
 };
 
-// ============================================================
-// FIREBASE CONFIGURATION
-// 1. Go to https://console.firebase.google.com/
-// 2. Create a new project (or use an existing one)
-// 3. Add a Web app and copy the firebaseConfig object below
-// 4. Enable "Authentication" → Sign-in method:
-//      • Google  (for Google sign-in)
-//      • Anonymous  (for Guest sign-in)
-// 5. Enable "Firestore Database" in test mode
-// ============================================================
 const firebaseConfig = {
   apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -48,17 +37,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// ── App Check (reCAPTCHA v3) ─────────────────────────────────
-// DISABLED: reCAPTCHA script fails to load on some networks (ERR_CERT_COMMON_NAME_INVALID).
-// When App Check token generation hangs, Firebase SDK queues ALL operations indefinitely,
-// causing infinite loading spinners on sign-in. Re-enable only when reCAPTCHA loads reliably.
-// if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
-//   initializeAppCheck(app, {
-//     provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-//     isTokenAutoRefreshEnabled: true,
-//   });
-// }
-
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
@@ -69,36 +47,24 @@ googleProvider.setCustomParameters({ prompt: 'select_account', login_hint: '' })
 const githubProvider = new GithubAuthProvider();
 githubProvider.setCustomParameters({ prompt: 'select_account' });
 
-// ── Sign up with email + password ──────────────────────────
+// sign up with email + password 
 export const signUpWithEmail = async (name, email, password) => {
   const result = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(result.user, { displayName: name.trim() || email.split('@')[0] });
-  
-  // Send email verification (anti-spam measure)
-  try {
-    const { sendEmailVerification } = await import('firebase/auth');
-    await sendEmailVerification(result.user);
-  } catch (err) {
-    console.warn('⚠️ Could not send verification email:', err);
-  }
-  
   return result;
 };
 
-// ── Sign in with email + password ────────────────────────
+// Email/password sign-in
 export const signInWithEmail = (email, password) =>
   signInWithEmailAndPassword(auth, email, password);
 
-// ── Sign in with Google ──────────────────────────────────────
-// Always uses popup — redirect was silently failing because
-// getRedirectResult() was never awaited after the page returned.
+// Google sign-in
 export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
 
-// ── Sign in with GitHub ──────────────────────────────────────
+// GitHub sign-in
 export const signInWithGithub = () => signInWithPopup(auth, githubProvider);
 
-// ── Sign in as Anonymous guest ───────────────────────────────
-// Accepts a user-chosen name. Falls back to a random Guest# name.
+// Guest sign-in
 export const signInAsGuest = async (chosenName) => {
   const guestName = chosenName?.trim() ||
     `Guest#${Math.floor(Math.random() * 9000 + 1000)}`;
@@ -108,10 +74,7 @@ export const signInAsGuest = async (chosenName) => {
   return result;
 };
 
-// ── Resolve display name reliably ───────────────────────────
-// updateProfile() updates auth.currentUser immediately but may
-// race with onAuthStateChanged. This helper always returns the
-// freshest display name.
+// Get user display name
 export const getDisplayName = (user) => {
   if (!user) return '';
   // auth.currentUser is always the freshest source
@@ -123,13 +86,13 @@ export const getDisplayName = (user) => {
   return user.email?.split('@')[0] || 'User';
 };
 
-// ── Sign out ─────────────────────────────────────────────────
+// Sign out
 export const signOutUser = () => {
   sessionStorage.removeItem('guestName');
   return signOut(auth);
 };
 
-// ── Register signed-in (non-anonymous) user in Firestore ─────
+// Register user in Firestore
 export const registerUser = async (user, retryCount = 0) => {
   if (!user) return;
   
@@ -213,8 +176,7 @@ export const registerUser = async (user, retryCount = 0) => {
   }
 };
 
-// ── Admin ───────────────────────────────────────────────
-// Check admin status from Firestore instead of exposing in client code
+// Check if user is admin
 export const isAdmin = async (user) => {
   if (!user) return false;
   try {
@@ -226,5 +188,5 @@ export const isAdmin = async (user) => {
   }
 };
 
-// ── Deterministic DM conversation ID ─────────────────────────
+// Generate DM conversation ID
 export const getDMId = (uid1, uid2) => [uid1, uid2].sort().join('_');
