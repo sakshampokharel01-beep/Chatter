@@ -24,7 +24,6 @@ export default async function handler(req, res) {
 
   try {
     const blob = await put(pathname, req, {
-      access: 'public',
       contentType: contentType || 'application/octet-stream',
       addRandomSuffix: false,
     });
