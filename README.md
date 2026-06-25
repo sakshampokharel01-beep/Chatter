@@ -1,6 +1,11 @@
 # Chatter - Real-time Chat Application
 
-A modern, feature-rich chat application built with React, Firebase, and WebRTC for seamless communication.
+Chatter is a modern, feature-rich chat application built with React, Firebase, and WebRTC for communication.
+
+This project is still more of a learning/portfolio project than a production-ready app, but the structure is setup in a way that makes it easy to extend.
+
+## Screenshots
+<img width="1877" height="861" alt="image" src="https://github.com/user-attachments/assets/c2c0d0d3-5a27-4591-ae93-2d37ac346c5c" />
 
 ## Features
 
@@ -73,35 +78,6 @@ A modern, feature-rich chat application built with React, Firebase, and WebRTC f
 - Render (Socket.IO server)
 - Firebase (Backend services)
 
-## Setup
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create `.env` file with Firebase credentials:
-   ```
-   VITE_FIREBASE_API_KEY=your_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   VITE_FIREBASE_APP_ID=your_app_id
-   VITE_SOCKET_SERVER_URL=http://localhost:3001
-   ```
-
-4. Start the dev server:
-   ```bash
-   npm run dev
-   ```
-
-5. Start Socket.IO server (in another terminal):
-   ```bash
-   node server.js
-   ```
-
 ## Deployment
 
 **Frontend:** Vercel (https://chatter-talk.vercel.app)
@@ -131,16 +107,24 @@ chatter/
 ├── storage.rules            # Firebase Storage rules
 └── package.json
 ```
+## AI Usage Note
+I used AI help for some parts of the project, especially for:
+
+- improving code structure and debugging
+- generating UI ideas and component patterns
+- helping with documentation and README writing
+- understanding some setup/config issues
+But the main idea, system design, app flow, and overall project structure were built by me. The core logic and product direction were not copied from anywhere else.
 
 ## Security Features
 
 - Firestore security rules for data protection
-- Email verification for new accounts
 - Anti-spam measures (rate limiting, blocked domains)
 - Admin-only moderation tools
 - User blocking and account deletion
 - Secure file upload validation
 ## Notes
--This is a learning project first
--The app is not fully polished like a commercial streaming service yet
--The goal was to practice building a real product flow end to end
+
+- This is a learning project first
+- The app is not fully polished like a commercial streaming service yet
+- The goal was to practice building a real product flow end to end
