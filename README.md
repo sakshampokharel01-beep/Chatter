@@ -140,11 +140,7 @@ chatter/
 - Admin-only moderation tools
 - User blocking and account deletion
 - Secure file upload validation
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT
+## Notes
+-This is a learning project first
+-The app is not fully polished like a commercial streaming service yet
+-The goal was to practice building a real product flow end to end
