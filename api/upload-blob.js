@@ -24,14 +24,14 @@ export default async function handler(req, res) {
 
   try {
     const blob = await put(pathname, req, {
-      access: 'private',
+      access: 'public',
       contentType: contentType || 'application/octet-stream',
       addRandomSuffix: false,
     });
 
     return res.status(200).json({ 
       url: blob.url, 
-      downloadUrl: blob.downloadUrl || blob.url 
+      downloadUrl: blob.url 
     });
   } catch (error) {
     console.error('Upload error:', error);
