@@ -1,47 +1,41 @@
-export const config = {
-  runtime: 'edge',
-};
+import { put } from '@vercel/blob';
 
-export default async function handler(request) {
-  // Only allow PUT requests
-  if (request.method !== 'PUT') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    });
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle OPTIONS request for CORS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  const { searchParams } = new URL(request.url);
-  const pathname = searchParams.get('pathname');
-  const filename = searchParams.get('filename');
-  const contentType = searchParams.get('contentType');
+  // Only allow PUT requests
+  if (req.method !== 'PUT') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { pathname, filename, contentType } = req.query;
 
   if (!pathname || !filename) {
-    return new Response(JSON.stringify({ error: 'Missing pathname or filename' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(400).json({ error: 'Missing pathname or filename' });
   }
 
   try {
-    const { put } = await import('@vercel/blob');
-    
-    const blob = await put(pathname, request.body, {
+    const blob = await put(pathname, req, {
       access: 'public',
       contentType: contentType || 'application/octet-stream',
       addRandomSuffix: false,
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
-    return new Response(JSON.stringify({ url: blob.url, downloadUrl: blob.downloadUrl }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
+    return res.status(200).json({ 
+      url: blob.url, 
+      downloadUrl: blob.downloadUrl || blob.url 
     });
   } catch (error) {
     console.error('Upload error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(500).json({ error: error.message });
   }
 }
