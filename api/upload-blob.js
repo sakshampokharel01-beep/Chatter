@@ -29,6 +29,7 @@ export default async function handler(req, res) {
       addRandomSuffix: false,
     });
 
+    // For public access, both urls are the same
     return res.status(200).json({ 
       url: blob.url, 
       downloadUrl: blob.url 
