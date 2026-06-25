@@ -44,16 +44,14 @@ service firebase.storage {
     
     // DM Files: /dms/{dmId}/files/{userId}/{fileName}
     match /dms/{dmId}/files/{userId}/{fileName} {
-      // Allow read if user is participant in the DM
-      allow read: if isSignedIn() && 
-        (firestore.get(/databases/(default)/documents/dms/$(dmId)).data.participants.hasAny([request.auth.uid]));
+      // Allow read if user is signed in
+      allow read: if isSignedIn();
       
       // Allow upload if user is the owner and file is valid
       allow create: if isSignedIn() && 
         isOwner(userId) &&
         isValidFileSize() &&
-        isValidFileType() &&
-        firestore.get(/databases/(default)/documents/dms/$(dmId)).data.participants.hasAny([request.auth.uid]);
+        isValidFileType();
       
       // Allow delete only by owner within 1 hour
       allow delete: if isSignedIn() && 
@@ -63,16 +61,14 @@ service firebase.storage {
     
     // Voice Messages: /dms/{dmId}/voice/{userId}/{fileName}
     match /dms/{dmId}/voice/{userId}/{fileName} {
-      // Allow read if user is participant in the DM
-      allow read: if isSignedIn() && 
-        (firestore.get(/databases/(default)/documents/dms/$(dmId)).data.participants.hasAny([request.auth.uid]));
+      // Allow read if user is signed in
+      allow read: if isSignedIn();
       
       // Allow upload if user is the owner and audio is valid
       allow create: if isSignedIn() && 
         isOwner(userId) &&
         isValidVoiceSize() &&
-        isValidAudioType() &&
-        firestore.get(/databases/(default)/documents/dms/$(dmId)).data.participants.hasAny([request.auth.uid]);
+        isValidAudioType();
       
       // Allow delete only by owner within 1 hour
       allow delete: if isSignedIn() && 
